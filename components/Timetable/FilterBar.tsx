@@ -47,88 +47,92 @@ export default function FilterBar({ mode, filters, setFilter, onSave, onClear }:
             </div>
 
             {/* Filter Content */}
-            <div className={`${isExpanded ? 'block mt-6 animate-in fade-in slide-in-from-top-4 duration-300' : 'hidden'} md:block`}>
-                {mode === 'student' && (
-                    <>
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-6 relative z-[105]">
-                            <Dropdown label="Program" value={filters.program} options={PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" />
-                            <Dropdown label="Semester" value={filters.semester} options={SEMESTERS} onChange={(v) => setFilter('semester', v)} icon="fa-layer-group" />
-                            <Dropdown label="Section" value={filters.section} options={SECTIONS} onChange={(v) => setFilter('section', v)} icon="fa-users" />
+            {/* Filter Content */}
+            <div className={`grid transition-all duration-500 ease-in-out ${isExpanded ? 'grid-rows-[1fr] opacity-100 mt-6' : 'grid-rows-[0fr] opacity-0 mt-0'} md:grid-rows-[1fr] md:opacity-100 md:mt-6`}>
+                <div className="overflow-hidden">
+                    {mode === 'student' && (
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-6 relative z-[105]">
+                                <Dropdown label="Program" value={filters.program} options={PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" />
+                                <Dropdown label="Semester" value={filters.semester} options={SEMESTERS} onChange={(v) => setFilter('semester', v)} icon="fa-layer-group" />
+                                <Dropdown label="Section" value={filters.section} options={SECTIONS} onChange={(v) => setFilter('section', v)} icon="fa-users" />
+                                <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" />
+                            </div>
+
+                            {/* Tags & Buttons (Lower Z) */}
+                            <div className="relative z-10">
+                                <div className="flex flex-wrap gap-2 mb-6 animate-fade-in">
+                                    {Object.entries(filters).map(([key, value]) => {
+                                        if (!value || key === 'day') return null;
+                                        // Format key for display
+                                        const label = key.replace(/([A-Z])/g, ' $1').trim();
+                                        return (
+                                            <button
+                                                key={key}
+                                                onClick={() => setFilter(key as any, '')}
+                                                className="group flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 text-xs font-bold text-indigo-700 dark:text-indigo-300 hover:bg-red-50 hover:border-red-200 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:border-red-800 dark:hover:text-red-400 transition-all duration-300 animate-scale-in origin-center shadow-sm hover:shadow-md"
+                                            >
+                                                <span className="opacity-60 text-[10px] uppercase font-black">{label}:</span>
+                                                <span>{value}</span>
+                                                <i className="fas fa-times text-[10px] group-hover:rotate-90 transition-transform duration-200"></i>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
+                                <div className="flex flex-col md:flex-row gap-3 md:gap-4">
+                                    <button onClick={onSave} className="flex-1 md:flex-none flex items-center justify-center gap-3 px-6 md:px-8 py-3 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black hover:shadow-xl hover:shadow-indigo-500/30 hover:scale-[1.02] active:scale-95 transition-all text-sm shadow-md group border border-indigo-400/30">
+                                        <i className="fas fa-save opacity-80 group-hover:animate-pulse"></i> Save as Preferences
+                                    </button>
+                                    <button onClick={onClear} className="flex-1 md:flex-none flex items-center justify-center gap-3 px-6 md:px-8 py-3 rounded-full border-2 border-red-500/30 text-red-500 font-black hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-500 hover:scale-[1.02] active:scale-95 transition-all text-sm shadow-sm group">
+                                        <i className="fas fa-trash-alt opacity-70 group-hover:animate-bounce"></i> Clear All
+                                    </button>
+                                </div>
+                            </div>
+                        </>
+                    )}
+
+                    {/* Teacher & Room Modes with Z-Index fix */}
+                    {mode === 'teacher' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-[105]">
+                            {/* ... inputs ... */}
+                            <div className="flex flex-col gap-2 relative">
+                                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Teacher Name</label>
+                                <div className="relative">
+                                    <i className="fas fa-chalkboard-teacher absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
+                                    <input
+                                        type="text"
+                                        value={filters.teacherName}
+                                        onChange={(e) => setFilter('teacherName', e.target.value)}
+                                        placeholder="e.g. Dr. Smith"
+                                        className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner"
+                                    />
+                                </div>
+                            </div>
                             <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" />
                         </div>
+                    )}
 
-                        {/* Tags & Buttons (Lower Z) */}
-                        <div className="relative z-10">
-                            <div className="flex flex-wrap gap-2 mb-6">
-                                {filters.program && (
-                                    <span className="flex items-center gap-2 bg-indigo-50 border border-indigo-100 text-indigo-600 px-3 py-1.5 rounded-xl text-xs font-bold">
-                                        Program: {filters.program} <i className="fas fa-times cursor-pointer" onClick={() => setFilter('program', '')}></i>
-                                    </span>
-                                )}
-                                {filters.semester && (
-                                    <span className="flex items-center gap-2 bg-indigo-50 border border-indigo-100 text-indigo-600 px-3 py-1.5 rounded-xl text-xs font-bold">
-                                        Semester: {filters.semester} <i className="fas fa-times cursor-pointer" onClick={() => setFilter('semester', '')}></i>
-                                    </span>
-                                )}
-                                {filters.section && (
-                                    <span className="flex items-center gap-2 bg-indigo-50 border border-indigo-100 text-indigo-600 px-3 py-1.5 rounded-xl text-xs font-bold">
-                                        Section: {filters.section} <i className="fas fa-times cursor-pointer" onClick={() => setFilter('section', '')}></i>
-                                    </span>
-                                )}
+                    {mode === 'room' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-[105]">
+                            {/* ... inputs ... */}
+                            <div className="flex flex-col gap-2 relative">
+                                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Room Number</label>
+                                <div className="relative">
+                                    <i className="fas fa-door-open absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
+                                    <input
+                                        type="text"
+                                        value={filters.roomNumber}
+                                        onChange={(e) => setFilter('roomNumber', e.target.value)}
+                                        placeholder="e.g. 107"
+                                        className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner"
+                                    />
+                                </div>
                             </div>
-
-                            <div className="flex flex-col md:flex-row gap-3 md:gap-4">
-                                <button onClick={onSave} className="flex-1 md:flex-none flex items-center justify-center gap-3 px-6 md:px-8 py-3 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black hover:shadow-xl hover:shadow-indigo-500/30 hover:scale-[1.02] active:scale-95 transition-all text-sm shadow-md group border border-indigo-400/30">
-                                    <i className="fas fa-save opacity-80 group-hover:animate-pulse"></i> Save as Preferences
-                                </button>
-                                <button onClick={onClear} className="flex-1 md:flex-none flex items-center justify-center gap-3 px-6 md:px-8 py-3 rounded-full border-2 border-red-500/30 text-red-500 font-black hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-500 hover:scale-[1.02] active:scale-95 transition-all text-sm shadow-sm group">
-                                    <i className="fas fa-trash-alt opacity-70 group-hover:animate-bounce"></i> Clear All
-                                </button>
-                            </div>
+                            <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" />
                         </div>
-                    </>
-                )}
-
-                {/* Teacher & Room Modes with Z-Index fix */}
-                {mode === 'teacher' && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-[105]">
-                        {/* ... inputs ... */}
-                        <div className="flex flex-col gap-2 relative">
-                            <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Teacher Name</label>
-                            <div className="relative">
-                                <i className="fas fa-chalkboard-teacher absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
-                                <input
-                                    type="text"
-                                    value={filters.teacherName}
-                                    onChange={(e) => setFilter('teacherName', e.target.value)}
-                                    placeholder="e.g. Dr. Smith"
-                                    className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner"
-                                />
-                            </div>
-                        </div>
-                        <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" />
-                    </div>
-                )}
-
-                {mode === 'room' && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-[105]">
-                        {/* ... inputs ... */}
-                        <div className="flex flex-col gap-2 relative">
-                            <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Room Number</label>
-                            <div className="relative">
-                                <i className="fas fa-door-open absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
-                                <input
-                                    type="text"
-                                    value={filters.roomNumber}
-                                    onChange={(e) => setFilter('roomNumber', e.target.value)}
-                                    placeholder="e.g. 107"
-                                    className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner"
-                                />
-                            </div>
-                        </div>
-                        <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" />
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         </div>
     );

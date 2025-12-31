@@ -33,13 +33,13 @@ export default function EventList({ events, onDelete, onToggleComplete }: EventL
     return (
         <div>
             <div className="flex gap-4 mb-6 pb-2 overflow-x-auto no-scrollbar">
-                <button onClick={() => setFilter('today')} className={`px-5 py-2.5 rounded-2xl font-bold whitespace-nowrap transition-all ${filter === 'today' ? 'bg-[var(--accent-color)] text-white shadow-lg scale-105' : 'glass hover:bg-white/50 hover:scale-105'}`}>
+                <button onClick={() => setFilter('today')} className={`px-5 py-2.5 rounded-2xl font-bold whitespace-nowrap transition-all ${filter === 'today' ? 'bg-indigo-600 dark:bg-indigo-500 text-white shadow-lg scale-105' : 'glass hover:bg-white/50 hover:scale-105 dark:text-slate-200'}`}>
                     Today
                 </button>
-                <button onClick={() => setFilter('all')} className={`px-5 py-2.5 rounded-2xl font-bold whitespace-nowrap transition-all ${filter === 'all' ? 'bg-[var(--accent-color)] text-white shadow-lg scale-105' : 'glass hover:bg-white/50 hover:scale-105'}`}>
+                <button onClick={() => setFilter('all')} className={`px-5 py-2.5 rounded-2xl font-bold whitespace-nowrap transition-all ${filter === 'all' ? 'bg-indigo-600 dark:bg-indigo-500 text-white shadow-lg scale-105' : 'glass hover:bg-white/50 hover:scale-105 dark:text-slate-200'}`}>
                     All Events
                 </button>
-                <button onClick={() => setFilter('overdue')} className={`px-5 py-2.5 rounded-2xl font-bold whitespace-nowrap transition-all ${filter === 'overdue' ? 'bg-red-500 text-white shadow-lg scale-105' : 'glass hover:bg-white/50 text-red-500 hover:scale-105'}`}>
+                <button onClick={() => setFilter('overdue')} className={`px-5 py-2.5 rounded-2xl font-bold whitespace-nowrap transition-all ${filter === 'overdue' ? 'bg-red-500 text-white shadow-lg scale-105' : 'glass hover:bg-white/50 text-red-500 dark:text-red-400 hover:scale-105'}`}>
                     Overdue
                 </button>
             </div>

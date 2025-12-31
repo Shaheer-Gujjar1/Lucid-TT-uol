@@ -99,20 +99,20 @@ export default function EventsPage() {
                         <p className="text-slate-500 dark:text-slate-400 font-bold text-sm">Manage your academic deadlines and tasks</p>
                     </div>
                     <div className="flex flex-wrap gap-3 w-full md:w-auto">
-                        <Link href="/" className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-slate-600 dark:text-slate-300 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 transition-all hover:scale-105 active:scale-95 shadow-sm">
+                        <Link href="/" className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-slate-600 dark:text-slate-300 bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 transition-all hover:scale-105 active:scale-95 shadow-sm">
                             <i className="fas fa-arrow-left"></i> Back
                         </Link>
                         {notificationPerm !== 'granted' && (
                             <button
                                 onClick={handleEnableNotifications}
-                                className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-white bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 border border-slate-700 transition-all hover:scale-105 active:scale-95 shadow-sm"
+                                className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-white bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 border border-slate-700 transition-all hover:scale-105 active:scale-95 shadow-sm"
                             >
                                 <i className="fas fa-bell"></i> Enable Alerts
                             </button>
                         )}
                         <button
                             onClick={() => setShowForm(!showForm)}
-                            className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-8 py-3 rounded-full font-black text-white shadow-lg transition-all hover:scale-105 active:scale-95 ${showForm ? 'bg-slate-500 hover:bg-slate-600 shadow-slate-500/30' : 'bg-gradient-to-r from-indigo-600 to-purple-600 shadow-indigo-500/30'}`}
+                            className={`w-full md:w-auto flex items-center justify-center gap-2 px-8 py-3 rounded-full font-black text-white shadow-lg transition-all hover:scale-105 active:scale-95 ${showForm ? 'bg-slate-500 hover:bg-slate-600 shadow-slate-500/30' : 'bg-gradient-to-r from-indigo-600 to-purple-600 shadow-indigo-500/30'}`}
                         >
                             <i className={`fas ${showForm ? 'fa-times' : 'fa-plus'}`}></i> {showForm ? 'Close Form' : 'Add New Event'}
                         </button>

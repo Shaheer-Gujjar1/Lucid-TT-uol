@@ -54,8 +54,8 @@ export default function EventForm({ onAdd }: EventFormProps) {
     const labelClasses = "block mb-2 font-black text-slate-400 dark:text-slate-500 text-xs uppercase tracking-widest pl-1";
 
     return (
-        <form onSubmit={handleSubmit} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-6 md:p-8 rounded-[2.5rem] shadow-2xl shadow-indigo-500/5 border border-white/50 dark:border-slate-700/50 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-600 opacity-80"></div>
+        <form onSubmit={handleSubmit} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-6 md:p-8 rounded-[2.5rem] shadow-2xl shadow-indigo-500/5 border border-white/50 dark:border-slate-700/50 relative">
+            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-600 opacity-80 rounded-t-[2.5rem]"></div>
 
             <h2 className="text-2xl font-black mb-8 text-slate-700 dark:text-white flex items-center gap-3">
                 <span className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-lg shadow-sm">

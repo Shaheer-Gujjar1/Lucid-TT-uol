@@ -48,8 +48,8 @@ export default function Dropdown({ label, value, options, onChange, placeholder 
 
             {/* Custom Dropdown List */}
             {isOpen && (
-                <div className="absolute top-[calc(100%+8px)] left-0 w-full z-[999] animate-fade-in-down origin-top">
-                    <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden">
+                <div className="absolute top-[calc(100%+8px)] left-0 w-full z-[999] animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-200 ease-out origin-top">
+                    <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden ring-1 ring-black/5">
                         <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
                             <div className="p-2 space-y-1">
                                 <button
