@@ -8,9 +8,10 @@ interface DayViewProps {
     slots: ProcessedSlot[];
     loading?: boolean;
     error?: string | null;
+    day?: string;
 }
 
-export default function DayView({ slots, loading, error }: DayViewProps) {
+export default function DayView({ slots, loading, error, day }: DayViewProps) {
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-20 animate-pulse">
@@ -43,7 +44,7 @@ export default function DayView({ slots, loading, error }: DayViewProps) {
     return (
         <div className="space-y-4 pb-24">
             {slots.map((slot, index) => (
-                <ProcessSlotCard key={`${slot.time}-${index}`} slotData={slot} />
+                <ProcessSlotCard key={`${slot.time}-${index}`} slotData={slot} index={index} day={day} />
             ))}
         </div>
     );

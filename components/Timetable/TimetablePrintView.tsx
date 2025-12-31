@@ -51,9 +51,7 @@ export default function TimetablePrintView({ slots, day, room, mode, date, filte
             gap: '0px', // No gap needed if no logo
         },
         headerGradientText: {
-            background: 'linear-gradient(to right, #6366f1, #9333ea)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
+            color: '#7c3aed', // Purple-600 to match theme without gradient text clip issues
             display: 'inline-block',
         },
         metaInfo: {
@@ -207,7 +205,7 @@ export default function TimetablePrintView({ slots, day, room, mode, date, filte
             <div style={styles.headerBlock}>
                 <div>
                     <div style={styles.headerTitle}>
-                        <span>Lucid <span style={styles.headerGradientText}>Timetable</span></span> <span style={{ fontSize: '14px', color: '#94a3b8', fontWeight: 500, marginLeft: '8px' }}>v5.4.7</span>
+                        <span>Lucid <span style={styles.headerGradientText}>Timetable</span></span> <span style={{ fontSize: '14px', color: '#94a3b8', fontWeight: 500, marginLeft: '8px' }}>v5.6.3</span>
                     </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>

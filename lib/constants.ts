@@ -14,6 +14,8 @@ export const PROGRAMS = [
     { label: "BSAF", value: "BSAF" },
     { label: "BSAF(2Y)", value: "BSAF(2Y)" },
     { label: "BSDM", value: "BSDM" },
+    { label: "BS Math", value: "BS Math" },
+    { label: "BSMDS", value: "BSMDS" },
 ];
 
 export const SEMESTERS = [

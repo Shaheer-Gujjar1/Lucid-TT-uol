@@ -362,37 +362,77 @@ interface ClassMatch {
 
 function parseAllClasses(cell: string): ClassMatch[] {
     const matches: ClassMatch[] = [];
-    const regex = /(BSCS|BSSE|BSAI|BBA(?:\s*\(?\s*2Y\s*\)?)?|BSAF(?:\s*\(?\s*2Y\s*\)?)?|BSDM|BS\w+|BS\s\w+|BS\s\d+|BBA\s\w+|BSAF\s\w+|BSDM\s\w+|PharmD|DPT|MLT|HND|RIT|Nursing|BS\sUrdu|BS\sMath|BS\sBiotech|BS\sZoology|BS\sChemistry|BS\sPhysics|BS\sEnglish|BS\sPsychology|BS\sCriminology|BS\sIR|BS\sMathematics|BS\sNursing|BS\sSISS|BS\sEducation|BS\sIslamic\sStudies|BS\sNutrition|BS\sMedical\sPhysics)[-\s]*(\d+|[IVX]+)(?:[-\s]*([ABC]))?/gi;
+    // Enhanced Regex to capture:
+    // 1. Standard Programs: BSCS, BSSE, etc.
+    // 2. BS Math variants: BS Math, BS Maths, BS-Math, Math-III, Maths-III (case insensitive via flag)
+    // 3. BSMDS variants: BSMDS, BS Mathematics for Data Science
+    // 4. Semesters: Roman (I-X), Decimal (1-10), "3rd+0" combo
+    // 5. Section: Optional [A-C]
+
+    // Main patterns joined by |
+    // Pattern 1: BSMDS / Data Science long form
+    // Pattern 2: BS Math / Maths / Mathematics
+    // Pattern 3: Standard codes (BSCS etc)
+    const regex = /(?:(BSMDS|BS\s*Mathematics\s*for\s*Data\s*Science)|(BS\s*Math(?:s|ematics)?|Math(?:s|ematics)?)|(BSCS|BSSE|BSAI|BBA(?:\s*\(?\s*2Y\s*\)?)?|BSAF(?:\s*\(?\s*2Y\s*\)?)?|BSDM|BS\w+|BS\s\w+|BS\s\d+|BBA\s\w+|BSAF\s\w+|BSDM\s\w+|PharmD|DPT|MLT|HND|RIT|Nursing|BS\sUrdu|BS\sBiotech|BS\sZoology|BS\sChemistry|BS\sPhysics|BS\sEnglish|BS\sPsychology|BS\sCriminology|BS\sIR|BS\sNursing|Post\s*RN\s*Nursing|BS\sSISS|BS\sEducation|BS\sIslamic\sStudies|BS\sNutrition|BS\sMedical\sPhysics))[-\s]*(?:Sem(?:ester)?\.?\s*)?(\d+(?:rd|th|st|nd)?(?:\+\d+)?|[IVX]+)(?:[-\s]*([ABC]))?/gi;
 
     let m;
     while ((m = regex.exec(cell)) !== null) {
-        let semester = m[2];
-        const romanToDecimal: Record<string, number> = {
-            'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5,
-            'VI': 6, 'VII': 7, 'VIII': 8, 'IX': 9, 'X': 10,
-            'i': 1, 'ii': 2, 'iii': 3, 'iv': 4, 'v': 5,
-            'vi': 6, 'vii': 7, 'viii': 8, 'ix': 9, 'x': 10
+        let rawProgram = (m[1] || m[2] || m[3] || "").trim();
+        let rawSemester = m[4]; // Can be "3", "III", "3rd", "3rd+0"
+        let section = m[5] || "";
+
+        // Normalization
+        let program = rawProgram.replace(/\s+/g, ''); // Default strip spaces
+
+        // BS Math Normalization
+        if (/Math/i.test(rawProgram)) {
+            program = "BS Math";
+        }
+
+        // BSMDS Normalization
+        if (/BSMDS/i.test(rawProgram) || /Data\s*Science/i.test(rawProgram)) {
+            program = "BSMDS";
+        }
+
+        // Nursing Normalization
+        if (/Nursing/i.test(program)) {
+            program = "Nursing";
+        }
+
+        // Existing BBA/BSAF 2Y normalization
+        if (/BBA\(2Y\)/i.test(program) || /BBA2Y/i.test(program) || /BBA\s*2Y/i.test(program)) {
+            program = "BBA(2Y)";
+        } else if (/BSAF\(2Y\)/i.test(program) || /BSAF2Y/i.test(program) || /BSAF\s*2Y/i.test(program)) {
+            program = "BSAF(2Y)";
+        }
+
+        // Handle "3rd+0" or simple semesters
+        const semProcess = (sem: string) => {
+            const romanToDecimal: Record<string, number> = {
+                'I': 1, 'II': 2, 'III': 3, 'IV': 4, 'V': 5,
+                'VI': 6, 'VII': 7, 'VIII': 8, 'IX': 9, 'X': 10,
+                'i': 1, 'ii': 2, 'iii': 3, 'iv': 4, 'v': 5,
+                'vi': 6, 'vii': 7, 'viii': 8, 'ix': 9, 'x': 10
+            };
+
+            // Remove ordinals (3rd -> 3)
+            let cleanSem = sem.replace(/(rd|th|st|nd)/gi, '');
+
+            if (romanToDecimal[cleanSem.toUpperCase()]) {
+                return romanToDecimal[cleanSem.toUpperCase()].toString();
+            }
+            return cleanSem;
         };
 
-        if (romanToDecimal[semester.toUpperCase()]) {
-            semester = romanToDecimal[semester.toUpperCase()].toString();
-        }
+        // Split "3+0" into ["3", "0"]
+        const semesters = rawSemester.split('+').map(s => semProcess(s.trim()));
 
-        let program = m[1].replace(/\s+/g, '');
-        if (/BBA\(2Y\)/i.test(program)) {
-            program = "BBA(2Y)";
-        } else if (/BSAF\(2Y\)/i.test(program)) {
-            program = "BSAF(2Y)";
-        } else if (/BBA2Y/i.test(program) || /BBA\s*2Y/i.test(program)) {
-            program = "BBA(2Y)";
-        } else if (/BSAF2Y/i.test(program) || /BSAF\s*2Y/i.test(program)) {
-            program = "BSAF(2Y)";
-        }
-
-        matches.push({
-            program: program,
-            semester: semester,
-            section: m[3] || ""
+        semesters.forEach(s => {
+            matches.push({
+                program: program,
+                semester: s,
+                section: section
+            });
         });
     }
 

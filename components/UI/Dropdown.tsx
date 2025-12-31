@@ -48,7 +48,7 @@ export default function Dropdown({ label, value, options, onChange, placeholder 
 
             {/* Custom Dropdown List */}
             {isOpen && (
-                <div className="absolute top-[calc(100%+8px)] left-0 w-full z-[100] animate-fade-in-down origin-top">
+                <div className="absolute top-[calc(100%+8px)] left-0 w-full z-[999] animate-fade-in-down origin-top">
                     <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden">
                         <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
                             <div className="p-2 space-y-1">
@@ -62,7 +62,7 @@ export default function Dropdown({ label, value, options, onChange, placeholder 
                                     <button
                                         key={opt.value}
                                         onClick={() => { onChange(opt.value); setIsOpen(false); }}
-                                        className={`w-full text-left px-5 py-3 rounded-xl text-sm font-black transition-all ${value === opt.value ? 'bg-gradient-to-r from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-800/20 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-500' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                                        className={`w-full text-left px-5 py-3 rounded-xl text-sm font-black transition-all ${value === opt.value ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20 scale-[1.02]' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
                                     >
                                         {opt.label}
                                     </button>

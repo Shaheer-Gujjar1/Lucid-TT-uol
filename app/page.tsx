@@ -307,39 +307,43 @@ export default function Home() {
         <div className="container mx-auto px-4 pt-28 max-w-5xl">
 
           {/* View Toggle matching screenshot */}
-          <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-full p-1.5 flex shadow-[0_8px_32px_rgba(0,0,0,0.06)] mb-8 border border-white/40 dark:border-slate-800/50 max-w-sm mx-auto">
+          <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-full p-1.5 flex shadow-[0_8px_32px_rgba(0,0,0,0.06)] mb-8 border border-white/40 dark:border-slate-800/50 max-w-sm mx-auto animate-fade-in-up animation-delay-100">
             <button
               onClick={() => setView('day')}
-              className={`flex-1 py-3 px-8 rounded-full font-black text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 ${view === 'day' ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30' : 'text-slate-500 hover:text-indigo-600 active:scale-95'}`}
+              className={`flex-1 py-3 px-8 rounded-full font-black text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 transform ${view === 'day' ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-105' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50 dark:hover:text-indigo-400 dark:hover:bg-slate-800 hover:scale-105 active:scale-95'}`}
             >
               <i className="fas fa-calendar-day"></i> Day View
             </button>
             <button
               onClick={() => setView('week')}
-              className={`flex-1 py-3 px-8 rounded-full font-black text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 ${view === 'week' ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30' : 'text-slate-500 hover:text-indigo-600 active:scale-95'}`}
+              className={`flex-1 py-3 px-8 rounded-full font-black text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 transform ${view === 'week' ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-105' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50 dark:hover:text-indigo-400 dark:hover:bg-slate-800 hover:scale-105 active:scale-95'}`}
             >
               <i className="fas fa-calendar-week"></i> Week View
             </button>
           </div>
 
-          <ModeToggle mode={mode} setMode={setMode} />
+          <div className="animate-fade-in-up animation-delay-200">
+            <ModeToggle mode={mode} setMode={setMode} />
+          </div>
 
-          <FilterBar
-            mode={mode}
-            filters={filters}
-            setFilter={handleSetFilter}
-            onSave={savePreferences}
-            onClear={clearPreferences}
-          />
+          <div className="animate-fade-in-up animation-delay-300 relative z-50">
+            <FilterBar
+              mode={mode}
+              filters={filters}
+              setFilter={handleSetFilter}
+              onSave={savePreferences}
+              onClear={clearPreferences}
+            />
+          </div>
 
           <div
-            className="mt-10 relative z-0 touch-pan-y"
+            className="mt-10 relative z-0 touch-pan-y animate-fade-in-up animation-delay-500"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
           >
             {view === 'day' ? (
-              <DayView slots={slots as ProcessedSlot[]} loading={loading} error={error} />
+              <DayView slots={slots as ProcessedSlot[]} loading={loading} error={error} day={filters.day} />
             ) : (
               <WeekView data={slots} loading={loading} error={error} />
             )}
@@ -349,7 +353,7 @@ export default function Home() {
         </div>
 
         {/* Floating Action Buttons */}
-        <div className="fixed bottom-6 right-6 flex flex-col items-end gap-3 z-50">
+        <div className="fixed bottom-6 right-6 flex flex-col items-end gap-3 z-50 animate-scale-in animation-delay-700">
           <div className="px-5 py-2.5 rounded-full font-bold text-xs shadow-lg shadow-indigo-500/20 flex items-center gap-2 border-2 border-white/20 transition-all duration-300 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
             <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]' : 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]'}`}></span>
             {isOnline ? 'Online' : 'Offline'}
@@ -366,11 +370,11 @@ export default function Home() {
             } finally {
               setLoading(false);
             }
-          }} className="w-12 h-12 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full shadow-lg shadow-indigo-500/30 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-white/20" title="Refresh Data">
-            <i className="fas fa-sync-alt"></i>
+          }} className="w-12 h-12 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full shadow-lg shadow-indigo-500/30 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-white/20 group" title="Refresh Data">
+            <i className="fas fa-sync-alt group-hover:animate-spin"></i>
           </button>
-          <button onClick={handleDownload} className="w-12 h-12 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full shadow-lg shadow-indigo-500/30 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-white/20" title="Download Timetable">
-            <i className="fas fa-download"></i>
+          <button onClick={handleDownload} className="w-12 h-12 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full shadow-lg shadow-indigo-500/30 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-white/20 group" title="Download Timetable">
+            <i className="fas fa-download group-hover:animate-bounce"></i>
           </button>
         </div>
 
