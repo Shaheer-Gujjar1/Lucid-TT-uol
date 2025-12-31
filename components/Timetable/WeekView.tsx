@@ -2,6 +2,7 @@
 'use client';
 
 import ProcessSlotCard from './ProcessSlotCard';
+import { ProcessedSlot } from '@/lib/parser';
 
 interface WeekViewProps {
     data: { day: string; slots: ProcessedSlot[] }[];
