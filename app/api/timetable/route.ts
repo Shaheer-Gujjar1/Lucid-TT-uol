@@ -43,7 +43,9 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const isMetaOnly = searchParams.get('meta') === 'true';
 
-    const sheetId = process.env.NEXT_PUBLIC_GOOGLE_SHEETS_ID || '';
+    // Use bracket notation to prevent Next.js from inlining the NEXT_PUBLIC_ var as a string literal during build,
+    // which triggers Netlify's secret scanner.
+    const sheetId = process.env.GOOGLE_SHEETS_ID || process.env['NEXT_PUBLIC_GOOGLE_SHEETS_ID'] || '';
     const apiKey = process.env.GOOGLE_SHEETS_API_KEY || '';
 
     // 1. Get the "Master Hash" (Modified Time)
