@@ -2,7 +2,9 @@
 'use client';
 
 import { ProcessedSlot } from '@/lib/parser';
+import { isSlotActive } from '@/lib/time_utils';
 import ProcessSlotCard from './ProcessSlotCard';
+import { useState, useEffect } from 'react';
 
 interface DayViewProps {
     slots: ProcessedSlot[];
@@ -12,6 +14,13 @@ interface DayViewProps {
 }
 
 export default function DayView({ slots, loading, error, day }: DayViewProps) {
+    // Force re-render every minute to update "Active" status
+    const [, setTick] = useState(0);
+    useEffect(() => {
+        const interval = setInterval(() => setTick(t => t + 1), 60000);
+        return () => clearInterval(interval);
+    }, []);
+
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-20 animate-pulse">
@@ -46,7 +55,13 @@ export default function DayView({ slots, loading, error, day }: DayViewProps) {
     return (
         <div key={day} className="space-y-4 pb-24">
             {slots.map((slot, index) => (
-                <ProcessSlotCard key={`${slot.time}-${index}`} slotData={slot} index={index} day={day} />
+                <ProcessSlotCard
+                    key={`${slot.time}-${index}`}
+                    slotData={slot}
+                    index={index}
+                    day={day}
+                    isActive={day ? isSlotActive(day, slot.time) : false}
+                />
             ))}
         </div>
     );

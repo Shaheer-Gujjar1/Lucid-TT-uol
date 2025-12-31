@@ -3,6 +3,8 @@
 
 import ProcessSlotCard from './ProcessSlotCard';
 import { ProcessedSlot } from '@/lib/parser';
+import { isSlotActive } from '@/lib/time_utils';
+import { useState, useEffect } from 'react';
 
 interface WeekViewProps {
     data: { day: string; slots: ProcessedSlot[] }[];
@@ -11,6 +13,13 @@ interface WeekViewProps {
 }
 
 export default function WeekView({ data, loading, error }: WeekViewProps) {
+    // Force re-render every minute
+    const [, setTick] = useState(0);
+    useEffect(() => {
+        const interval = setInterval(() => setTick(t => t + 1), 60000);
+        return () => clearInterval(interval);
+    }, []);
+
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-20">
@@ -57,6 +66,7 @@ export default function WeekView({ data, loading, error }: WeekViewProps) {
                                     slotData={slot}
                                     index={slotIdx}
                                     day={dayData.day}
+                                    isActive={isSlotActive(dayData.day, slot.time)}
                                 />
                             ))
                         )}

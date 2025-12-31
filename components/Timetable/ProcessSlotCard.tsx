@@ -1,30 +1,15 @@
-'use client';
-
 import { ProcessedSlot } from '@/lib/parser';
-import { isSlotActive } from '@/lib/time_utils';
-import { useEffect, useState, memo } from 'react';
+import { memo } from 'react';
 
 interface ProcessSlotCardProps {
     slotData: ProcessedSlot;
     index?: number;
     day?: string;
+    isActive?: boolean;
 }
 
-const ProcessSlotCard = memo(function ProcessSlotCard({ slotData, index = 0, day }: ProcessSlotCardProps) {
+const ProcessSlotCard = memo(function ProcessSlotCard({ slotData, index = 0, day, isActive = false }: ProcessSlotCardProps) {
     const { time, entries } = slotData;
-    const [isActive, setIsActive] = useState(false);
-
-    useEffect(() => {
-        if (day && time) {
-            setIsActive(isSlotActive(day, time));
-            const interval = setInterval(() => {
-                setIsActive(isSlotActive(day, time));
-            }, 60000);
-            return () => clearInterval(interval);
-        } else {
-            setIsActive(false);
-        }
-    }, [day, time]);
 
     // Stagger delay
     const delay = Math.min(index * 100, 1000);
