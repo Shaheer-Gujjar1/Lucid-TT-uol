@@ -33,7 +33,6 @@ export default function DayView({ slots, loading, error, day }: DayViewProps) {
 
     if (!slots || slots.length === 0) {
         return (
-        return (
             <div className="bg-white/50 border-2 border-dashed border-slate-200 p-20 rounded-[3rem] text-center animate-fade-in">
                 <div className="inline-block animate-bounce duration-[2000ms]">
                     <i className="fas fa-calendar-alt text-5xl text-slate-200 mb-4"></i>
