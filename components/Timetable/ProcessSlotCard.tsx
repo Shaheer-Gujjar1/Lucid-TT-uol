@@ -2,7 +2,7 @@
 
 import { ProcessedSlot } from '@/lib/parser';
 import { isSlotActive } from '@/lib/time_utils';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo } from 'react';
 
 interface ProcessSlotCardProps {
     slotData: ProcessedSlot;
@@ -10,7 +10,7 @@ interface ProcessSlotCardProps {
     day?: string;
 }
 
-export default function ProcessSlotCard({ slotData, index = 0, day }: ProcessSlotCardProps) {
+const ProcessSlotCard = memo(function ProcessSlotCard({ slotData, index = 0, day }: ProcessSlotCardProps) {
     const { time, entries } = slotData;
     const [isActive, setIsActive] = useState(false);
 
@@ -185,4 +185,6 @@ export default function ProcessSlotCard({ slotData, index = 0, day }: ProcessSlo
             </div>
         </div>
     );
-}
+});
+
+export default ProcessSlotCard;

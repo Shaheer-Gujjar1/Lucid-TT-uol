@@ -1,10 +1,10 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import Link from 'next/link';
 
-export default function Navbar() {
+const Navbar = memo(function Navbar() {
     const [darkMode, setDarkMode] = useState(false);
 
     useEffect(() => {
@@ -94,4 +94,6 @@ export default function Navbar() {
             </div>
         </nav>
     );
-}
+});
+
+export default Navbar;
