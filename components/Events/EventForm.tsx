@@ -95,8 +95,23 @@ export default function EventForm({ onAdd }: EventFormProps) {
             </div>
 
             <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-4 border-t border-slate-100 dark:border-slate-800">
-                <div className="w-full md:w-1/3">
-                    <Dropdown label="Priority" value={formData.priority} options={PRIORITIES} onChange={v => setFormData({ ...formData, priority: v as any })} />
+                <div className="w-full md:w-auto flex-1">
+                    <label className={labelClasses}>Priority</label>
+                    <div className="flex items-center gap-3 p-1 bg-slate-100 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700">
+                        {PRIORITIES.map((option) => (
+                            <button
+                                key={option.value}
+                                type="button"
+                                onClick={() => setFormData({ ...formData, priority: option.value as any })}
+                                className={`flex-1 py-3 px-4 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 ${formData.priority === option.value
+                                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-105'
+                                    : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
+                                    }`}
+                            >
+                                {option.label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
                 <button type="submit" className="w-full md:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-10 py-4 rounded-full font-black hover:shadow-xl hover:shadow-indigo-500/30 hover:scale-[1.02] active:scale-95 transition-all text-sm uppercase tracking-wider flex items-center justify-center gap-3">
                     <i className="fas fa-check"></i> Save Event

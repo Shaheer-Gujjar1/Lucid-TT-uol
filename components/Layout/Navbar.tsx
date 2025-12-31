@@ -16,6 +16,44 @@ export default function Navbar() {
         }
     }, []);
 
+    const [upcomingCount, setUpcomingCount] = useState(0);
+
+    useEffect(() => {
+        const checkEvents = () => {
+            const stored = localStorage.getItem('lucid_timetable_events');
+            if (!stored) {
+                setUpcomingCount(0);
+                return;
+            }
+            try {
+                const events: any[] = JSON.parse(stored);
+                const now = new Date();
+                const todayStr = now.toISOString().split('T')[0];
+
+                const count = events.filter(e => {
+                    if (e.completed) return false;
+
+                    // Check if it's today
+                    if (e.date === todayStr) return true;
+
+                    // Check if within 24 hours from now
+                    const eventDate = new Date(`${e.date}T${e.time || '23:59'}`);
+                    const diff = eventDate.getTime() - now.getTime();
+                    return diff > 0 && diff <= 86400000; // 24 hours in ms
+                }).length;
+
+                setUpcomingCount(count);
+            } catch (e) {
+                console.error("Failed to parse events for badge", e);
+            }
+        };
+
+        checkEvents();
+        // Re-check when window gets focus (user comes back)
+        window.addEventListener('focus', checkEvents);
+        return () => window.removeEventListener('focus', checkEvents);
+    }, []);
+
     const toggleDarkMode = () => {
         const next = !darkMode;
         setDarkMode(next);
@@ -31,7 +69,7 @@ export default function Navbar() {
 
     return (
         <nav className="fixed top-0 left-0 right-0 z-[100] p-4 pointer-events-none animate-slide-down">
-            <div className="max-w-7xl mx-auto flex justify-between items-center bg-white/70 dark:bg-slate-900/80 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] rounded-[3rem] px-4 py-3 md:px-8 md:py-4 border border-white/40 dark:border-slate-800/50 pointer-events-auto transition-all duration-500">
+            <div className="max-w-7xl mx-auto flex justify-between items-center bg-white/90 dark:bg-slate-900/90 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.12)] rounded-[3rem] px-4 py-3 md:px-8 md:py-4 border border-white/40 dark:border-slate-800/50 pointer-events-auto transition-all duration-500">
                 <div className="flex items-center gap-2 md:gap-4 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800 dark:to-slate-900 py-2 px-4 md:py-3 md:px-8 rounded-full border border-slate-200/50 dark:border-slate-700/50 shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] transform hover:scale-105 active:scale-95 transition-all duration-300">
                     <img src="/logo-primary.png" className="w-6 h-6 md:w-8 md:h-8 object-contain" alt="Logo" />
                     <div className="flex items-baseline gap-2">
@@ -41,8 +79,13 @@ export default function Navbar() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <Link href="/events" className="w-12 h-12 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:shadow-lg hover:shadow-indigo-500/20 hover:scale-110 active:scale-95 transition-all duration-300 border border-slate-100 dark:border-slate-700" title="Events Catalog">
+                    <Link href="/events" className="relative w-12 h-12 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:shadow-lg hover:shadow-indigo-500/20 hover:scale-110 active:scale-95 transition-all duration-300 border border-slate-100 dark:border-slate-700" title="Events Catalog">
                         <i className="fas fa-calendar-alt text-lg"></i>
+                        {upcomingCount > 0 && (
+                            <span className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full shadow-md animate-pulse">
+                                {upcomingCount}
+                            </span>
+                        )}
                     </Link>
                     <button onClick={toggleDarkMode} className="w-12 h-12 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-amber-500 dark:hover:text-amber-400 hover:shadow-lg hover:shadow-amber-500/20 hover:scale-110 active:scale-95 transition-all duration-300 border border-slate-100 dark:border-slate-700" title="Toggle Appearance">
                         <i className={`fas ${darkMode ? 'fa-sun' : 'fa-moon'} text-lg`}></i>
