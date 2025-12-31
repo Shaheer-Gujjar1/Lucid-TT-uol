@@ -97,16 +97,21 @@ export default function EventForm({ onAdd }: EventFormProps) {
             <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-4 border-t border-slate-100 dark:border-slate-800">
                 <div className="w-full md:w-auto flex-1">
                     <label className={labelClasses}>Priority</label>
-                    <div className="flex items-center gap-3 p-1 bg-slate-100 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700">
+                    <div className="relative grid grid-cols-3 gap-0 p-1.5 bg-slate-100 dark:bg-slate-800/50 rounded-full border border-slate-200 dark:border-slate-700 isolate">
+                        {/* Sliding Pill */}
+                        <div className={`absolute top-1.5 bottom-1.5 w-[32%] bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full shadow-lg shadow-indigo-500/30 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] -z-10
+                            ${formData.priority === 'High' ? 'left-[1.5%]' : ''}
+                            ${formData.priority === 'Medium' ? 'left-[34%]' : ''}
+                            ${formData.priority === 'Low' ? 'left-[66.5%]' : ''}
+                        `}></div>
+
                         {PRIORITIES.map((option) => (
                             <button
                                 key={option.value}
                                 type="button"
                                 onClick={() => setFormData({ ...formData, priority: option.value as any })}
-                                className={`flex-1 py-3 px-4 rounded-xl font-black text-xs uppercase tracking-wider transition-all duration-300 ${formData.priority === option.value
-                                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-105'
-                                    : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
-                                    }`}
+                                className={`py-3 md:py-4 rounded-full font-black text-xs uppercase tracking-wider transition-colors duration-300 z-10 
+                                    ${formData.priority === option.value ? 'text-white' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
                             >
                                 {option.label}
                             </button>
