@@ -18,11 +18,14 @@ const ProcessSlotCard = memo(function ProcessSlotCard({ slotData, index = 0, day
     // -------------------------------------------------------------------------
     // RENDER: FREE SLOT
     // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // RENDER: FREE SLOT
+    // -------------------------------------------------------------------------
     if (!entries || entries.length === 0) {
 
         const activeContainerClass = isActive
             ? 'shadow-xl shadow-indigo-600/30 scale-[1.03] z-20'
-            : 'hover:scale-[1.01]';
+            : 'md:hover:scale-[1.01] active:scale-[0.98] transition-transform';
 
         const freeCardBg = isActive
             ? 'bg-gradient-to-br from-indigo-600/95 to-purple-600/95 border-white/20'
@@ -40,7 +43,7 @@ const ProcessSlotCard = memo(function ProcessSlotCard({ slotData, index = 0, day
             >
                 <div className={`relative p-3 md:p-5 rounded-xl ${freeCardBg} backdrop-blur-none md:backdrop-blur-md h-full flex flex-col justify-between overflow-hidden group`}>
                     {/* Decorative pattern */}
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-400/10 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-emerald-400/20 transition-all duration-500"></div>
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-400/10 rounded-full blur-2xl -mr-10 -mt-10 md:group-hover:bg-emerald-400/20 transition-all duration-500"></div>
 
                     <div className={`text-[9px] md:text-[10px] font-black uppercase tracking-widest self-start z-10 flex items-center gap-1.5 ${isActive ? 'text-indigo-200' : 'text-slate-400 dark:text-slate-500'}`}>
                         <div className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-white animate-ping' : 'bg-emerald-400'}`}></div>
@@ -48,7 +51,7 @@ const ProcessSlotCard = memo(function ProcessSlotCard({ slotData, index = 0, day
                         {isActive && <span className="ml-2 text-[8px] md:text-[9px] bg-white text-indigo-600 px-1.5 py-0.5 rounded-sm shadow-sm animate-pulse">NOW</span>}
                     </div>
                     <div className="flex-1 flex flex-col items-center justify-center pt-2 pb-2 z-10">
-                        <div className={`text-lg md:text-2xl font-black tracking-[0.25em] drop-shadow-sm group-hover:scale-110 transition-transform duration-300 ${isActive ? 'text-white' : 'text-emerald-500/90 dark:text-emerald-400'}`}>
+                        <div className={`text-lg md:text-2xl font-black tracking-[0.25em] drop-shadow-sm md:group-hover:scale-110 transition-transform duration-300 ${isActive ? 'text-white' : 'text-emerald-500/90 dark:text-emerald-400'}`}>
                             FREE
                         </div>
                         <div className={`text-[9px] md:text-[10px] font-bold uppercase tracking-wide mt-1 ${isActive ? 'text-indigo-100' : 'text-emerald-600/40 dark:text-emerald-300/30'}`}>
@@ -71,8 +74,8 @@ const ProcessSlotCard = memo(function ProcessSlotCard({ slotData, index = 0, day
         : 'from-blue-500/5 via-blue-500/0 to-transparent dark:from-blue-900/10 dark:via-transparent';
 
     let borderColor = isLab
-        ? 'border-amber-100/50 dark:border-amber-500/20 group-hover:border-amber-200 dark:group-hover:border-amber-500/40'
-        : 'border-blue-100/50 dark:border-blue-500/20 group-hover:border-blue-200 dark:group-hover:border-blue-500/40';
+        ? 'border-amber-100/50 dark:border-amber-500/20 md:group-hover:border-amber-200 md:dark:group-hover:border-amber-500/40'
+        : 'border-blue-100/50 dark:border-blue-500/20 md:group-hover:border-blue-200 md:dark:group-hover:border-blue-500/40';
 
     let cardBg = isLab
         ? 'bg-gradient-to-br from-amber-50/90 to-white/60 dark:from-slate-800/90 dark:to-slate-900/60'
@@ -90,7 +93,7 @@ const ProcessSlotCard = memo(function ProcessSlotCard({ slotData, index = 0, day
 
     const activeOuterClass = isActive
         ? 'shadow-xl shadow-indigo-600/30 scale-[1.03] z-20 transform'
-        : 'hover:shadow-lg hover:shadow-blue-500/5 dark:hover:shadow-blue-900/10 hover:scale-[1.01]';
+        : 'md:hover:shadow-lg md:hover:shadow-blue-500/5 md:dark:hover:shadow-blue-900/10 md:hover:scale-[1.01] active:scale-[0.99] transition-transform';
 
     return (
         <div
