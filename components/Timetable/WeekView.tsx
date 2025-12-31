@@ -41,7 +41,7 @@ export default function WeekView({ data, loading, error }: WeekViewProps) {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 pb-20">
             {data.map((dayData, idx) => (
-                <div key={`${dayData.day}-${idx}`} className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-[2rem] p-4 shadow-sm border border-slate-100 dark:border-slate-800">
+                <div key={`${dayData.day}-${idx}`} className="flex flex-col h-full bg-white dark:bg-slate-900 rounded-[2rem] p-4 shadow-sm border border-slate-100 dark:border-slate-800 animate-fade-in-up" style={{ animationDelay: `${idx * 150}ms` }}>
                     <div className="text-center mb-4 pb-2 border-b-2 border-indigo-500">
                         <h3 className="text-xl font-bold text-indigo-600 dark:text-indigo-400">{dayData.day}</h3>
                     </div>

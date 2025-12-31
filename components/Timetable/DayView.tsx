@@ -33,16 +33,20 @@ export default function DayView({ slots, loading, error, day }: DayViewProps) {
 
     if (!slots || slots.length === 0) {
         return (
-            <div className="bg-white/50 border-2 border-dashed border-slate-200 p-20 rounded-[3rem] text-center">
-                <i className="fas fa-calendar-alt text-5xl text-slate-200 mb-4"></i>
+        return (
+            <div className="bg-white/50 border-2 border-dashed border-slate-200 p-20 rounded-[3rem] text-center animate-fade-in">
+                <div className="inline-block animate-bounce duration-[2000ms]">
+                    <i className="fas fa-calendar-alt text-5xl text-slate-200 mb-4"></i>
+                </div>
                 <h3 className="text-xl font-black text-slate-300 uppercase tracking-widest">No classes found</h3>
                 <p className="text-slate-400 text-sm mt-2">Adjust your filters or select a different day.</p>
             </div>
         );
+        );
     }
 
     return (
-        <div className="space-y-4 pb-24">
+        <div key={day} className="space-y-4 pb-24">
             {slots.map((slot, index) => (
                 <ProcessSlotCard key={`${slot.time}-${index}`} slotData={slot} index={index} day={day} />
             ))}

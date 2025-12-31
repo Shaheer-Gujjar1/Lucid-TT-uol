@@ -53,20 +53,20 @@ export default function ProcessSlotCard({ slotData, index = 0, day }: ProcessSlo
                 style={style}
                 data-active={isActive ? "true" : "false"}
             >
-                <div className={`relative p-5 rounded-xl ${freeCardBg} backdrop-blur-md h-full flex flex-col justify-between overflow-hidden group`}>
+                <div className={`relative p-3 md:p-5 rounded-xl ${freeCardBg} backdrop-blur-md h-full flex flex-col justify-between overflow-hidden group`}>
                     {/* Decorative pattern */}
                     <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-400/10 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-emerald-400/20 transition-all duration-500"></div>
 
-                    <div className={`text-[10px] font-black uppercase tracking-widest self-start z-10 flex items-center gap-1.5 ${isActive ? 'text-indigo-200' : 'text-slate-400 dark:text-slate-500'}`}>
+                    <div className={`text-[9px] md:text-[10px] font-black uppercase tracking-widest self-start z-10 flex items-center gap-1.5 ${isActive ? 'text-indigo-200' : 'text-slate-400 dark:text-slate-500'}`}>
                         <div className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-white animate-ping' : 'bg-emerald-400'}`}></div>
                         {time}
-                        {isActive && <span className="ml-2 text-[9px] bg-white text-indigo-600 px-1.5 py-0.5 rounded-sm shadow-sm animate-pulse">NOW</span>}
+                        {isActive && <span className="ml-2 text-[8px] md:text-[9px] bg-white text-indigo-600 px-1.5 py-0.5 rounded-sm shadow-sm animate-pulse">NOW</span>}
                     </div>
-                    <div className="flex-1 flex flex-col items-center justify-center pt-4 pb-2 z-10">
-                        <div className={`text-2xl font-black tracking-[0.25em] drop-shadow-sm group-hover:scale-110 transition-transform duration-300 ${isActive ? 'text-white' : 'text-emerald-500/90 dark:text-emerald-400'}`}>
+                    <div className="flex-1 flex flex-col items-center justify-center pt-2 pb-2 z-10">
+                        <div className={`text-lg md:text-2xl font-black tracking-[0.25em] drop-shadow-sm group-hover:scale-110 transition-transform duration-300 ${isActive ? 'text-white' : 'text-emerald-500/90 dark:text-emerald-400'}`}>
                             FREE
                         </div>
-                        <div className={`text-[10px] font-bold uppercase tracking-wide mt-1 ${isActive ? 'text-indigo-100' : 'text-emerald-600/40 dark:text-emerald-300/30'}`}>
+                        <div className={`text-[9px] md:text-[10px] font-bold uppercase tracking-wide mt-1 ${isActive ? 'text-indigo-100' : 'text-emerald-600/40 dark:text-emerald-300/30'}`}>
                             No Classes Scheduled
                         </div>
                     </div>
@@ -113,13 +113,13 @@ export default function ProcessSlotCard({ slotData, index = 0, day }: ProcessSlo
             style={style}
             data-active={isActive ? "true" : "false"}
         >
-            <div className={`relative p-5 rounded-xl ${cardBg} backdrop-blur-md border ${isActive ? 'border-white/20' : 'border-white/50 dark:border-white/5'} overflow-hidden h-full`}>
+            <div className={`relative p-3 md:p-5 rounded-xl ${cardBg} backdrop-blur-md border ${isActive ? 'border-white/20' : 'border-white/50 dark:border-white/5'} overflow-hidden h-full`}>
 
                 {/* Visual accent line on left */}
                 <div className={`absolute left-0 top-4 bottom-4 w-1 ${accentColor} rounded-r-full ${isActive ? 'opacity-100' : 'opacity-60 group-hover:opacity-100'} transition-opacity`}></div>
 
                 {entries.length > 1 && (
-                    <div className="absolute top-0 right-0 bg-gradient-to-bl from-red-500 to-red-600 text-white text-[9px] font-black px-3 py-1.5 rounded-bl-xl z-10 shadow-sm uppercase tracking-widest flex items-center gap-1">
+                    <div className="absolute top-0 right-0 bg-gradient-to-bl from-red-500 to-red-600 text-white text-[8px] md:text-[9px] font-black px-2 md:px-3 py-1 md:py-1.5 rounded-bl-xl z-10 shadow-sm uppercase tracking-widest flex items-center gap-1">
                         <i className="fas fa-exclamation-triangle text-[8px]"></i>
                         CLASH
                     </div>
@@ -145,35 +145,35 @@ export default function ProcessSlotCard({ slotData, index = 0, day }: ProcessSlo
 
                     return (
                         <div key={idx}>
-                            {idx > 0 && <hr className={`my-5 border-dashed ${isActive ? 'border-white/20' : 'border-slate-200/60 dark:border-slate-700/50'}`} />}
-                            <div className="flex justify-between items-start gap-4 pl-3">
+                            {idx > 0 && <hr className={`my-3 md:my-5 border-dashed ${isActive ? 'border-white/20' : 'border-slate-200/60 dark:border-slate-700/50'}`} />}
+                            <div className="flex justify-between items-start gap-2 md:gap-4 pl-2 md:pl-3">
                                 <div className="flex flex-col flex-1">
-                                    <div className={`text-[10px] font-black uppercase tracking-widest mb-2 flex items-center gap-2 ${labelColor}`}>
+                                    <div className={`text-[9px] md:text-[10px] font-black uppercase tracking-widest mb-1 md:mb-2 flex items-center gap-1.5 md:gap-2 ${labelColor}`}>
                                         <i className={`far fa-clock ${isActive ? 'text-indigo-200' : 'text-slate-300 dark:text-slate-600'}`}></i> {time}
-                                        {isActive && <span className="ml-2 text-[9px] bg-white text-indigo-600 px-2 py-0.5 rounded-full font-bold shadow-sm animate-pulse">NOW</span>}
+                                        {isActive && <span className="ml-2 text-[8px] md:text-[9px] bg-white text-indigo-600 px-1.5 md:px-2 py-0.5 rounded-full font-bold shadow-sm animate-pulse">NOW</span>}
                                     </div>
-                                    <div className={`font-extrabold text-lg leading-snug mb-2 tracking-tight ${mainTextColor}`}>
+                                    <div className={`font-extrabold text-base md:text-lg leading-snug mb-1 md:mb-2 tracking-tight ${mainTextColor}`}>
                                         {s.course}
                                     </div>
-                                    <div className={`text-xs font-semibold flex items-center gap-2 mt-auto ${secondaryTextColor}`}>
-                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] ${iconBg}`}>
+                                    <div className={`text-[10px] md:text-xs font-semibold flex items-center gap-1.5 md:gap-2 mt-auto ${secondaryTextColor}`}>
+                                        <div className={`w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center text-[9px] md:text-[10px] ${iconBg}`}>
                                             <i className="fas fa-chalkboard-teacher"></i>
                                         </div>
                                         {s.instructor}
                                     </div>
                                 </div>
 
-                                <div className="flex flex-col items-end text-right space-y-3">
-                                    <span className={`inline-block text-[9px] font-black px-3 py-1 rounded-lg shadow-sm border tracking-[0.05em] backdrop-blur-sm ${tagBg}`}>
+                                <div className="flex flex-col items-end text-right space-y-2 md:space-y-3">
+                                    <span className={`inline-block text-[8px] md:text-[9px] font-black px-2 md:px-3 py-0.5 md:py-1 rounded-lg shadow-sm border tracking-[0.05em] backdrop-blur-sm ${tagBg}`}>
                                         {s.isLab ? 'LAB' : 'LECTURE'}
                                     </span>
 
-                                    <div className="flex flex-col items-end gap-1">
-                                        <div className={`text-xs font-bold flex items-center justify-end gap-1.5 px-2 py-1 rounded-md border ${isActive ? 'border-white/20 bg-white/10 text-white' : badgeColor}`}>
-                                            <span className={`text-[10px] ${roomLabelColor}`}>ROOM</span>
+                                    <div className="flex flex-col items-end gap-0.5 md:gap-1">
+                                        <div className={`text-[10px] md:text-xs font-bold flex items-center justify-end gap-1 md:gap-1.5 px-1.5 md:px-2 py-0.5 md:py-1 rounded-md border ${isActive ? 'border-white/20 bg-white/10 text-white' : badgeColor}`}>
+                                            <span className={`text-[8px] md:text-[10px] ${roomLabelColor}`}>ROOM</span>
                                             {s.room}
                                         </div>
-                                        <div className={`text-[10px] font-bold uppercase tracking-wider px-1 ${roomLabelColor}`}>
+                                        <div className={`text-[8px] md:text-[10px] font-bold uppercase tracking-wider px-1 ${roomLabelColor}`}>
                                             {s.class}
                                         </div>
                                     </div>

@@ -36,7 +36,7 @@ export default function Navbar() {
                     <img src="/logo-primary.png" className="w-6 h-6 md:w-8 md:h-8 object-contain" alt="Logo" />
                     <div className="flex items-baseline gap-2">
                         <span className="text-sm md:text-lg font-black text-slate-700 dark:text-slate-200 tracking-tighter">Lucid <span className="bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent">Timetable</span></span>
-                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">v5.6.3</span>
+                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">v5.6.4</span>
                     </div>
                 </div>
 

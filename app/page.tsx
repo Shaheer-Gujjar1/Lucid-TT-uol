@@ -9,6 +9,7 @@ import FilterBar from '@/components/Timetable/FilterBar';
 import DayView from '@/components/Timetable/DayView';
 import WeekView from '@/components/Timetable/WeekView';
 import TimetablePrintView from '@/components/Timetable/TimetablePrintView';
+import ViewToggle from '@/components/Timetable/ViewToggle';
 import Toast from '@/components/UI/Toast';
 import { ProcessedSlot, DAYS, processDayData } from '@/lib/parser';
 import { checkAndSync, detectSheetChanges } from '@/lib/sync_service';
@@ -263,22 +264,36 @@ export default function Home() {
   // Swipe Handler
   const touchStart = useRef<number | null>(null);
   const touchEnd = useRef<number | null>(null);
-  const minSwipeDistance = 50;
+  const touchStartY = useRef<number | null>(null);
+  const touchEndY = useRef<number | null>(null);
+  const minSwipeDistance = 100; // Increased threshold to avoid accidental swipes
 
   const onTouchStart = (e: React.TouchEvent) => {
     touchEnd.current = null;
+    touchEndY.current = null;
     touchStart.current = e.targetTouches[0].clientX;
+    touchStartY.current = e.targetTouches[0].clientY;
   };
 
   const onTouchMove = (e: React.TouchEvent) => {
     touchEnd.current = e.targetTouches[0].clientX;
+    touchEndY.current = e.targetTouches[0].clientY;
   };
 
   const onTouchEnd = () => {
     if (!touchStart.current || !touchEnd.current) return;
-    const distance = touchStart.current - touchEnd.current;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
+
+    const distanceX = touchStart.current - touchEnd.current;
+
+    // Vertical scroll check (if we have Y data)
+    if (touchStartY.current !== null && touchEndY.current !== null) {
+      const distanceY = touchStartY.current - touchEndY.current;
+      // If vertical movement is greater than horizontal, assume scrolling -> ignore swipe
+      if (Math.abs(distanceY) > Math.abs(distanceX)) return;
+    }
+
+    const isLeftSwipe = distanceX > minSwipeDistance;
+    const isRightSwipe = distanceX < -minSwipeDistance;
 
     if (isLeftSwipe || isRightSwipe) {
       if (view === 'day') {
@@ -307,19 +322,8 @@ export default function Home() {
         <div className="container mx-auto px-4 pt-28 max-w-5xl">
 
           {/* View Toggle matching screenshot */}
-          <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-full p-1.5 flex shadow-[0_8px_32px_rgba(0,0,0,0.06)] mb-8 border border-white/40 dark:border-slate-800/50 max-w-sm mx-auto animate-fade-in-up animation-delay-100">
-            <button
-              onClick={() => setView('day')}
-              className={`flex-1 py-3 px-8 rounded-full font-black text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 transform ${view === 'day' ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-105' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50 dark:hover:text-indigo-400 dark:hover:bg-slate-800 hover:scale-105 active:scale-95'}`}
-            >
-              <i className="fas fa-calendar-day"></i> Day View
-            </button>
-            <button
-              onClick={() => setView('week')}
-              className={`flex-1 py-3 px-8 rounded-full font-black text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 transform ${view === 'week' ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-105' : 'text-slate-500 hover:text-indigo-600 hover:bg-slate-50 dark:hover:text-indigo-400 dark:hover:bg-slate-800 hover:scale-105 active:scale-95'}`}
-            >
-              <i className="fas fa-calendar-week"></i> Week View
-            </button>
+          <div className="animate-fade-in-up animation-delay-100">
+            <ViewToggle view={view} setView={setView} />
           </div>
 
           <div className="animate-fade-in-up animation-delay-200">
