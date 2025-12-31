@@ -33,10 +33,10 @@ export default function EventList({ events, onDelete, onToggleComplete }: EventL
     return (
         <div>
             <div className="flex gap-4 mb-6 pb-2 overflow-x-auto no-scrollbar">
-                <button onClick={() => setFilter('today')} className={`px-5 py-2.5 rounded-2xl font-bold whitespace-nowrap transition-all ${filter === 'today' ? 'bg-indigo-600 dark:bg-indigo-500 text-white shadow-lg scale-105' : 'glass hover:bg-white/50 hover:scale-105 dark:text-slate-200'}`}>
+                <button onClick={() => setFilter('today')} className={`px-5 py-2.5 rounded-2xl font-bold whitespace-nowrap transition-all ${filter === 'today' ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-105' : 'glass hover:bg-white/50 hover:scale-105 dark:text-slate-200'}`}>
                     Today
                 </button>
-                <button onClick={() => setFilter('all')} className={`px-5 py-2.5 rounded-2xl font-bold whitespace-nowrap transition-all ${filter === 'all' ? 'bg-indigo-600 dark:bg-indigo-500 text-white shadow-lg scale-105' : 'glass hover:bg-white/50 hover:scale-105 dark:text-slate-200'}`}>
+                <button onClick={() => setFilter('all')} className={`px-5 py-2.5 rounded-2xl font-bold whitespace-nowrap transition-all ${filter === 'all' ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30 scale-105' : 'glass hover:bg-white/50 hover:scale-105 dark:text-slate-200'}`}>
                     All Events
                 </button>
                 <button onClick={() => setFilter('overdue')} className={`px-5 py-2.5 rounded-2xl font-bold whitespace-nowrap transition-all ${filter === 'overdue' ? 'bg-red-500 text-white shadow-lg scale-105' : 'glass hover:bg-white/50 text-red-500 dark:text-red-400 hover:scale-105'}`}>
@@ -57,26 +57,26 @@ export default function EventList({ events, onDelete, onToggleComplete }: EventL
                         const urgencyClass = isUrgent ? 'event-card-urgent' : isToday ? 'event-card-today' : '';
 
                         return (
-                            <div key={event.id} className={`glass p-6 rounded-[2rem] transition-all hover:-translate-y-1 hover:shadow-2xl border-l-[8px] ${urgencyClass} ${event.completed ? 'border-green-500 opacity-60 grayscale-[0.5]' : 'border-[var(--accent-color)] shadow-xl'}`}>
+                            <div key={event.id} className={`glass p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] transition-all hover:-translate-y-1 hover:shadow-2xl border-l-[6px] md:border-l-[8px] ${urgencyClass} ${event.completed ? 'border-green-500 opacity-60 grayscale-[0.5]' : 'border-[var(--accent-color)] shadow-xl'}`}>
                                 <div className="flex justify-between items-start flex-wrap md:flex-nowrap gap-4">
-                                    <div className="flex-1 pr-4 min-w-[250px]">
-                                        <div className="flex items-center gap-2 mb-3 flex-wrap">
-                                            <span className={`text-[10px] md:text-xs uppercase tracking-widest px-3 py-1 rounded-xl font-bold shadow-sm ${getPriorityColor(event.priority)}`}>{event.priority}</span>
-                                            <span className="text-xs text-[var(--text-tertiary)] font-bold bg-[var(--card-bg)] px-3 py-1 rounded-xl border border-[var(--glass-border)] shadow-sm">
-                                                <i className="far fa-calendar-alt mr-2 text-[var(--accent-color)]"></i>{event.date} {event.time ? `• ${event.time}` : ''}
+                                    <div className="flex-1 pr-2 md:pr-4 min-w-[200px]">
+                                        <div className="flex items-center gap-1.5 md:gap-2 mb-2 md:mb-3 flex-wrap">
+                                            <span className={`text-[9px] md:text-xs uppercase tracking-widest px-2 py-0.5 md:px-3 md:py-1 rounded-lg md:rounded-xl font-bold shadow-sm ${getPriorityColor(event.priority)}`}>{event.priority}</span>
+                                            <span className="text-[10px] md:text-xs text-[var(--text-tertiary)] font-bold bg-[var(--card-bg)] px-2 py-0.5 md:px-3 md:py-1 rounded-lg md:rounded-xl border border-[var(--glass-border)] shadow-sm">
+                                                <i className="far fa-calendar-alt mr-1.5 text-[var(--accent-color)]"></i>{event.date} {event.time ? `• ${event.time}` : ''}
                                             </span>
-                                            <span className="text-xs text-[var(--text-tertiary)] font-bold bg-[var(--card-bg)] px-3 py-1 rounded-xl border border-[var(--glass-border)] uppercase shadow-sm">{event.type}</span>
+                                            <span className="text-[10px] md:text-xs text-[var(--text-tertiary)] font-bold bg-[var(--card-bg)] px-2 py-0.5 md:px-3 md:py-1 rounded-lg md:rounded-xl border border-[var(--glass-border)] uppercase shadow-sm">{event.type}</span>
                                         </div>
-                                        <h3 className={`font-extrabold text-xl md:text-2xl text-[var(--text-primary)] mb-2 tracking-tight ${event.completed ? 'line-through decoration-4 decoration-green-500/50' : ''}`}>{event.title}</h3>
-                                        {event.course && <p className="text-base text-[var(--accent-color)] font-bold mb-2 flex items-center"><i className="fas fa-book-open mr-2"></i>{event.course}</p>}
-                                        {event.description && <p className="text-sm md:text-base text-[var(--text-secondary)] mt-3 whitespace-pre-wrap leading-relaxed opacity-90">{event.description}</p>}
+                                        <h3 className={`font-extrabold text-lg md:text-2xl text-[var(--text-primary)] mb-1.5 md:mb-2 tracking-tight ${event.completed ? 'line-through decoration-4 decoration-green-500/50' : ''}`}>{event.title}</h3>
+                                        {event.course && <p className="text-sm md:text-base text-[var(--accent-color)] font-bold mb-2 flex items-center"><i className="fas fa-book-open mr-2 text-xs md:text-sm"></i>{event.course}</p>}
+                                        {event.description && <p className="text-xs md:text-base text-[var(--text-secondary)] mt-2 md:mt-3 whitespace-pre-wrap leading-relaxed opacity-90">{event.description}</p>}
                                     </div>
-                                    <div className="flex flex-row md:flex-col gap-3 ml-auto md:ml-0">
-                                        <button onClick={() => onToggleComplete(event.id)} className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-md ${event.completed ? 'bg-green-500 text-white hover:bg-green-600 scale-110' : 'glass text-gray-400 hover:bg-green-500 hover:text-white hover:scale-110'}`} title={event.completed ? "Mark as Incomplete" : "Mark as Complete"}>
-                                            <i className="fas fa-check text-lg"></i>
+                                    <div className="flex flex-row md:flex-col gap-2 md:gap-3 ml-auto md:ml-0">
+                                        <button onClick={() => onToggleComplete(event.id)} className={`w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center transition-all shadow-md ${event.completed ? 'bg-green-500 text-white hover:bg-green-600 scale-110' : 'glass text-gray-400 hover:bg-green-500 hover:text-white hover:scale-110'}`} title={event.completed ? "Mark as Incomplete" : "Mark as Complete"}>
+                                            <i className="fas fa-check text-base md:text-lg"></i>
                                         </button>
-                                        <button onClick={() => onDelete(event.id)} className="w-12 h-12 rounded-2xl glass text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white hover:scale-110 transition-all shadow-md" title="Delete">
-                                            <i className="fas fa-trash-alt text-lg"></i>
+                                        <button onClick={() => onDelete(event.id)} className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl glass text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white hover:scale-110 transition-all shadow-md" title="Delete">
+                                            <i className="fas fa-trash-alt text-base md:text-lg"></i>
                                         </button>
                                     </div>
                                 </div>
