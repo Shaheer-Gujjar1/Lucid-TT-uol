@@ -41,7 +41,6 @@ export default function DayView({ slots, loading, error, day }: DayViewProps) {
                 <p className="text-slate-400 text-sm mt-2">Adjust your filters or select a different day.</p>
             </div>
         );
-        );
     }
 
     return (
