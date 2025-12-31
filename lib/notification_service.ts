@@ -39,7 +39,6 @@ export const sendNotification = (title: string, options?: NotificationOptions) =
             new Notification(title, {
                 icon: '/logo-primary.png', // Assuming this exists, fallback if not
                 badge: '/logo-primary.png',
-                vibrate: [200, 100, 200],
                 ...options
             });
         } catch (e) {
