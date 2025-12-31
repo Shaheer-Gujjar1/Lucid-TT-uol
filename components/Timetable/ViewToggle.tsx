@@ -7,7 +7,7 @@ interface ViewToggleProps {
 
 export default function ViewToggle({ view, setView }: ViewToggleProps) {
     return (
-        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-full p-1.5 flex shadow-[0_8px_32px_rgba(0,0,0,0.06)] mb-8 border border-white/40 dark:border-slate-800/50 max-w-sm mx-auto relative z-10 w-full md:w-auto">
+        <div className="bg-white md:bg-white/80 dark:bg-slate-900 md:dark:bg-slate-900/80 backdrop-blur-none md:backdrop-blur-md rounded-full p-1.5 flex shadow-sm md:shadow-[0_8px_32px_rgba(0,0,0,0.06)] mb-8 border border-white/40 dark:border-slate-800/50 max-w-sm mx-auto relative z-10 w-full md:w-auto">
             <div className="grid grid-cols-2 w-full relative">
                 {/* Sliding Pill */}
                 <div

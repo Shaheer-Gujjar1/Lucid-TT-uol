@@ -8,7 +8,7 @@ interface ModeToggleProps {
 
 export default function ModeToggle({ mode, setMode }: ModeToggleProps) {
     return (
-        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-full p-1.5 w-full max-w-2xl mx-auto shadow-[0_8px_32px_rgba(0,0,0,0.06)] mb-8 border border-white/40 dark:border-slate-800/50 relative isolate">
+        <div className="bg-white md:bg-white/80 dark:bg-slate-900 md:dark:bg-slate-900/80 backdrop-blur-none md:backdrop-blur-md rounded-full p-1.5 w-full max-w-2xl mx-auto shadow-sm md:shadow-[0_8px_32px_rgba(0,0,0,0.06)] mb-8 border border-white/40 dark:border-slate-800/50 relative isolate">
 
             {/* Sliding Pill */}
             <div

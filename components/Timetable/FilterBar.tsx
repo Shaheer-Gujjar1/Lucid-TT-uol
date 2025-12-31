@@ -26,7 +26,7 @@ export default function FilterBar({ mode, filters, setFilter, onSave, onClear }:
     const [isExpanded, setIsExpanded] = useState(false);
 
     return (
-        <div className="relative z-[100] bg-gradient-to-br from-indigo-50/40 via-white to-white dark:from-slate-800/50 dark:via-slate-900 dark:to-slate-900 rounded-[2.5rem] p-5 md:p-8 shadow-[0_8px_32px_rgba(0,0,0,0.06)] mb-8 border border-indigo-100/50 dark:border-slate-800/80 backdrop-blur-sm transition-all duration-500">
+        <div className="relative z-[100] bg-white dark:bg-slate-900 md:bg-gradient-to-br md:from-indigo-50/40 md:via-white md:to-white md:dark:from-slate-800/50 md:dark:via-slate-900 md:dark:to-slate-900 rounded-[2.5rem] p-5 md:p-8 shadow-sm md:shadow-[0_8px_32px_rgba(0,0,0,0.06)] mb-8 border border-indigo-100/50 dark:border-slate-800/80 backdrop-blur-none md:backdrop-blur-sm transition-all duration-500">
 
             {/* Mobile Toggle Header */}
             <div
