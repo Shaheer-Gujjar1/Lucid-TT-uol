@@ -38,7 +38,7 @@ const ProcessSlotCard = memo(function ProcessSlotCard({ slotData, index = 0, day
                 style={style}
                 data-active={isActive ? "true" : "false"}
             >
-                <div className={`relative p-3 md:p-5 rounded-xl ${freeCardBg} backdrop-blur-md h-full flex flex-col justify-between overflow-hidden group`}>
+                <div className={`relative p-3 md:p-5 rounded-xl ${freeCardBg} backdrop-blur-none md:backdrop-blur-md h-full flex flex-col justify-between overflow-hidden group`}>
                     {/* Decorative pattern */}
                     <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-400/10 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-emerald-400/20 transition-all duration-500"></div>
 
@@ -98,7 +98,7 @@ const ProcessSlotCard = memo(function ProcessSlotCard({ slotData, index = 0, day
             style={style}
             data-active={isActive ? "true" : "false"}
         >
-            <div className={`relative p-3 md:p-5 rounded-xl ${cardBg} backdrop-blur-md border ${isActive ? 'border-white/20' : 'border-white/50 dark:border-white/5'} overflow-hidden h-full`}>
+            <div className={`relative p-3 md:p-5 rounded-xl ${cardBg} backdrop-blur-none md:backdrop-blur-md border ${isActive ? 'border-white/20' : 'border-white/50 dark:border-white/5'} overflow-hidden h-full`}>
 
                 {/* Visual accent line on left */}
                 <div className={`absolute left-0 top-4 bottom-4 w-1 ${accentColor} rounded-r-full ${isActive ? 'opacity-100' : 'opacity-60 group-hover:opacity-100'} transition-opacity`}></div>
