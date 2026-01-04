@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Dropdown from '@/components/UI/Dropdown';
 import { PROGRAMS, SEMESTERS, SECTIONS, DAYS_OPTIONS, TEACHERS } from '@/lib/constants';
 
@@ -24,6 +24,17 @@ interface FilterBarProps {
 
 export default function FilterBar({ mode, filters, setFilter, onSave, onClear }: FilterBarProps) {
     const [isExpanded, setIsExpanded] = useState(false);
+    const [allowOverflow, setAllowOverflow] = useState(false);
+
+    useEffect(() => {
+        let timeout: NodeJS.Timeout;
+        if (isExpanded) {
+            timeout = setTimeout(() => setAllowOverflow(true), 500);
+        } else {
+            setAllowOverflow(false);
+        }
+        return () => clearTimeout(timeout);
+    }, [isExpanded]);
 
     return (
         <div className="relative z-[100] bg-white dark:bg-slate-900 md:bg-gradient-to-br md:from-indigo-50/40 md:via-white md:to-white md:dark:from-slate-800/50 md:dark:via-slate-900 md:dark:to-slate-900 rounded-[2.5rem] p-5 md:p-8 shadow-sm md:shadow-[0_8px_32px_rgba(0,0,0,0.06)] mb-8 border border-indigo-100/50 dark:border-slate-800/80 backdrop-blur-none md:backdrop-blur-sm transition-all duration-500">
@@ -48,8 +59,8 @@ export default function FilterBar({ mode, filters, setFilter, onSave, onClear }:
 
             {/* Filter Content */}
             {/* Filter Content */}
-            <div className={`grid transition-all duration-500 ease-in-out ${isExpanded ? 'grid-rows-[1fr] opacity-100 mt-6' : 'grid-rows-[0fr] opacity-0 mt-0'} md:grid-rows-[1fr] md:opacity-100 md:mt-6`}>
-                <div className={`overflow-hidden md:overflow-visible transition-all duration-300 ${isExpanded ? 'pb-48' : 'pb-0'} md:pb-0`}>
+            <div className={`grid transition-all duration-500 ease-in-out ${isExpanded ? 'grid-rows-[1fr] mt-6' : 'grid-rows-[0fr] mt-0'} md:grid-rows-[1fr] md:opacity-100 md:mt-6 ${allowOverflow ? 'overflow-visible' : 'overflow-hidden'} md:overflow-visible`}>
+                <div className={`overflow-hidden md:overflow-visible transition-all duration-300 ${isExpanded ? 'pb-80' : 'pb-0'} md:pb-0`}>
                     {mode === 'student' && (
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-6 relative z-[105]">
                             <Dropdown label="Program" value={filters.program} options={PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" />
@@ -133,6 +144,6 @@ export default function FilterBar({ mode, filters, setFilter, onSave, onClear }:
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
