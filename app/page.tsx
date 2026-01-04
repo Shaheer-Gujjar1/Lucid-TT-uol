@@ -61,15 +61,52 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (mode === 'student') {
-      const stored = localStorage.getItem('lucid_timetable_preferences');
-      if (stored) {
-        try {
-          const prefs = JSON.parse(stored);
-          setFilters(f => ({ ...f, ...prefs }));
-        } catch (e) { console.error(e); }
+    // Reset filters and restore preferences based on mode to PREVENT CLASHES
+    setFilters(prev => {
+      const resetFilters = {
+        program: '',
+        semester: '',
+        section: '',
+        teacherName: '',
+        roomNumber: '',
+        day: prev.day // Always preserve day
+      };
+
+      if (mode === 'student') {
+        const stored = localStorage.getItem('lucid_student_prefs') || localStorage.getItem('lucid_timetable_preferences');
+        if (stored) {
+          try {
+            const prefs = JSON.parse(stored);
+            // Strictly apply only student fields
+            return {
+              ...resetFilters,
+              program: prefs.program || '',
+              semester: prefs.semester || '',
+              section: prefs.section || ''
+            };
+          } catch (e) { console.error(e); }
+        }
+        return resetFilters;
       }
-    }
+
+      else if (mode === 'teacher') {
+        const stored = localStorage.getItem('lucid_teacher_prefs');
+        if (stored) {
+          try {
+            const prefs = JSON.parse(stored);
+            // Strictly apply only teacher fields
+            return {
+              ...resetFilters,
+              teacherName: prefs.teacherName || ''
+            };
+          } catch (e) { console.error(e); }
+        }
+        return resetFilters;
+      }
+
+      // Room Mode or Default -> Clean Slate
+      return resetFilters;
+    });
   }, [mode]);
 
   // Initial data restoration from LocalStorage and Sync trigger
@@ -204,18 +241,33 @@ export default function Home() {
   };
 
   const savePreferences = () => {
-    localStorage.setItem('lucid_timetable_preferences', JSON.stringify({
-      program: filters.program,
-      semester: filters.semester,
-      section: filters.section
-    }));
-    setToastMsg('Preferences saved!');
+    if (mode === 'student') {
+      localStorage.setItem('lucid_student_prefs', JSON.stringify({
+        program: filters.program,
+        semester: filters.semester,
+        section: filters.section
+      }));
+      setToastMsg('Student preferences saved!');
+    } else if (mode === 'teacher') {
+      localStorage.setItem('lucid_teacher_prefs', JSON.stringify({
+        teacherName: filters.teacherName
+      }));
+      setToastMsg('Teacher preferences saved!');
+    }
   };
 
   const clearPreferences = () => {
-    localStorage.removeItem('lucid_timetable_preferences');
-    setFilters(prev => ({ ...prev, program: '', semester: '', section: '' }));
-    setToastMsg('Preferences cleared!');
+    if (mode === 'student') {
+      localStorage.removeItem('lucid_student_prefs');
+      // Also clear legacy key
+      localStorage.removeItem('lucid_timetable_preferences');
+      setFilters(prev => ({ ...prev, program: '', semester: '', section: '' }));
+      setToastMsg('Student preferences cleared!');
+    } else if (mode === 'teacher') {
+      localStorage.removeItem('lucid_teacher_prefs');
+      setFilters(prev => ({ ...prev, teacherName: '' }));
+      setToastMsg('Teacher preferences cleared!');
+    }
   };
 
   const handleDownload = async () => {

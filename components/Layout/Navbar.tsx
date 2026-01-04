@@ -74,7 +74,13 @@ const Navbar = memo(function Navbar() {
                     <img src="/logo-primary.png" className="w-6 h-6 md:w-8 md:h-8 object-contain" alt="Logo" />
                     <div className="flex items-baseline gap-2">
                         <span className="text-sm md:text-lg font-black text-slate-700 dark:text-slate-200 tracking-tighter">Lucid <span className="bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent">Timetable</span></span>
-                        <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-700">v5.6.4</span>
+                        <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800">
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                            </span>
+                            <span className="text-xs font-bold text-indigo-600 dark:text-indigo-300">v5.6.9</span>
+                        </div>
                     </div>
                 </div>
 

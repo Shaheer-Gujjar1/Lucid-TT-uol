@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Lucid Timetable v5.6.3",
+    title: "Lucid Timetable v5.6.9",
     description: "UOL • Live",
     icons: {
         icon: "/favicon.png",
