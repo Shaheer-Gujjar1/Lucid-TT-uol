@@ -11,6 +11,7 @@ import WeekView from '@/components/Timetable/WeekView';
 import TimetablePrintView from '@/components/Timetable/TimetablePrintView';
 import ViewToggle from '@/components/Timetable/ViewToggle';
 import Toast from '@/components/UI/Toast';
+import InfoModal from '@/components/UI/InfoModal';
 import { ProcessedSlot, DAYS, processDayData } from '@/lib/parser';
 import { checkAndSync, detectSheetChanges } from '@/lib/sync_service';
 
@@ -32,8 +33,22 @@ export default function Home() {
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [generatedAt, setGeneratedAt] = useState<string>('');
 
+  const [isFabExpanded, setIsFabExpanded] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+
   useEffect(() => {
     setGeneratedAt(new Date().toLocaleString());
+
+    // Auto-open Info Modal for first-time users
+    const hasSeenIntro = localStorage.getItem('lucid_intro_seen');
+    if (!hasSeenIntro) {
+      // Small delay to let the UI load and settle
+      const timer = setTimeout(() => {
+        setShowInfoModal(true);
+        localStorage.setItem('lucid_intro_seen', 'true');
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   // Client-side cache to prevent refetching
@@ -296,6 +311,19 @@ export default function Home() {
           clonedDoc.documentElement.style.backgroundColor = '#ffffff';
           clonedDoc.body.style.backgroundColor = '#ffffff';
           clonedDoc.body.style.color = '#000000';
+
+          // Force Light Mode for consistent download design
+          clonedDoc.documentElement.classList.remove('dark');
+
+          // Optimize for Capture: Remove Blur and Shadows to prevent rendering artifacts
+          const allElements = clonedDoc.querySelectorAll('*');
+          allElements.forEach((el) => {
+            if (el instanceof HTMLElement) {
+              el.style.backdropFilter = 'none'; // Fix gray boxes
+              el.style.boxShadow = 'none';      // Fix shadow scaling artifacts
+            }
+          });
+
           // Also try to nullify any style attributes that might contain vars
           clonedDoc.documentElement.removeAttribute('style');
         }
@@ -319,6 +347,38 @@ export default function Home() {
   const touchStartY = useRef<number | null>(null);
   const touchEndY = useRef<number | null>(null);
   const minSwipeDistance = 100; // Increased threshold to avoid accidental swipes
+
+  // Haptic Feedback Helper
+  const triggerHaptic = () => {
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(12); // Subtle tap
+    }
+  };
+
+  // Keyboard Navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (view !== 'day') return;
+
+      const currentIdx = DAYS.indexOf(filters.day);
+      if (currentIdx === -1) return;
+
+      if (e.key === 'ArrowLeft') {
+        const newIdx = (currentIdx - 1 + DAYS.length) % DAYS.length;
+        setFilters(prev => ({ ...prev, day: DAYS[newIdx] }));
+        setToastMsg(`Switched to ${DAYS[newIdx]}`);
+        triggerHaptic();
+      } else if (e.key === 'ArrowRight') {
+        const newIdx = (currentIdx + 1) % DAYS.length;
+        setFilters(prev => ({ ...prev, day: DAYS[newIdx] }));
+        setToastMsg(`Switched to ${DAYS[newIdx]}`);
+        triggerHaptic();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [view, filters.day]);
 
   const onTouchStart = (e: React.TouchEvent) => {
     touchEnd.current = null;
@@ -361,7 +421,8 @@ export default function Home() {
 
         const newDay = DAYS[newIdx];
         setFilters(prev => ({ ...prev, day: newDay }));
-        setToastMsg(`Switched to ${newDay}`); // Notification
+        setToastMsg(`Switched to ${newDay}`);
+        triggerHaptic();
       }
     }
   };
@@ -409,30 +470,70 @@ export default function Home() {
         </div>
 
         {/* Floating Action Buttons */}
-        <div className="fixed bottom-6 right-6 flex flex-col items-end gap-3 z-50 animate-scale-in animation-delay-700">
-          <div className="px-5 py-2.5 rounded-full font-bold text-xs shadow-lg shadow-indigo-500/20 flex items-center gap-2 border-2 border-white/20 transition-all duration-300 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
-            <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]' : 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]'}`}></span>
-            {isOnline ? 'Online' : 'Offline'}
+        {/* Floating Action Buttons Menu */}
+        <div className="fixed bottom-6 right-6 flex flex-col items-end gap-3 z-50 animate-scale-in animation-delay-700 pointer-events-none">
+
+          {/* Menu Items (Only visible when expanded) */}
+          <div className={`flex flex-col items-end gap-3 transition-all duration-300 origin-bottom ${isFabExpanded ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 translate-y-10 scale-90 pointer-events-none absolute bottom-16'}`}>
+
+            {/* Status Pill */}
+            <div className="px-5 py-2.5 rounded-full font-bold text-xs shadow-lg shadow-black/5 dark:shadow-indigo-500/20 flex items-center gap-2 border border-slate-200 dark:border-slate-700 transition-all duration-300 bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 backdrop-blur-md">
+              <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]'}`}></span>
+              {isOnline ? 'Online' : 'Offline'}
+            </div>
+
+            {/* Refresh */}
+            <button
+              onClick={async () => {
+                setLoading(true);
+                try {
+                  const updated = await checkAndSync(true);
+                  responseCache.current['full_data'] = updated;
+                  fetchData();
+                  setToastMsg('Schedule updated manually!');
+                } catch (e) {
+                  setToastMsg('Manual update failed');
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              className="w-12 h-12 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 rounded-full shadow-lg shadow-indigo-500/20 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-indigo-100 dark:border-slate-700"
+              title="Refresh Data"
+            >
+              <i className="fas fa-sync-alt"></i>
+            </button>
+
+            {/* Download */}
+            <button
+              onClick={handleDownload}
+              className="w-12 h-12 bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 rounded-full shadow-lg shadow-purple-500/20 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-purple-100 dark:border-slate-700"
+              title="Download Timetable"
+            >
+              <i className="fas fa-download"></i>
+            </button>
+
+            {/* Info Button (NEW) */}
+            <button
+              onClick={() => { setShowInfoModal(true); setIsFabExpanded(false); }}
+              className="w-12 h-12 bg-white dark:bg-slate-800 text-blue-500 dark:text-blue-400 rounded-full shadow-lg shadow-blue-500/20 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-blue-100 dark:border-slate-700"
+              title="App Info"
+            >
+              <i className="fas fa-info"></i>
+            </button>
+
           </div>
-          <button onClick={async () => {
-            setLoading(true);
-            try {
-              const updated = await checkAndSync(true);
-              responseCache.current['full_data'] = updated;
-              fetchData();
-              setToastMsg('Schedule updated manually!');
-            } catch (e) {
-              setToastMsg('Manual update failed');
-            } finally {
-              setLoading(false);
-            }
-          }} className="w-12 h-12 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full shadow-lg shadow-indigo-500/30 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-white/20 group" title="Refresh Data">
-            <i className="fas fa-sync-alt group-hover:animate-spin"></i>
-          </button>
-          <button onClick={handleDownload} className="w-12 h-12 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full shadow-lg shadow-indigo-500/30 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-white/20 group" title="Download Timetable">
-            <i className="fas fa-download group-hover:animate-bounce"></i>
+
+          {/* Main Toggle Button */}
+          <button
+            onClick={() => setIsFabExpanded(!isFabExpanded)}
+            className={`w-14 h-14 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-xl shadow-indigo-500/40 flex items-center justify-center hover:scale-105 active:scale-95 transition-all duration-300 border-2 border-white/20 pointer-events-auto relative z-50`}
+            style={{ transform: isFabExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+          >
+            <i className={`fas ${isFabExpanded ? 'fa-chevron-down' : 'fa-chevron-up'} text-xl`}></i>
           </button>
         </div>
+
+        <InfoModal isOpen={showInfoModal} onClose={() => setShowInfoModal(false)} />
 
         {toastMsg && <Toast message={toastMsg} onClose={() => setToastMsg(null)} />}
       </div>

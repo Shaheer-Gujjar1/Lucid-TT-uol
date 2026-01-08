@@ -205,7 +205,7 @@ export default function TimetablePrintView({ slots, day, room, mode, date, filte
             <div style={styles.headerBlock}>
                 <div>
                     <div style={styles.headerTitle}>
-                        <span>Lucid <span style={styles.headerGradientText}>Timetable</span></span> <span style={{ fontSize: '14px', color: '#94a3b8', fontWeight: 500, marginLeft: '8px' }}>v5.6.9</span>
+                        <span>Lucid <span style={styles.headerGradientText}>Timetable</span></span> <span style={{ fontSize: '14px', color: '#94a3b8', fontWeight: 500, marginLeft: '8px' }}>v5.7.3</span>
                     </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
@@ -223,7 +223,7 @@ export default function TimetablePrintView({ slots, day, room, mode, date, filte
 
                     if (isFree) {
                         return (
-                            <div key={idx} style={styles.slotCard(false, true)}>
+                            <div key={idx} style={{ ...styles.slotCard(false, true), borderLeft: 'none' }}>
                                 <div style={styles.timeLabel}>{slot.time}</div>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                                     <div style={styles.freeText}>FREE</div>
@@ -234,9 +234,21 @@ export default function TimetablePrintView({ slots, day, room, mode, date, filte
 
                     const isClash = slot.entries.length > 1;
                     const isLab = slot.entries[0]?.isLab;
+                    const accentColor = isLab ? '#f59e0b' : '#3b82f6';
 
                     return (
-                        <div key={idx} style={styles.slotCard(isLab, false)}>
+                        <div key={idx} style={{ ...styles.slotCard(isLab, false), borderLeft: 'none' }}>
+                            {/* Accent Pill */}
+                            <div style={{
+                                position: 'absolute',
+                                left: 0,
+                                top: '16px',
+                                bottom: '16px',
+                                width: '4px',
+                                background: accentColor,
+                                borderRadius: '0 4px 4px 0'
+                            }}></div>
+
                             {isClash && <div style={styles.clashBadge}>CLASH</div>}
 
                             {slot.entries.map((entry, entryIdx) => (

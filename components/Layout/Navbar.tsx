@@ -81,7 +81,7 @@ const Navbar = memo(function Navbar() {
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 md:h-2 md:w-2 bg-indigo-500"></span>
                             </span>
-                            <span className="text-[10px] md:text-xs font-bold text-indigo-600 dark:text-indigo-300">v5.6.9</span>
+                            <span className="text-[10px] md:text-xs font-bold text-indigo-600 dark:text-indigo-300">v5.7.3</span>
                         </div>
                     </div>
                 </div>

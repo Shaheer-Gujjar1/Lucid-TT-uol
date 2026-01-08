@@ -3,6 +3,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 
+// ... Interface ...
 interface DropdownProps {
     label: string;
     value: string;
@@ -10,23 +11,50 @@ interface DropdownProps {
     onChange: (value: string) => void;
     placeholder?: string;
     icon?: string;
+    isOpen?: boolean;
+    onToggle?: (open: boolean) => void;
 }
 
-export default function Dropdown({ label, value, options, onChange, placeholder = "Select...", icon }: DropdownProps) {
-    const [isOpen, setIsOpen] = useState(false);
+export default function Dropdown({ label, value, options, onChange, placeholder = "Select...", icon, isOpen, onToggle }: DropdownProps) {
+    const [internalOpen, setInternalOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    const isControlled = typeof isOpen === 'boolean' && onToggle;
+    const show = isControlled ? isOpen : internalOpen;
 
     const selectedOption = options.find(opt => opt.value === value);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
+                if (isControlled) {
+                    onToggle(false);
+                } else {
+                    setInternalOpen(false);
+                }
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    }, [isControlled, onToggle]);
+
+    const handleToggle = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (isControlled) {
+            onToggle(!show);
+        } else {
+            setInternalOpen(!internalOpen);
+        }
+    };
+
+    const handleSelect = (val: string) => {
+        onChange(val);
+        if (isControlled) {
+            onToggle(false);
+        } else {
+            setInternalOpen(false);
+        }
+    };
 
     return (
         <div className="flex flex-col gap-2 w-full relative" ref={dropdownRef}>
@@ -34,8 +62,8 @@ export default function Dropdown({ label, value, options, onChange, placeholder 
 
             <button
                 type="button"
-                onClick={() => setIsOpen(!isOpen)}
-                className={`w-full flex items-center justify-between bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl text-slate-700 dark:text-slate-200 font-black text-sm transition-all duration-300 shadow-inner group ${isOpen ? 'ring-4 ring-indigo-500/10 border-indigo-500' : 'hover:border-indigo-400'} ${icon ? 'pl-12 relative' : ''}`}
+                onMouseDown={handleToggle}
+                className={`w-full flex items-center justify-between bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl text-slate-700 dark:text-slate-200 font-black text-sm transition-all duration-300 shadow-inner group ${show ? 'ring-4 ring-indigo-500/10 border-indigo-500' : 'hover:border-indigo-400'} ${icon ? 'pl-12 relative' : ''}`}
             >
                 {icon && (
                     <i className={`fas ${icon} absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500`}></i>
@@ -43,17 +71,17 @@ export default function Dropdown({ label, value, options, onChange, placeholder 
                 <span className={!value ? 'text-slate-400' : ''}>
                     {selectedOption ? selectedOption.label : placeholder}
                 </span>
-                <i className={`fas fa-chevron-down text-[10px] transition-transform duration-300 ${isOpen ? 'rotate-180 text-indigo-500' : 'text-slate-400'}`}></i>
+                <i className={`fas fa-chevron-down text-[10px] transition-transform duration-300 ${show ? 'rotate-180 text-indigo-500' : 'text-slate-400'}`}></i>
             </button>
 
             {/* Custom Dropdown List */}
-            {isOpen && (
+            {show && (
                 <div className="absolute top-[calc(100%+8px)] left-0 w-full z-[999] animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-200 ease-out origin-top">
                     <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden ring-1 ring-black/5">
                         <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
                             <div className="p-2 space-y-1">
                                 <button
-                                    onClick={() => { onChange(''); setIsOpen(false); }}
+                                    onClick={() => handleSelect('')}
                                     className="w-full text-left px-5 py-3 rounded-xl text-sm font-bold text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                                 >
                                     {placeholder}
@@ -61,7 +89,7 @@ export default function Dropdown({ label, value, options, onChange, placeholder 
                                 {options.map((opt) => (
                                     <button
                                         key={opt.value}
-                                        onClick={() => { onChange(opt.value); setIsOpen(false); }}
+                                        onClick={() => handleSelect(opt.value)}
                                         className={`w-full text-left px-5 py-3 rounded-xl text-sm font-black transition-all ${value === opt.value ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20 scale-[1.02]' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
                                     >
                                         {opt.label}

@@ -25,8 +25,11 @@ interface FilterBarProps {
 export default function FilterBar({ mode, filters, setFilter, onSave, onClear }: FilterBarProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [allowOverflow, setAllowOverflow] = useState(false);
+    const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
     useEffect(() => {
+        if (!isExpanded) setActiveDropdown(null); // Reset when collapsed
+
         let timeout: NodeJS.Timeout;
         if (isExpanded) {
             timeout = setTimeout(() => setAllowOverflow(true), 500);
@@ -39,34 +42,36 @@ export default function FilterBar({ mode, filters, setFilter, onSave, onClear }:
     return (
         <div className="relative z-[100] bg-white dark:bg-slate-900 md:bg-gradient-to-br md:from-indigo-50/40 md:via-white md:to-white md:dark:from-slate-800/50 md:dark:via-slate-900 md:dark:to-slate-900 rounded-[2.5rem] p-5 md:p-8 shadow-sm md:shadow-[0_8px_32px_rgba(0,0,0,0.06)] mb-8 border border-indigo-100/50 dark:border-slate-800/80 backdrop-blur-none md:backdrop-blur-sm transition-all duration-500">
 
-            {/* Mobile Toggle Header */}
-            <div
-                className="md:hidden flex justify-between items-center cursor-pointer"
-                onClick={() => setIsExpanded(!isExpanded)}
-            >
-                <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${isExpanded ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30' : 'bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700'}`}>
-                        <i className="fas fa-filter"></i>
+            {/* Header - Always Visible */}
+            <div className="flex justify-between items-center cursor-pointer group" onClick={() => setIsExpanded(!isExpanded)}>
+                <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 transition-transform duration-500 ${isExpanded ? 'rotate-180 scale-110' : 'group-hover:scale-105'}`}>
+                        <i className={`fas ${isExpanded ? 'fa-times' : 'fa-filter'} text-xl`}></i>
                     </div>
-                    <span className="font-black text-slate-700 dark:text-slate-200 text-sm uppercase tracking-wider">
-                        {isExpanded ? 'Hide Filters' : 'Show Filters'}
-                    </span>
+                    <div>
+                        <h2 className="text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight">
+                            {isExpanded ? 'Hide Filters' : 'Show Filters'}
+                        </h2>
+                        <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest group-hover:text-indigo-500 transition-colors">
+                            {mode.charAt(0).toUpperCase() + mode.slice(1)} Mode
+                        </p>
+                    </div>
                 </div>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 bg-slate-100 dark:bg-slate-800 ${isExpanded ? 'rotate-180 text-indigo-600' : 'text-slate-400'}`}>
-                    <i className="fas fa-chevron-down"></i>
+                <div className={`w-10 h-10 rounded-full border-2 border-slate-100 dark:border-slate-800 flex items-center justify-center transition-all duration-300 ${isExpanded ? 'bg-slate-100 dark:bg-slate-800 rotate-180' : 'bg-white dark:bg-slate-900'}`}>
+                    <i className="fas fa-chevron-down text-indigo-500"></i>
                 </div>
             </div>
 
             {/* Filter Content */}
             {/* Filter Content */}
-            <div className={`grid transition-all duration-500 ease-in-out ${isExpanded ? 'grid-rows-[1fr] mt-6' : 'grid-rows-[0fr] mt-0'} md:grid-rows-[1fr] md:opacity-100 md:mt-6 ${allowOverflow ? 'overflow-visible' : 'overflow-hidden'} md:overflow-visible`}>
-                <div className={`overflow-hidden md:overflow-visible transition-all duration-300 ${isExpanded ? 'pb-80' : 'pb-0'} md:pb-0`}>
+            <div className={`grid transition-all duration-500 ease-in-out ${isExpanded ? 'grid-rows-[1fr] mt-6' : 'grid-rows-[0fr] mt-0'} md:grid-rows-[1fr] md:opacity-100 md:mt-6 ${isExpanded && allowOverflow ? 'overflow-visible' : 'overflow-hidden'} md:overflow-visible`}>
+                <div className={`overflow-hidden md:overflow-visible transition-all duration-300 ${activeDropdown === 'day' ? (mode === 'room' ? 'pb-68' : 'pb-40') : 'pb-1'} md:pb-1 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
                     {mode === 'student' && (
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-6 relative z-[105]">
-                            <Dropdown label="Program" value={filters.program} options={PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" />
-                            <Dropdown label="Semester" value={filters.semester} options={SEMESTERS} onChange={(v) => setFilter('semester', v)} icon="fa-layer-group" />
-                            <Dropdown label="Section" value={filters.section} options={SECTIONS} onChange={(v) => setFilter('section', v)} icon="fa-users" />
-                            <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" />
+                            <Dropdown label="Program" value={filters.program} options={PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" isOpen={activeDropdown === 'program'} onToggle={(v) => setActiveDropdown(v ? 'program' : null)} />
+                            <Dropdown label="Semester" value={filters.semester} options={SEMESTERS} onChange={(v) => setFilter('semester', v)} icon="fa-layer-group" isOpen={activeDropdown === 'semester'} onToggle={(v) => setActiveDropdown(v ? 'semester' : null)} />
+                            <Dropdown label="Section" value={filters.section} options={SECTIONS} onChange={(v) => setFilter('section', v)} icon="fa-users" isOpen={activeDropdown === 'section'} onToggle={(v) => setActiveDropdown(v ? 'section' : null)} />
+                            <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
                         </div>
                     )}
 
@@ -86,7 +91,7 @@ export default function FilterBar({ mode, filters, setFilter, onSave, onClear }:
                                     />
                                 </div>
                             </div>
-                            <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" />
+                            <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
                         </div>
                     )}
 
@@ -105,7 +110,7 @@ export default function FilterBar({ mode, filters, setFilter, onSave, onClear }:
                                     />
                                 </div>
                             </div>
-                            <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" />
+                            <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
                         </div>
                     )}
 
