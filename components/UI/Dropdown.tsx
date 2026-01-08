@@ -81,7 +81,7 @@ export default function Dropdown({ label, value, options, onChange, placeholder 
                         <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
                             <div className="p-2 space-y-1">
                                 <button
-                                    onClick={() => handleSelect('')}
+                                    onMouseDown={(e) => { e.preventDefault(); handleSelect(''); }}
                                     className="w-full text-left px-5 py-3 rounded-xl text-sm font-bold text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                                 >
                                     {placeholder}
@@ -89,7 +89,7 @@ export default function Dropdown({ label, value, options, onChange, placeholder 
                                 {options.map((opt) => (
                                     <button
                                         key={opt.value}
-                                        onClick={() => handleSelect(opt.value)}
+                                        onMouseDown={(e) => { e.preventDefault(); handleSelect(opt.value); }}
                                         className={`w-full text-left px-5 py-3 rounded-xl text-sm font-black transition-all ${value === opt.value ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20 scale-[1.02]' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
                                     >
                                         {opt.label}

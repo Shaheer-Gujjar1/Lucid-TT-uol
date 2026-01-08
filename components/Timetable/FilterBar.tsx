@@ -40,7 +40,7 @@ export default function FilterBar({ mode, filters, setFilter, onSave, onClear }:
     }, [isExpanded]);
 
     return (
-        <div className="relative z-[100] bg-white dark:bg-slate-900 md:bg-gradient-to-br md:from-indigo-50/40 md:via-white md:to-white md:dark:from-slate-800/50 md:dark:via-slate-900 md:dark:to-slate-900 rounded-[2.5rem] p-5 md:p-8 shadow-sm md:shadow-[0_8px_32px_rgba(0,0,0,0.06)] mb-8 border border-indigo-100/50 dark:border-slate-800/80 backdrop-blur-none md:backdrop-blur-sm transition-all duration-500">
+        <div className={`relative z-[100] bg-white dark:bg-slate-900 md:bg-gradient-to-br md:from-indigo-50/40 md:via-white md:to-white md:dark:from-slate-800/50 md:dark:via-slate-900 md:dark:to-slate-900 rounded-[2.5rem] shadow-sm md:shadow-[0_8px_32px_rgba(0,0,0,0.06)] border border-indigo-100/50 dark:border-slate-800/80 backdrop-blur-none md:backdrop-blur-sm transition-all duration-500 ${isExpanded ? 'p-5 md:p-8 mb-8' : 'p-3 md:p-3 mb-2'}`}>
 
             {/* Header - Always Visible */}
             <div className="flex justify-between items-center cursor-pointer group" onClick={() => setIsExpanded(!isExpanded)}>
@@ -64,8 +64,8 @@ export default function FilterBar({ mode, filters, setFilter, onSave, onClear }:
 
             {/* Filter Content */}
             {/* Filter Content */}
-            <div className={`grid transition-all duration-500 ease-in-out ${isExpanded ? 'grid-rows-[1fr] mt-6' : 'grid-rows-[0fr] mt-0'} md:grid-rows-[1fr] md:opacity-100 md:mt-6 ${isExpanded && allowOverflow ? 'overflow-visible' : 'overflow-hidden'} md:overflow-visible`}>
-                <div className={`overflow-hidden md:overflow-visible transition-all duration-300 ${activeDropdown === 'day' ? (mode === 'room' ? 'pb-68' : 'pb-40') : 'pb-1'} md:pb-1 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
+            <div className={`grid transition-all duration-500 ease-in-out ${isExpanded ? 'grid-rows-[1fr] mt-6' : 'grid-rows-[0fr] mt-0'} ${isExpanded && allowOverflow ? 'overflow-visible' : 'overflow-hidden'}`}>
+                <div className={`overflow-hidden ${isExpanded ? 'md:overflow-visible' : 'md:overflow-hidden'} transition-all duration-300 ${activeDropdown === 'day' ? (mode === 'room' ? 'pb-68' : 'pb-40') : 'pb-1'} md:pb-1 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
                     {mode === 'student' && (
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-6 relative z-[105]">
                             <Dropdown label="Program" value={filters.program} options={PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" isOpen={activeDropdown === 'program'} onToggle={(v) => setActiveDropdown(v ? 'program' : null)} />

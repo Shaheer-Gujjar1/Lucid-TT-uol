@@ -1,5 +1,7 @@
 'use client';
 
+import { triggerHaptic } from '@/lib/haptics';
+
 interface ViewToggleProps {
     view: 'day' | 'week';
     setView: (view: 'day' | 'week') => void;
@@ -17,13 +19,13 @@ export default function ViewToggle({ view, setView }: ViewToggleProps) {
                 />
 
                 <button
-                    onClick={() => setView('day')}
+                    onClick={() => { triggerHaptic(); setView('day'); }}
                     className={`py-3 px-8 rounded-full font-black text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95 ${view === 'day' ? 'text-white' : 'text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400'}`}
                 >
                     <i className="fas fa-calendar-day"></i> <span className="hidden sm:inline">Day View</span><span className="sm:hidden">Day</span>
                 </button>
                 <button
-                    onClick={() => setView('week')}
+                    onClick={() => { triggerHaptic(); setView('week'); }}
                     className={`py-3 px-8 rounded-full font-black text-xs uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2 transform active:scale-95 ${view === 'week' ? 'text-white' : 'text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400'}`}
                 >
                     <i className="fas fa-calendar-week"></i> <span className="hidden sm:inline">Week View</span><span className="sm:hidden">Week</span>

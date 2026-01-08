@@ -22,10 +22,20 @@ export default function NotificationManager() {
         // Run immediately
         runCheck();
 
+        // Listen for network recovery
+        const handleOnline = () => {
+            console.log('Network restored - Checking for missed notifications...');
+            runCheck();
+        };
+        window.addEventListener('online', handleOnline);
+
         // Run every minute (60,000 ms)
         const intervalId = setInterval(runCheck, 60000);
 
-        return () => clearInterval(intervalId);
+        return () => {
+            clearInterval(intervalId);
+            window.removeEventListener('online', handleOnline);
+        };
     }, []);
 
     return null; // Invisible component

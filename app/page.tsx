@@ -14,6 +14,7 @@ import Toast from '@/components/UI/Toast';
 import InfoModal from '@/components/UI/InfoModal';
 import { ProcessedSlot, DAYS, processDayData } from '@/lib/parser';
 import { checkAndSync, detectSheetChanges } from '@/lib/sync_service';
+import { triggerHaptic } from '@/lib/haptics';
 
 export default function Home() {
   const [mode, setMode] = useState<'student' | 'teacher' | 'room'>('student');
@@ -50,6 +51,11 @@ export default function Home() {
       return () => clearTimeout(timer);
     }
   }, []);
+
+  // Haptic feedback on Toast
+  useEffect(() => {
+    if (toastMsg) triggerHaptic();
+  }, [toastMsg]);
 
   // Client-side cache to prevent refetching
   const responseCache = useRef<{ [key: string]: any }>({});
@@ -348,12 +354,7 @@ export default function Home() {
   const touchEndY = useRef<number | null>(null);
   const minSwipeDistance = 100; // Increased threshold to avoid accidental swipes
 
-  // Haptic Feedback Helper
-  const triggerHaptic = () => {
-    if (typeof navigator !== 'undefined' && navigator.vibrate) {
-      navigator.vibrate(12); // Subtle tap
-    }
-  };
+
 
   // Keyboard Navigation
   useEffect(() => {
@@ -367,7 +368,6 @@ export default function Home() {
         const newIdx = (currentIdx - 1 + DAYS.length) % DAYS.length;
         setFilters(prev => ({ ...prev, day: DAYS[newIdx] }));
         setToastMsg(`Switched to ${DAYS[newIdx]}`);
-        triggerHaptic();
       } else if (e.key === 'ArrowRight') {
         const newIdx = (currentIdx + 1) % DAYS.length;
         setFilters(prev => ({ ...prev, day: DAYS[newIdx] }));
@@ -422,7 +422,6 @@ export default function Home() {
         const newDay = DAYS[newIdx];
         setFilters(prev => ({ ...prev, day: newDay }));
         setToastMsg(`Switched to ${newDay}`);
-        triggerHaptic();
       }
     }
   };

@@ -86,12 +86,19 @@ export const checkEventNotifications = (events: AgendaEvent[]) => {
             logChanged = true;
         }
 
-        // 2. One Hour Before (1h +/- 15min window)
-        if (diffHours <= 1 && diffHours > 0 && !log.hourBefore) {
-            sendNotification(`Reminder: ${event.title}`, {
-                body: `Starting in 1 hour! ${event.description ? '- ' + event.description.substring(0, 30) + '...' : ''}`,
+        // 2. One Hour Before (or just missed start)
+        if (diffHours <= 1 && diffHours > -1 && !log.hourBefore) {
+            const isStarted = diffHours < 0;
+            const title = isStarted ? `Happening Now: ${event.title}` : `Reminder: ${event.title}`;
+
+            const timeMsg = isStarted
+                ? `Started ${Math.abs(Math.round(diffHours * 60))} mins ago.`
+                : `Starting in ${Math.round(diffHours * 60)} mins!`;
+
+            sendNotification(title, {
+                body: `${timeMsg} ${event.description ? '- ' + event.description.substring(0, 30) + '...' : ''}`,
                 tag: `hour-${event.id}`,
-                requireInteraction: true // Stays until clicked
+                requireInteraction: true
             });
             log.hourBefore = true;
             logChanged = true;
