@@ -10,14 +10,15 @@ import DayView from '@/components/Timetable/DayView';
 import WeekView from '@/components/Timetable/WeekView';
 import TimetablePrintView from '@/components/Timetable/TimetablePrintView';
 import ViewToggle from '@/components/Timetable/ViewToggle';
+import ExamView from '@/components/Exam/ExamView';
 import Toast from '@/components/UI/Toast';
 import InfoModal from '@/components/UI/InfoModal';
 import { ProcessedSlot, DAYS, processDayData } from '@/lib/parser';
 import { checkAndSync, detectSheetChanges } from '@/lib/sync_service';
-import { triggerHaptic } from '@/lib/haptics';
 
 export default function Home() {
-  const [mode, setMode] = useState<'student' | 'teacher' | 'room'>('student');
+  const [mode, setMode] = useState<'student' | 'teacher' | 'room' | 'exam'>('student');
+  const [examView, setExamView] = useState<'datesheet' | 'seating'>('datesheet');
   const [view, setView] = useState<'day' | 'week'>('day');
   const [filters, setFilters] = useState({
     program: '',
@@ -25,8 +26,15 @@ export default function Home() {
     section: '',
     day: '',
     teacherName: '',
-    roomNumber: ''
+    roomNumber: '',
+    date: '',
+    studentSearch: ''
   });
+
+  const [availableExamDates, setAvailableExamDates] = useState<string[]>([]);
+  const handleDatesAvailable = useCallback((dates: string[]) => {
+    setAvailableExamDates(dates);
+  }, []);
 
   const [slots, setSlots] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -51,11 +59,6 @@ export default function Home() {
       return () => clearTimeout(timer);
     }
   }, []);
-
-  // Haptic feedback on Toast
-  useEffect(() => {
-    if (toastMsg) triggerHaptic();
-  }, [toastMsg]);
 
   // Client-side cache to prevent refetching
   const responseCache = useRef<{ [key: string]: any }>({});
@@ -88,9 +91,11 @@ export default function Home() {
         program: '',
         semester: '',
         section: '',
+        day: prev.day,
         teacherName: '',
         roomNumber: '',
-        day: prev.day // Always preserve day
+        date: '',
+        studentSearch: ''
       };
 
       if (mode === 'student') {
@@ -115,7 +120,6 @@ export default function Home() {
         if (stored) {
           try {
             const prefs = JSON.parse(stored);
-            // Strictly apply only teacher fields
             return {
               ...resetFilters,
               teacherName: prefs.teacherName || ''
@@ -125,10 +129,29 @@ export default function Home() {
         return resetFilters;
       }
 
-      // Room Mode or Default -> Clean Slate
+      else if (mode === 'exam') {
+        // Datesheet: Load specific prefs
+        if (examView === 'datesheet') {
+          const stored = localStorage.getItem('lucid_exam_datesheet_prefs');
+          if (stored) {
+            try {
+              const prefs = JSON.parse(stored);
+              return {
+                ...resetFilters,
+                program: prefs.program || '',
+                semester: prefs.semester || '',
+                section: prefs.section || ''
+              };
+            } catch (e) { console.error(e); }
+          }
+        }
+        // Seating Plan: No prefs (Reset)
+        return resetFilters;
+      }
+
       return resetFilters;
     });
-  }, [mode]);
+  }, [mode, examView]);
 
   // Initial data restoration from LocalStorage and Sync trigger
   useEffect(() => {
@@ -177,6 +200,7 @@ export default function Home() {
   }, []);
 
   const fetchData = useCallback(async () => {
+    if (mode === 'exam') return;
     const activeDay = view === 'week' ? 'all' : filters.day;
     if (!activeDay) return;
 
@@ -274,6 +298,13 @@ export default function Home() {
         teacherName: filters.teacherName
       }));
       setToastMsg('Teacher preferences saved!');
+    } else if (mode === 'exam' && examView === 'datesheet') {
+      localStorage.setItem('lucid_exam_datesheet_prefs', JSON.stringify({
+        program: filters.program,
+        semester: filters.semester,
+        section: filters.section
+      }));
+      setToastMsg('Datesheet preferences saved!');
     }
   };
 
@@ -288,6 +319,10 @@ export default function Home() {
       localStorage.removeItem('lucid_teacher_prefs');
       setFilters(prev => ({ ...prev, teacherName: '' }));
       setToastMsg('Teacher preferences cleared!');
+    } else if (mode === 'exam' && examView === 'datesheet') {
+      localStorage.removeItem('lucid_exam_datesheet_prefs');
+      setFilters(prev => ({ ...prev, program: '', semester: '', section: '' }));
+      setToastMsg('Datesheet preferences cleared!');
     }
   };
 
@@ -372,7 +407,6 @@ export default function Home() {
         const newIdx = (currentIdx + 1) % DAYS.length;
         setFilters(prev => ({ ...prev, day: DAYS[newIdx] }));
         setToastMsg(`Switched to ${DAYS[newIdx]}`);
-        triggerHaptic();
       }
     };
 
@@ -434,9 +468,11 @@ export default function Home() {
         <div className="container mx-auto px-4 pt-28 max-w-5xl">
 
           {/* View Toggle matching screenshot */}
-          <div className="animate-fade-in-up animation-delay-100">
-            <ViewToggle view={view} setView={setView} />
-          </div>
+          {mode !== 'exam' && (
+            <div className="animate-fade-in-up animation-delay-100">
+              <ViewToggle view={view} setView={setView} />
+            </div>
+          )}
 
           <div className="animate-fade-in-up animation-delay-200">
             <ModeToggle mode={mode} setMode={setMode} />
@@ -445,10 +481,12 @@ export default function Home() {
           <div className="animate-fade-in-up animation-delay-300 relative z-50">
             <FilterBar
               mode={mode}
+              examView={examView}
               filters={filters}
               setFilter={handleSetFilter}
               onSave={savePreferences}
               onClear={clearPreferences}
+              availableDates={availableExamDates}
             />
           </div>
 
@@ -458,7 +496,15 @@ export default function Home() {
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
           >
-            {view === 'day' ? (
+            {mode === 'exam' ? (
+              <ExamView
+                view={examView}
+                onViewChange={setExamView}
+                filters={filters}
+                onDatesAvailable={handleDatesAvailable}
+                availableDates={availableExamDates}
+              />
+            ) : view === 'day' ? (
               <DayView slots={slots as ProcessedSlot[]} loading={loading} error={error} day={filters.day} />
             ) : (
               <WeekView data={slots} loading={loading} error={error} />
@@ -538,14 +584,16 @@ export default function Home() {
       </div>
 
       {/* Print View (Hidden standardly, visible on print) */}
-      <TimetablePrintView
-        slots={slots as ProcessedSlot[]}
-        day={filters.day}
-        mode={mode}
-        room={mode === 'room' ? filters.roomNumber : undefined}
-        filters={filters}
-        generatedAt={generatedAt}
-      />
+      {mode !== 'exam' && (
+        <TimetablePrintView
+          slots={slots as ProcessedSlot[]}
+          day={filters.day}
+          mode={mode}
+          room={mode === 'room' ? filters.roomNumber : undefined}
+          filters={filters}
+          generatedAt={generatedAt}
+        />
+      )}
     </div>
   );
 }

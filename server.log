@@ -1,0 +1,28 @@
+nohup: ignoring input
+
+> lucid-timetable-next@0.1.0 start
+> next start -p 3005
+
+▲ Next.js 16.1.1
+- Local:         http://localhost:3005
+- Network:       http://192.168.1.12:3005
+
+✓ Starting...
+✓ Ready in 913ms
+[TestSeating] Starting Seating Plan Debug Test...
+[TestSeating] Fetch Status: 200
+[TestSeating] Buffer Received: 255654 bytes
+[TestSeating] Detected PDF Header. Using PDF Parser...
+Warning: Setting up fake worker.
+[TestSeating] PDF Raw Text Extracted. Length: 21447
+Warning: Setting up fake worker.
+[TestSeating] Parser Output: 614 entries
+[TestSeating] Starting Seating Plan Debug Test...
+[TestSeating] Fetch Status: 200
+[TestSeating] Buffer Received: 255654 bytes
+[TestSeating] Detected PDF Header. Using PDF Parser...
+Warning: Setting up fake worker.
+[TestSeating] PDF Raw Text Extracted. Length: 21447
+Warning: Setting up fake worker.
+[TestSeating] Parser Output: 614 entries
+Killed

@@ -205,7 +205,7 @@ export default function TimetablePrintView({ slots, day, room, mode, date, filte
             <div style={styles.headerBlock}>
                 <div>
                     <div style={styles.headerTitle}>
-                        <span>Lucid <span style={styles.headerGradientText}>Timetable</span></span> <span style={{ fontSize: '14px', color: '#94a3b8', fontWeight: 500, marginLeft: '8px' }}>v5.7.4</span>
+                        <span>Lucid <span style={styles.headerGradientText}>Timetable</span></span> <span style={{ fontSize: '14px', color: '#94a3b8', fontWeight: 500, marginLeft: '8px' }}>v6.0.0</span>
                     </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
@@ -237,7 +237,7 @@ export default function TimetablePrintView({ slots, day, room, mode, date, filte
                     const accentColor = isLab ? '#f59e0b' : '#3b82f6';
 
                     return (
-                        <div key={idx} style={{ ...styles.slotCard(isLab, false), borderLeft: 'none' }}>
+                        <div key={idx} style={{ ...styles.slotCard(isLab, false), borderLeftStyle: 'none' }}>
                             {/* Accent Pill */}
                             <div style={{
                                 position: 'absolute',

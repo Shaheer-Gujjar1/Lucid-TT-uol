@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Dropdown from '@/components/UI/Dropdown';
-import { PROGRAMS, SEMESTERS, SECTIONS, DAYS_OPTIONS, TEACHERS } from '@/lib/constants';
+import { PROGRAMS, EXAM_PROGRAMS, SEMESTERS, SECTIONS, DAYS_OPTIONS, TEACHERS } from '@/lib/constants';
 
 interface Filters {
     program: string;
@@ -12,17 +12,21 @@ interface Filters {
     day: string;
     teacherName: string;
     roomNumber: string;
+    date?: string;
+    studentSearch?: string;
 }
 
 interface FilterBarProps {
-    mode: 'student' | 'teacher' | 'room';
+    mode: 'student' | 'teacher' | 'room' | 'exam';
+    examView?: 'datesheet' | 'seating';
     filters: Filters;
     setFilter: (key: keyof Filters, value: string) => void;
     onSave?: () => void;
     onClear?: () => void;
+    availableDates?: string[];
 }
 
-export default function FilterBar({ mode, filters, setFilter, onSave, onClear }: FilterBarProps) {
+export default function FilterBar({ mode, examView, filters, setFilter, onSave, onClear, availableDates }: FilterBarProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [allowOverflow, setAllowOverflow] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -65,7 +69,7 @@ export default function FilterBar({ mode, filters, setFilter, onSave, onClear }:
             {/* Filter Content */}
             {/* Filter Content */}
             <div className={`grid transition-all duration-500 ease-in-out ${isExpanded ? 'grid-rows-[1fr] mt-6' : 'grid-rows-[0fr] mt-0'} ${isExpanded && allowOverflow ? 'overflow-visible' : 'overflow-hidden'}`}>
-                <div className={`overflow-hidden ${isExpanded ? 'md:overflow-visible' : 'md:overflow-hidden'} transition-all duration-300 ${activeDropdown === 'day' ? (mode === 'room' ? 'pb-68' : 'pb-40') : 'pb-1'} md:pb-1 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
+                <div className={`overflow-hidden ${isExpanded ? 'md:overflow-visible' : 'md:overflow-hidden'} transition-all duration-300 ${activeDropdown === 'day' || activeDropdown === 'program' ? ((mode === 'room' || mode === 'exam') ? 'pb-68' : 'pb-40') : 'pb-1'} md:pb-1 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
                     {mode === 'student' && (
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-6 relative z-[105]">
                             <Dropdown label="Program" value={filters.program} options={PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" isOpen={activeDropdown === 'program'} onToggle={(v) => setActiveDropdown(v ? 'program' : null)} />
@@ -113,6 +117,63 @@ export default function FilterBar({ mode, filters, setFilter, onSave, onClear }:
                             <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
                         </div>
                     )}
+                    {/* Exam Mode */}
+                    {mode === 'exam' && (
+                        <div className="mb-6 relative z-[105]">
+                            {examView === 'seating' ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Student Search */}
+                                    <div className="flex flex-col gap-2 relative">
+                                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Student Name / ID</label>
+                                        <div className="relative">
+                                            <i className="fas fa-user absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
+                                            <input
+                                                type="text"
+                                                value={filters.studentSearch || ''}
+                                                onChange={(e) => setFilter('studentSearch', e.target.value)}
+                                                placeholder="Enter Name or Registration ID..."
+                                                className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner"
+                                            />
+                                        </div>
+                                    </div>
+                                    {/* Room Search */}
+                                    <div className="flex flex-col gap-2 relative">
+                                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Room Number</label>
+                                        <div className="relative">
+                                            <i className="fas fa-door-open absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
+                                            <input
+                                                type="text"
+                                                value={filters.roomNumber || ''}
+                                                onChange={(e) => setFilter('roomNumber', e.target.value)}
+                                                placeholder="Filter by Room..."
+                                                className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                                    <Dropdown
+                                        label="Date"
+                                        value={filters.date || ''}
+                                        options={[
+                                            { label: 'All Dates', value: '' },
+                                            ...(availableDates || []).map(d => ({ label: d, value: d }))
+                                        ]}
+                                        onChange={(v) => setFilter('date', v)}
+                                        icon="fa-calendar-alt"
+                                        isOpen={activeDropdown === 'date'}
+                                        onToggle={(v) => setActiveDropdown(v ? 'date' : null)}
+                                    />
+                                    <Dropdown label="Program" value={filters.program} options={EXAM_PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" isOpen={activeDropdown === 'program'} onToggle={(v) => setActiveDropdown(v ? 'program' : null)} />
+                                    <Dropdown label="Semester" value={filters.semester} options={SEMESTERS} onChange={(v) => setFilter('semester', v)} icon="fa-layer-group" isOpen={activeDropdown === 'semester'} onToggle={(v) => setActiveDropdown(v ? 'semester' : null)} />
+                                    <Dropdown label="Section" value={filters.section} options={SECTIONS} onChange={(v) => setFilter('section', v)} icon="fa-users" isOpen={activeDropdown === 'section'} onToggle={(v) => setActiveDropdown(v ? 'section' : null)} />
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+
 
                     {/* Global Actions (Tags + Save Buttons) */}
                     <div className="relative z-10">

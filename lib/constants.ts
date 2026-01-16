@@ -18,6 +18,12 @@ export const PROGRAMS = [
     { label: "BSMDS", value: "BSMDS" },
 ];
 
+export const EXAM_PROGRAMS = [
+    { label: "BSCS", value: "BSCS" },
+    { label: "BSSE", value: "BSSE" },
+    { label: "BSAI", value: "BSAI" },
+];
+
 export const SEMESTERS = [
     { label: "0", value: "0" },
     { label: "1", value: "1" },
