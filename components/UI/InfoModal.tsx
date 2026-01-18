@@ -1,3 +1,4 @@
+
 'use client';
 
 interface InfoModalProps {
@@ -43,8 +44,8 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                     {/* Intro */}
                     <div className="text-center pb-2">
                         <p className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
-                            Welcome to your new academic companion. <br />
-                            Here is everything you can do with <strong>Lucid Timetable</strong>.
+                            Welcome to the all-new <strong>Lucid Timetable v6.0</strong>. <br />
+                            Now with a powerful Exam Suite and enhanced dark mode.
                         </p>
                     </div>
 
@@ -57,7 +58,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                             <ModeCard
                                 icon="fa-user-graduate" color="text-indigo-600 dark:text-indigo-400" bg="bg-indigo-50 dark:bg-indigo-900/20"
                                 title="Student Mode"
-                                desc="Find your class schedule by Program, Semester & Section. Save 'Preferences' to load it instantly next time."
+                                desc="Find your class schedule by Program, Semester & Section. Save 'Preferences' to load it instantly."
                             />
                             <ModeCard
                                 icon="fa-chalkboard-teacher" color="text-purple-600 dark:text-purple-400" bg="bg-purple-50 dark:bg-purple-900/20"
@@ -65,9 +66,14 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                                 desc="Search for any instructor to view their complete weekly teaching schedule across all departments."
                             />
                             <ModeCard
+                                icon="fa-file-signature" color="text-sky-600 dark:text-sky-400" bg="bg-sky-50 dark:bg-sky-900/20"
+                                title="Exam Mode (NEW)"
+                                desc="Access the official Datesheet & Seating Plan instantly. Find your exam venue, seat number, and time in seconds."
+                            />
+                            <ModeCard
                                 icon="fa-door-open" color="text-pink-600 dark:text-pink-400" bg="bg-pink-50 dark:bg-pink-900/20"
                                 title="Room Mode"
-                                desc="Check the availability of any room or find a free slot for self-study."
+                                desc="Check the availability of any room to find a free slot for self-study."
                             />
                         </div>
                     </section>
@@ -78,23 +84,26 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                             <i className="fas fa-bolt"></i> Powerful Features
                         </h3>
                         <div className="space-y-4">
+                            <FeatureRow icon="fa-search" title="Smart Seating Search" desc="Type your Name or ID to instantly find your seat allocation in the exam hall." />
                             <FeatureRow icon="fa-download" title="Export & Print" desc="Download high-quality images of your timetable or print purely." />
-                            <FeatureRow icon="fa-calendar-alt" title="Events Hub" desc="Tap the Calendar icon in the Navbar to add/view upcoming personalised events (e.g. Assignments, Presentations, Quizzes, etc) & get reminders." />
-                            <FeatureRow icon="fa-wifi" title="Offline Ready" desc="Once Loaded, works without internet. Your schedule is cached automatically." />
-                            <FeatureRow icon="fa-sync-alt" title="Live Sync" desc="Detects changes in the official Google Sheet and updates automatically & securely." />
+                            <FeatureRow icon="fa-calendar-alt" title="Events Hub" desc="Manage assignments, quizzes, and personalized events with reminders." />
+                            <FeatureRow icon="fa-moon" title="Enhanced Dark Mode" desc="A completely redesigned dark experience that is easy on the eyes." />
                         </div>
                     </section>
 
-                    {/* Gestures & Tips */}
+                    {/* Credits */}
                     <section>
                         <h3 className="flex items-center gap-2 text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4">
-                            <i className="fas fa-lightbulb"></i> Pro Tips & Gestures
+                            <i className="fas fa-code"></i> Developer
                         </h3>
-                        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-5 border border-slate-100 dark:border-slate-700 space-y-4">
-                            <TipRow icon="fa-hand-pointer" title="Gesture Control" desc="Swipe left/right or use Arrow Keys (Desktop) to navigate days." />
-                            <TipRow icon="fa-fingerprint" title="Haptic Feedback" desc="Enjoy tactile vibrations on every swipe and meaningful interaction." />
-                            <TipRow icon="fa-sync-alt" title="Manual Sync" desc="Tap the Sync button (in the menu) to fetch the latest official data instantly." />
-                            <TipRow icon="fa-moon" title="Dark Mode" desc="Switch to Dark Mode for a comfortable viewing experience at night." />
+                        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-black text-xl shadow-sm">
+                                SA
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-slate-800 dark:text-white">Shaheer Ahmed</h4>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Lead Developer & Designer</p>
+                            </div>
                         </div>
                     </section>
 
@@ -102,7 +111,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
 
                 {/* Footer */}
                 <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-center shrink-0">
-                    <p className="text-xs text-slate-400 font-bold">Version 6.0.2 • Made with ❤️</p>
+                    <p className="text-xs text-slate-400 font-bold">Version 6.0.0 • Made with ❤️</p>
                 </div>
             </div>
         </div>
@@ -150,5 +159,3 @@ function TipRow({ icon, title, desc }: { icon: string, title: string, desc: stri
         </div>
     );
 }
-
-
