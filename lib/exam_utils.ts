@@ -22,6 +22,7 @@ export interface SeatingPlanEntry {
     seatNumber: string;
     row: string;
     column: string;
+    studentClass?: string; // New field for Class info (e.g., BSCS 5 B)
     examDate?: string; // Extracted from filename
 }
 

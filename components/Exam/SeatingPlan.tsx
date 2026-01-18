@@ -53,7 +53,7 @@ export default function SeatingPlan({ data, loading }: SeatingPlanProps) {
                         style={{ animationDelay: `${Math.min(idx * 50, 500)}ms` }}
                     >
                         {/* Inner Card - Matching ProcessSlotCard "Occupied" Style */}
-                        <div className="relative p-5 rounded-xl bg-gradient-to-br from-white/90 to-white/60 dark:from-slate-800/90 dark:to-slate-900/60 backdrop-blur-md border border-white/50 dark:border-white/5 overflow-hidden h-full">
+                        <div className="relative p-4 md:p-5 rounded-xl bg-gradient-to-br from-white/90 to-white/60 dark:from-slate-800/90 dark:to-slate-900/60 backdrop-blur-md border border-white/50 dark:border-white/5 overflow-hidden h-full">
 
                             {/* Left Side Bar (Accent Pill) */}
                             <div className="absolute left-0 top-4 bottom-4 w-1 bg-indigo-500 rounded-r-full opacity-60 group-hover:opacity-100 transition-opacity"></div>
@@ -95,7 +95,15 @@ export default function SeatingPlan({ data, loading }: SeatingPlanProps) {
                                             {seat.room.replace('Room ', '')}
                                         </p>
                                     </div>
+                                    {/* Class Info (New) */}
                                     <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-2.5 border border-slate-100 dark:border-slate-700/50">
+                                        <p className="font-bold text-slate-400 uppercase text-[9px] tracking-wider mb-0.5">Class</p>
+                                        <p className="font-black text-slate-700 dark:text-slate-200 text-sm truncate" title={seat.studentClass}>
+                                            {seat.studentClass || "Unknown"}
+                                        </p>
+                                    </div>
+
+                                    <div className="col-span-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg p-2.5 border border-slate-100 dark:border-slate-700/50">
                                         <p className="font-bold text-slate-400 uppercase text-[9px] tracking-wider mb-0.5">Course</p>
                                         <p className="font-black text-slate-700 dark:text-slate-200 text-sm truncate" title={seat.courseTitle}>
                                             {seat.courseTitle}
