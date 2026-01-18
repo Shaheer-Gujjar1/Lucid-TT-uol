@@ -69,6 +69,10 @@ export async function GET(request: NextRequest) {
                         if (!requestedFileId) {
                             targetFileId = availableFiles[0].id;
                             targetFileName = availableFiles[0].name;
+                        } else {
+                            // If requestedFileId is present, try to find its name in the list
+                            const found = availableFiles.find(f => f.id === requestedFileId);
+                            if (found) targetFileName = found.name;
                         }
 
                         console.log(`[ExamAPI] Found ${availableFiles.length} files. Files: ${JSON.stringify(availableFiles.map(f => f.name))}`);

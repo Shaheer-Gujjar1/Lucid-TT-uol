@@ -106,8 +106,8 @@ export const parseSeatingPlanPDF = async (buffer: Buffer, defaultDate?: string):
                 const entries: SeatingPlanEntry[] = [];
                 let currentRoom = "Unknown Room";
 
-                // Column Mapping: Array of X-Ranges -> Course Name
-                let columnMap: { startX: number, endX: number, course: string }[] = [];
+                // Column Mapping: Array of X-Ranges -> Course Name & Row Info
+                let columnMap: { startX: number, endX: number, course: string, row: string }[] = [];
 
                 rows.forEach(row => {
                     const lineText = row.items.map(i => i.text).join(' ').trim();
@@ -124,85 +124,103 @@ export const parseSeatingPlanPDF = async (buffer: Buffer, defaultDate?: string):
                         }
                     }
 
-                    // 2. Header Detection (Course Mapping)
-                    if (lineText.includes('Sr#') || lineText.toLowerCase().includes('computer') || lineText.toLowerCase().includes('islamic')) {
-                        // Check if this line is strictly a header line (contains Sr#)
-                        const isHeaderLine = lineText.includes('Sr#');
+                    // 2. Header Detection (Row & Course Mapping)
+                    // Screenshot shows: "Row 1 - BSSE 1    Row 2 - BSCS 2 ..."
+                    // Key identifiers: "Row", "Sr#" (on sub-header)
+                    // If line contains "Row" and " - ", it's likely a header line.
+                    if (lineText.includes('Row') || lineText.includes('Sr#')) {
 
-                        if (isHeaderLine) {
-                            // Reset Map Strategy: Only reset if we find VALID headers.
-                            const newMap: { startX: number, endX: number, course: string }[] = [];
+                        // We need to parse distinct header blocks based on X distribution.
+                        // "Row 1 - BSSE 1" might be one item or multiple text items.
 
-                            row.items.forEach(item => {
-                                const t = item.text.trim();
-                                if (t === 'Sr#' || /^\d+$/.test(t)) return; // Skip Sr# and numbers
-                                if (t.length < 3) return; // Skip garbage
+                        const newMap: { startX: number, endX: number, course: string, row: string }[] = [];
 
-                                // Course Found!
-                                // Expand X-range significantly to catch students below
+                        // Group items that are close together?
+                        // Or just analyze each item?
+                        // "Row 1 - BSSE 1" might be split into "Row 1", "-", "BSSE 1" or be one string.
+                        // Let's iterate items and try to form "Headers".
+
+                        // Heuristic: If item contains "Row", start a new column definition.
+
+                        row.items.forEach(item => {
+                            let t = item.text.trim();
+
+                            // Check for "Row X - Course" pattern
+                            // Regex: Row \d+ - .games?
+                            const rowMatch = t.match(/(?:Row|R)[\s]*(\d+)(.*)/i);
+
+                            if (rowMatch) {
+                                // It found a Row header!
+                                const rowName = "Row " + rowMatch[1];
+                                let restOfText = rowMatch[2];
+
+                                // Clean up course name
+                                if (restOfText.startsWith('-') || restOfText.startsWith(' -')) {
+                                    restOfText = restOfText.replace(/^[\s-]*/, '');
+                                }
+
+                                const courseName = restOfText.trim() || "Exam";
+
                                 newMap.push({
-                                    startX: item.x - 5, // Widen left
-                                    endX: item.x + 20,  // Widen right (Course titles can be long)
-                                    course: t
+                                    startX: item.x - 20,  // More generous bounds
+                                    endX: item.x + 50,    // Cover wide breakdown
+                                    course: courseName,
+                                    row: rowName
                                 });
-                            });
-
-                            if (newMap.length > 0) {
-                                columnMap = newMap;
                             }
+                            // Also handle "Sr#" sub-header to refine positions?
+                            // If we see "Sr#", it confirms a column start.
+                            else if (t === 'Sr#') {
+                                // Optional: We could use this to anchor the left side of the column more precisely.
+                            }
+                        });
+
+
+                        // If we found Row headers, update map.
+                        if (newMap.length > 0) {
+                            columnMap = newMap;
                         }
-                    }
+                    } // End Header Detection
+
 
                     // 3. Student Extraction
                     row.items.forEach((item, idx) => {
                         const part = item.text.trim();
-                        // Detailed ID regex
+                        // ID Regex
                         const isId = /^\d{6,}$/.test(part) || /^[A-Z]+-\d+-\d+$/.test(part) || (part.startsWith('70') && part.length >= 8);
                         if (part.startsWith('202') && part.length === 8) return;
 
                         if (isId) {
-                            // Find Name
+                            // Find Name (Look forward)
                             let nameParts: string[] = [];
                             for (let i = idx + 1; i < row.items.length; i++) {
                                 const next = row.items[i];
                                 const nextIsId = /^\d{6,}$/.test(next.text) || /^[A-Z]+-\d+-\d+$/.test(next.text);
                                 if (nextIsId) break;
-                                if (/^\d{1,3}$/.test(next.text)) continue;
+                                if (/^\d{1,3}$/.test(next.text)) continue; // Skip rough numbers in name area
                                 nameParts.push(next.text);
                             }
 
                             const studentName = nameParts.join(' ').trim() || 'Unknown';
 
-                            // Determine Course from X position (Sticky Logic)
+                            // Determine Course AND Row from X position
                             let course = "Exam";
-
-                            // Find closest column center instead of strict bounds?
-                            // Or stick with bounds. Let's try finding the "Best Fit" column.
-                            // Students align with the `Sr#` column usually, which is to the LEFT of Course Name?
-                            // Actually, in screenshot: `Sr#` is Left. `Course Name` is Right of Sr#.
-                            // Student ID is under `Sr#` usually? No, `1` is under Sr#. ID is next to it.
-                            // So Student ID is roughly where "Course Name" starts?
-                            // Let's use distance minimization.
+                            let rowName = "";
 
                             if (columnMap.length > 0) {
                                 let bestMatch = null;
                                 let minDist = 1000;
 
                                 columnMap.forEach(col => {
-                                    // Distance from StudentID X to Column Start X
-                                    // Or does the header center align?
-                                    // Let's check overlap.
-                                    // If part.x is within [startX, endX]
                                     if (item.x >= col.startX && item.x <= col.endX) {
                                         bestMatch = col;
                                     }
                                 });
 
-                                // Fallback: Closest column if within reason
                                 if (!bestMatch) {
                                     columnMap.forEach(col => {
-                                        const dist = Math.abs(item.x - col.startX); // Compare Starts
-                                        if (dist < 10) { // Tolerance of 10 units
+                                        const dist = Math.abs(item.x - col.startX);
+                                        if (dist < 25) { // Increased tolerance significantly
                                             if (dist < minDist) {
                                                 minDist = dist;
                                                 bestMatch = col;
@@ -211,8 +229,27 @@ export const parseSeatingPlanPDF = async (buffer: Buffer, defaultDate?: string):
                                     });
                                 }
 
-                                if (bestMatch) course = (bestMatch as any).course;
+                                if (bestMatch) {
+                                    course = (bestMatch as any).course;
+                                    rowName = (bestMatch as any).row || "";
+                                }
                             }
+
+                            // Seat Number Detection (Sr#)
+                            let seatNum = "";
+                            // Look backwards up to 5 items to find the Sr# number to the left
+                            for (let back = 1; back <= 5; back++) {
+                                if (idx - back >= 0) {
+                                    const prev = row.items[idx - back];
+                                    const prevT = prev.text.trim();
+                                    // Must be a number, short, and to the LEFT
+                                    if (prev.x < item.x && /^\d+$/.test(prevT) && prevT.length < 4) {
+                                        seatNum = prevT;
+                                        break; // Found closest number to the left
+                                    }
+                                }
+                            }
+
 
                             entries.push({
                                 studentId: part,
@@ -222,10 +259,10 @@ export const parseSeatingPlanPDF = async (buffer: Buffer, defaultDate?: string):
                                 section: "",
                                 courseTitle: course,
                                 room: currentRoom,
-                                seatNumber: "",
-                                row: "",
+                                seatNumber: seatNum,
+                                row: rowName,   // Use mapped row
                                 column: "",
-                                examDate: defaultDate // Inject Date
+                                examDate: defaultDate || ""
                             });
                         }
                     });

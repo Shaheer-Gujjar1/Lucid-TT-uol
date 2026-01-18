@@ -101,6 +101,14 @@ export default function SeatingPlan({ data, loading }: SeatingPlanProps) {
                                             {seat.courseTitle}
                                         </p>
                                     </div>
+
+                                    {/* Row Display (Conditional) */}
+                                    {seat.row && (
+                                        <div className="col-span-2 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-lg p-2.5 border border-indigo-100/50 dark:border-indigo-500/10 flex items-center justify-between">
+                                            <p className="font-bold text-indigo-400 uppercase text-[9px] tracking-wider">Row</p>
+                                            <p className="font-black text-indigo-700 dark:text-indigo-300 text-sm">{seat.row}</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
