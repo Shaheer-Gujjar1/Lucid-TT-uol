@@ -146,7 +146,19 @@ export default function Home() {
                         } catch (e) { console.error(e); }
                     }
                 }
-                // Seating Plan: No prefs (Reset)
+                // Seating Plan: Restore ONLY student search
+                if (examView === 'seating') {
+                    const stored = localStorage.getItem('lucid_exam_seating_prefs');
+                    if (stored) {
+                        try {
+                            const prefs = JSON.parse(stored);
+                            return {
+                                ...resetFilters,
+                                studentSearch: prefs.studentSearch || ''
+                            };
+                        } catch (e) { console.error(e); }
+                    }
+                }
                 return resetFilters;
             }
 
@@ -306,6 +318,12 @@ export default function Home() {
                 section: filters.section
             }));
             setToastMsg('Datesheet preferences saved!');
+        } else if (mode === 'exam' && examView === 'seating') {
+            // NEW: Save ONLY student search for Seating Plan as requested
+            localStorage.setItem('lucid_exam_seating_prefs', JSON.stringify({
+                studentSearch: filters.studentSearch
+            }));
+            setToastMsg('Seating search preference saved!');
         }
     };
 
@@ -324,6 +342,10 @@ export default function Home() {
             localStorage.removeItem('lucid_exam_datesheet_prefs');
             setFilters(prev => ({ ...prev, program: '', semester: '', section: '' }));
             setToastMsg('Datesheet preferences cleared!');
+        } else if (mode === 'exam' && examView === 'seating') {
+            localStorage.removeItem('lucid_exam_seating_prefs');
+            setFilters(prev => ({ ...prev, studentSearch: '' }));
+            setToastMsg('Seating preferences cleared!');
         }
     };
 
