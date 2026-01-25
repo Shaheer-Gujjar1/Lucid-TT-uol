@@ -65,7 +65,7 @@ export default function Datesheet({ data, loading }: DatesheetProps) {
                                     <div className="p-[1px] rounded-2xl bg-gradient-to-br from-indigo-500/5 via-indigo-500/0 to-transparent dark:from-indigo-900/10 dark:via-transparent border border-indigo-100/50 dark:border-indigo-500/20 shadow-sm md:hover:shadow-lg md:hover:shadow-indigo-500/5 md:hover:scale-[1.01] transition-all duration-300 h-full">
 
                                         {/* Inner Card */}
-                                        <div className="relative p-5 rounded-xl bg-gradient-to-br from-white/90 to-white/60 dark:from-slate-800/90 dark:to-slate-900/60 backdrop-blur-md h-full overflow-hidden border border-white/50 dark:border-white/5">
+                                        <div className="relative p-5 rounded-xl bg-gradient-to-br from-blue-50/40 to-white/60 dark:from-slate-800/90 dark:to-slate-900/60 backdrop-blur-md h-full overflow-hidden border border-blue-100/50 dark:border-slate-700/50">
 
                                             {/* Left Side Bar (Accent Pill) - Consistent */}
                                             <div className="absolute left-0 top-4 bottom-4 w-1 bg-indigo-500 rounded-r-full opacity-60 group-hover:opacity-100 transition-opacity"></div>

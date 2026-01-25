@@ -53,7 +53,7 @@ export default function SeatingPlan({ data, loading }: SeatingPlanProps) {
                         style={{ animationDelay: `${Math.min(idx * 50, 500)}ms` }}
                     >
                         {/* Inner Card - Matching ProcessSlotCard "Occupied" Style */}
-                        <div className="relative p-4 md:p-5 rounded-xl bg-gradient-to-br from-white/90 to-white/60 dark:from-slate-800/90 dark:to-slate-900/60 backdrop-blur-md border border-white/50 dark:border-white/5 overflow-hidden h-full">
+                        <div className="relative p-4 md:p-5 rounded-xl bg-gradient-to-br from-blue-50/40 to-white/60 dark:from-slate-800/90 dark:to-slate-900/60 backdrop-blur-md border border-blue-100/50 dark:border-slate-700/50 overflow-hidden h-full">
 
                             {/* Left Side Bar (Accent Pill) */}
                             <div className="absolute left-0 top-4 bottom-4 w-1 bg-indigo-500 rounded-r-full opacity-60 group-hover:opacity-100 transition-opacity"></div>

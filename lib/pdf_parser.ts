@@ -174,28 +174,20 @@ export const parseSeatingPlanPDF = async (buffer: Buffer, defaultDate?: string):
                                     }
                                     const cls = restOfText.trim();
 
-                                    // Hybrid Parsing with Heuristic
-                                    const parts = cls.split('-').map(s => s.trim()).filter(s => s.length > 0);
-                                    let finalClass = "";
+                                    // SAFE RESTORATION Strategy:
+                                    // 1. Always treat start of text as Class Name (prevents "Unknown Class")
+                                    // 2. Check for Dash separator - if present, split Class vs Course
+
+                                    let finalClass = cls;
                                     let finalCourse = "Exam";
 
-                                    if (parts.length > 1) {
-                                        // Standard "Class - Course"
-                                        finalClass = parts[0];
-                                        finalCourse = parts.slice(1).join(' - ');
-                                    } else if (parts.length === 1) {
-                                        // Ambiguous "Text"
-                                        const text = parts[0];
-                                        // Heuristic: Class usually has digits (5A, 7B) or BS/MS
-                                        const looksLikeClass = /\d/.test(text) || /\b(BS|MS|M\.?Phil|Ph\.?D)\b/i.test(text);
-
-                                        if (looksLikeClass) {
-                                            finalClass = text;
-                                            finalCourse = "Exam"; // Wait for Sr#
-                                        } else {
-                                            // Assume it's a Course Name
-                                            finalClass = "";
-                                            finalCourse = text;
+                                    if (cls.includes('-')) {
+                                        const parts = cls.split('-').map(s => s.trim()).filter(s => s.length > 0);
+                                        if (parts.length > 1) {
+                                            finalClass = parts[0];
+                                            finalCourse = parts.slice(1).join(' - ');
+                                        } else if (parts.length === 1) {
+                                            finalClass = parts[0];
                                         }
                                     }
 
@@ -208,7 +200,7 @@ export const parseSeatingPlanPDF = async (buffer: Buffer, defaultDate?: string):
                                     colHeaders[colIdx].push({
                                         y: row.y,
                                         rowLabel: rowLabel,
-                                        className: finalClass,
+                                        className: finalClass || "Unknown Class",
                                         courseName: finalCourse
                                     });
                                 }

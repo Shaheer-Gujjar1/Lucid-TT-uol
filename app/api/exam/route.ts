@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import { parseSeatingPlanPDF } from '@/lib/pdf_parser';
 
-const CACHE_DURATION = 15 * 60 * 1000; // 15 minutes
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
 
 // Global cache to persist across hot reloads in dev
 declare global {
@@ -33,10 +33,11 @@ export async function GET(request: NextRequest) {
         if (!global._examCache) global._examCache = {};
 
         // Construct a cache key based on file/folder
+        const isRefresh = searchParams.get('refresh') === 'true';
         const cacheKey = requestedFileId ? `file_${requestedFileId}` : `folder_${SEATING_PLAN_FOLDER_ID}`;
         const cached = global._examCache[cacheKey];
 
-        if (cached && (now - cached.timestamp < CACHE_DURATION)) {
+        if (!isRefresh && cached && (now - cached.timestamp < CACHE_DURATION)) {
             console.log(`[ExamAPI] Cache Hit (${cacheKey}): Serving ${cached.data?.data?.length || 0} entries`);
             return NextResponse.json({ ...cached.data, cached: true });
         }

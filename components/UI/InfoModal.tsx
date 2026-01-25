@@ -44,7 +44,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                     {/* Intro */}
                     <div className="text-center pb-2">
                         <p className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
-                            Welcome to the all-new <strong>Lucid Timetable v6.0</strong>. <br />
+                            Welcome to the all-new <strong>Lucid Timetable v6.1</strong>. <br />
                             Now with a powerful Exam Suite and enhanced dark mode.
                         </p>
                     </div>
@@ -102,7 +102,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                             </div>
                             <div>
                                 <h4 className="font-bold text-slate-800 dark:text-white">Shaheer Ahmed</h4>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">Lead Developer & Designer</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">From: BSCS-UOL-SGD</p>
                             </div>
                         </div>
                     </section>
@@ -111,7 +111,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
 
                 {/* Footer */}
                 <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-center shrink-0">
-                    <p className="text-xs text-slate-400 font-bold">Version 6.0.0 • Made with ❤️</p>
+                    <p className="text-xs text-slate-400 font-bold">Version 6.1.4 • Made with ❤️</p>
                 </div>
             </div>
         </div>

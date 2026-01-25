@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Datesheet from './Datesheet';
 import SeatingPlan from './SeatingPlan';
 import { DatesheetEntry, SeatingPlanEntry } from '@/lib/exam_utils';
@@ -17,6 +17,7 @@ interface ExamViewProps {
     };
     onDatesAvailable?: (dates: string[]) => void;
     availableDates?: string[];
+    refreshTrigger?: number;
 }
 
 interface ExamFile {
@@ -24,7 +25,7 @@ interface ExamFile {
     name: string;
 }
 
-export default function ExamView({ view, onViewChange, filters, onDatesAvailable }: ExamViewProps) {
+export default function ExamView({ view, onViewChange, filters, onDatesAvailable, refreshTrigger = 0 }: ExamViewProps) {
     const [datesheetData, setDatesheetData] = useState<DatesheetEntry[]>([]);
     const [seatingData, setSeatingData] = useState<SeatingPlanEntry[]>([]);
 
@@ -43,6 +44,9 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
     const [debouncedSearchName, setDebouncedSearchName] = useState('');
     const [debouncedSearchRoom, setDebouncedSearchRoom] = useState('');
 
+    // Track if we've already handled the current refresh trigger
+    const lastHandledRefresh = useRef(0);
+
     // Debounce Search Inputs from Props
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -52,11 +56,38 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
         return () => clearTimeout(timer);
     }, [filters.studentSearch, filters.roomNumber]);
 
+    // Load from LocalStorage on mount
+    useEffect(() => {
+        try {
+            const cachedDatesheet = localStorage.getItem('lucid_exam_datesheet_cache');
+            if (cachedDatesheet) {
+                const data = JSON.parse(cachedDatesheet);
+                setAllDatesheet(data);
+                setDatesheetData(data);
+
+                // Propagate dates to parent even from cache
+                const dates = Array.from(new Set(data.map((d: any) => d.date))).filter(Boolean) as string[];
+                dates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+                if (onDatesAvailable) onDatesAvailable(dates);
+            }
+
+            const cachedSeating = localStorage.getItem('lucid_exam_seating_cache');
+            if (cachedSeating) {
+                const data = JSON.parse(cachedSeating);
+                setAllSeating(data);
+                setSeatingData(data);
+            }
+        } catch (e) {
+            console.error('Error loading exam cache', e);
+        }
+    }, []);
+
     // Fetch Seating Plan
-    const fetchSeating = (fileId?: string) => {
+    const fetchSeating = (fileId?: string, forceRefresh: boolean = false) => {
         setLoading(true);
         setError(null);
-        const url = `/api/exam?type=seating${fileId ? `&fileId=${fileId}` : ''}&_t=${Date.now()}`;
+        // Cache busting and explicit refresh param
+        const url = `/api/exam?type=seating${fileId ? `&fileId=${fileId}` : ''}${forceRefresh ? '&refresh=true' : ''}&_t=${Date.now()}`;
 
         fetch(url)
             .then(res => res.json())
@@ -66,6 +97,9 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
                 } else if (res.data) {
                     setAllSeating(res.data);
                     setSeatingData(res.data);
+
+                    // Persist to local storage
+                    localStorage.setItem('lucid_exam_seating_cache', JSON.stringify(res.data));
 
                     if (res.files && res.files.length > 0) setAvailableFiles(res.files);
                     if (res.activeFileId) setActiveFileId(res.activeFileId);
@@ -78,12 +112,16 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
             .finally(() => setLoading(false));
     };
 
-    // Initial Fetch (Once)
+    // Initial Fetch (If no cache) or Force Refresh
     useEffect(() => {
-        if (view === 'seating' && allSeating.length === 0) {
-            fetchSeating();
+        const isInitial = allSeating.length === 0;
+        const isNewRefresh = refreshTrigger > lastHandledRefresh.current;
+
+        if (view === 'seating' && (isInitial || isNewRefresh)) {
+            if (isNewRefresh) lastHandledRefresh.current = refreshTrigger;
+            fetchSeating(activeFileId || undefined, isNewRefresh);
         }
-    }, [view, allSeating.length]);
+    }, [view, refreshTrigger, allSeating.length]); // Keep length to handle initial load vs empty state
 
     // Handle File Switch
     const handleFileSwitch = (fileId: string) => {
@@ -91,16 +129,23 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
         fetchSeating(fileId);
     };
 
-    // Fetch Datesheet (Once)
+    // Fetch Datesheet (If no cache) or Force Refresh
     useEffect(() => {
-        if (view === 'datesheet' && allDatesheet.length === 0) {
+        const isInitial = allDatesheet.length === 0;
+        const isNewRefresh = refreshTrigger > lastHandledRefresh.current;
+
+        if (view === 'datesheet' && (isInitial || isNewRefresh)) {
+            if (isNewRefresh) lastHandledRefresh.current = refreshTrigger;
             setLoading(true);
-            fetch('/api/exam?type=datesheet')
+            fetch(`/api/exam?type=datesheet&_t=${Date.now()}`)
                 .then(res => res.json())
                 .then(res => {
                     if (res.data) {
                         setAllDatesheet(res.data);
                         setDatesheetData(res.data);
+
+                        // Persist to local storage
+                        localStorage.setItem('lucid_exam_datesheet_cache', JSON.stringify(res.data));
 
                         // Extract unique dates for Dropdown
                         const dates = Array.from(new Set(res.data.map((d: any) => d.date))).filter(Boolean) as string[];
@@ -112,7 +157,7 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
                 .catch(err => console.error(err))
                 .finally(() => setLoading(false));
         }
-    }, [view, allDatesheet.length, onDatesAvailable]);
+    }, [view, refreshTrigger, onDatesAvailable]);
 
     // Efficient Memoized Filter logic
     useEffect(() => {
@@ -170,7 +215,7 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
                         {view === 'datesheet' ? 'Exam Datesheet' : 'Seating Plan'}
                     </h2>
                     <p className="text-slate-500 dark:text-slate-400 font-bold text-sm ml-1 max-w-md">
-                        {view === 'datesheet' ? 'Official Final Term Schedule v6.0' : 'Find your exam venue and seat allocation instantly'}
+                        {view === 'datesheet' ? 'Official Academic Examination Schedule' : 'Find your exam venue and seat allocation instantly'}
                     </p>
                 </div>
 

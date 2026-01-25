@@ -77,7 +77,7 @@ export default function TimetablePrintView({ slots, day, room, mode, date, filte
             textTransform: 'uppercase' as const,
             letterSpacing: '0.5px',
         },
-        slotCard: (isLab: boolean, isFree: boolean) => {
+        slotCard: (isLab: boolean, isFree: boolean, noBorderLeft: boolean = false) => {
             // Precise Tailwind-match gradients
             // Lecture (Blue): from-blue-50 via-blue-50/60 to-white
             const bgBlue = 'linear-gradient(135deg, #eff6ff 0%, rgba(239, 246, 255, 0.6) 50%, #ffffff 100%)';
@@ -96,8 +96,10 @@ export default function TimetablePrintView({ slots, day, room, mode, date, filte
                 borderRadius: '16px',
                 padding: '20px',
                 marginBottom: '16px',
-                border: `1px solid ${borderColor}`,
-                borderLeft: `6px solid ${borderLeftColor}`,
+                borderTop: `1px solid ${borderColor}`,
+                borderRight: `1px solid ${borderColor}`,
+                borderBottom: `1px solid ${borderColor}`,
+                borderLeft: noBorderLeft ? 'none' : `6px solid ${borderLeftColor}`,
                 boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
                 minHeight: isFree ? '80px' : 'auto',
             };
@@ -205,7 +207,7 @@ export default function TimetablePrintView({ slots, day, room, mode, date, filte
             <div style={styles.headerBlock}>
                 <div>
                     <div style={styles.headerTitle}>
-                        <span>Lucid <span style={styles.headerGradientText}>Timetable</span></span> <span style={{ fontSize: '14px', color: '#94a3b8', fontWeight: 500, marginLeft: '8px' }}>v6.0.0</span>
+                        <span>Lucid <span style={styles.headerGradientText}>Timetable</span></span> <span style={{ fontSize: '14px', color: '#94a3b8', fontWeight: 500, marginLeft: '8px' }}>v6.1.4</span>
                     </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
@@ -223,7 +225,7 @@ export default function TimetablePrintView({ slots, day, room, mode, date, filte
 
                     if (isFree) {
                         return (
-                            <div key={idx} style={{ ...styles.slotCard(false, true), borderLeft: 'none' }}>
+                            <div key={idx} style={styles.slotCard(false, true, true)}>
                                 <div style={styles.timeLabel}>{slot.time}</div>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                                     <div style={styles.freeText}>FREE</div>
@@ -237,7 +239,7 @@ export default function TimetablePrintView({ slots, day, room, mode, date, filte
                     const accentColor = isLab ? '#f59e0b' : '#3b82f6';
 
                     return (
-                        <div key={idx} style={{ ...styles.slotCard(isLab, false), borderLeftStyle: 'none' }}>
+                        <div key={idx} style={styles.slotCard(isLab, false, true)}>
                             {/* Accent Pill */}
                             <div style={{
                                 position: 'absolute',
