@@ -111,7 +111,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
 
                 {/* Footer */}
                 <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-center shrink-0">
-                    <p className="text-xs text-slate-400 font-bold">Version 6.3.6 • Made with ❤️</p>
+                    <p className="text-xs text-slate-400 font-bold">Version 6.3.9 • Made with ❤️</p>
                 </div>
             </div>
         </div>

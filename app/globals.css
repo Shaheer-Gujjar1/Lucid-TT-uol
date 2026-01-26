@@ -99,6 +99,43 @@ h6 {
   /* meaningful initial state */
 }
 
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-flow {
+  background-size: 200% auto;
+  animation: gradientFlow 3s linear infinite;
+}
+
+@keyframes breathing {
+
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+
+  50% {
+    transform: scale(1.25);
+    filter: brightness(1.3);
+  }
+}
+
+.animate-breathing {
+  animation: breathing 3s ease-in-out infinite;
+}
+
 .animate-slide-down {
   animation: slideDown 0.5s ease-out forwards;
 }

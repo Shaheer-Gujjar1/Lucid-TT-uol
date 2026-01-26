@@ -44,7 +44,7 @@ export default function Datesheet({ data, loading }: DatesheetProps) {
 
                         {/* Date Header - Sticky with adjusted top offset */}
                         <div className="sticky top-32 z-30 mb-8 ml-2 transition-all duration-300">
-                            <div className="inline-flex items-center gap-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl px-6 py-3 rounded-full shadow-lg border border-white/50 dark:border-slate-700/50 ring-1 ring-black/5">
+                            <div className="inline-flex items-center gap-4 bg-white/95 md:bg-white/90 dark:bg-slate-900/95 md:dark:bg-slate-900/90 backdrop-blur-none md:backdrop-blur-xl px-6 py-3 rounded-full shadow-lg border border-white/50 dark:border-slate-700/50 ring-1 ring-black/5">
                                 <div className="bg-indigo-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg shadow-indigo-500/30">
                                     <i className="fas fa-calendar-day text-sm"></i>
                                 </div>
@@ -62,10 +62,10 @@ export default function Datesheet({ data, loading }: DatesheetProps) {
                             {exams.map((exam, i) => (
                                 <div key={i} className="group relative">
                                     {/* Outer Gradient Border Wrapper matching ProcessSlotCard / SeatingPlan */}
-                                    <div className="p-[1px] rounded-2xl bg-gradient-to-br from-indigo-500/5 via-indigo-500/0 to-transparent dark:from-indigo-900/10 dark:via-transparent border border-indigo-100/50 dark:border-indigo-500/20 shadow-sm md:hover:shadow-lg md:hover:shadow-indigo-500/5 md:hover:scale-[1.01] transition-all duration-300 h-full">
+                                    <div className="p-[1px] rounded-2xl bg-gradient-to-br from-indigo-500/10 to-transparent dark:from-indigo-900/20 dark:to-transparent border border-indigo-100/50 dark:border-indigo-500/20 shadow-sm md:hover:shadow-lg md:hover:shadow-indigo-500/5 md:hover:scale-[1.01] transition-all duration-300 h-full">
 
                                         {/* Inner Card */}
-                                        <div className="relative p-5 rounded-xl bg-gradient-to-br from-blue-50/40 to-white/60 dark:from-slate-800/90 dark:to-slate-900/60 backdrop-blur-md h-full overflow-hidden border border-blue-100/50 dark:border-slate-700/50">
+                                        <div className="relative p-5 rounded-xl bg-gradient-to-br from-white/80 to-white/40 dark:from-slate-800/90 dark:to-slate-900/80 backdrop-blur-none md:backdrop-blur-md h-full overflow-hidden border border-blue-100/50 dark:border-slate-700/50">
 
                                             {/* Left Side Bar (Accent Pill) - Consistent */}
                                             <div className="absolute left-0 top-4 bottom-4 w-1 bg-indigo-500 rounded-r-full opacity-60 group-hover:opacity-100 transition-opacity"></div>

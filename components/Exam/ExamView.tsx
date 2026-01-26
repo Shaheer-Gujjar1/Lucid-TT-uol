@@ -91,6 +91,9 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
                     if (files && files.length > 0) setAvailableFiles(files);
                 } catch (e) { console.error('Error parsing file cache', e); }
             }
+            // Load active file preference
+            const cachedActiveFile = localStorage.getItem('lucid_active_seating_file_id');
+            if (cachedActiveFile) setActiveFileId(cachedActiveFile);
         } catch (e) {
             console.error('Error loading exam cache', e);
         }
@@ -114,6 +117,7 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
 
                     // Persist to local storage
                     localStorage.setItem('lucid_exam_seating_cache', JSON.stringify(res.data));
+                    localStorage.setItem('lucid_exam_seating_timestamp', Date.now().toString());
 
                     if (res.files && res.files.length > 0) {
                         // Protective Check: If we are fetching a specific fileId, and the response only contains 1 file,
@@ -126,7 +130,10 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
                             localStorage.setItem('lucid_exam_files_cache', JSON.stringify(res.files));
                         }
                     }
-                    if (res.activeFileId) setActiveFileId(res.activeFileId);
+                    if (res.activeFileId) {
+                        setActiveFileId(res.activeFileId);
+                        localStorage.setItem('lucid_active_seating_file_id', res.activeFileId);
+                    }
                 }
             })
             .catch(err => {
@@ -136,6 +143,14 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
             .finally(() => setLoading(false));
     };
 
+    // Helper to check cache validity (e.g. 30 minutes)
+    const isCacheValid = (key: string) => {
+        const timestamp = localStorage.getItem(`${key}_timestamp`);
+        if (!timestamp) return false;
+        const diff = Date.now() - parseInt(timestamp);
+        return diff < 30 * 60 * 1000; // 30 mins
+    };
+
     // Initial Fetch (If no cache) or Force Refresh
     useEffect(() => {
         const isInitial = allSeating.length === 0;
@@ -143,15 +158,35 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
         // Recovery: If we have data but no file list (e.g. bad cache), fetch again to populate selector
         const isMissingFiles = allSeating.length > 0 && availableFiles.length === 0;
 
-        if (view === 'seating' && (isInitial || isNewRefresh || isMissingFiles)) {
+        if (view === 'seating') {
             if (isNewRefresh) lastHandledRefresh.current = refreshTrigger;
-            fetchSeating(activeFileId || undefined, isNewRefresh);
+
+            // If we have no data in state, CHECK CACHE first before fetching
+            // The mount effect might not have fired or we navigated away
+            if (isInitial && !isNewRefresh) {
+                const cached = localStorage.getItem('lucid_exam_seating_cache');
+                if (cached && isCacheValid('lucid_exam_seating')) {
+                    console.log("Using valid seating cache");
+                    // We already set state in the mount effect, but if for some reason this effect runs
+                    // and sees empty state (race condition), do nothing as mount effect handles it.
+                    // Actually, to be safe, if we have cache, we just don't fetch.
+                    return;
+                }
+            }
+
+            if (isInitial || isNewRefresh || isMissingFiles) {
+                // Use activeFileId if available (state or cache), otherwise undefined
+                const fileToFetch = activeFileId || localStorage.getItem('lucid_active_seating_file_id') || undefined;
+                fetchSeating(fileToFetch, isNewRefresh);
+            }
         }
     }, [view, refreshTrigger, allSeating.length, availableFiles.length]); // Keep length to handle initial load vs empty state
 
     // Handle File Switch
     const handleFileSwitch = (fileId: string) => {
         if (fileId === activeFileId) return;
+        setActiveFileId(fileId);
+        localStorage.setItem('lucid_active_seating_file_id', fileId);
         fetchSeating(fileId);
     };
 
@@ -160,31 +195,45 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
         const isInitial = allDatesheet.length === 0;
         const isNewRefresh = refreshTrigger > lastHandledRefresh.current;
 
-        if (view === 'datesheet' && (isInitial || isNewRefresh)) {
+        if (view === 'datesheet') {
             if (isNewRefresh) lastHandledRefresh.current = refreshTrigger;
-            setLoading(true);
-            fetch(`/api/exam?type=datesheet&_t=${Date.now()}`)
-                .then(res => res.json())
-                .then(res => {
-                    if (res.data) {
-                        setAllDatesheet(res.data);
-                        setDatesheetData(res.data);
 
-                        // Persist to local storage
-                        localStorage.setItem('lucid_exam_datesheet_cache', JSON.stringify(res.data));
+            // Cache Check for Datesheet
+            if (isInitial && !isNewRefresh) {
+                const cached = localStorage.getItem('lucid_exam_datesheet_cache');
+                if (cached && isCacheValid('lucid_exam_datesheet')) {
+                    console.log("Using valid datesheet cache");
+                    // Ensure dates are propagated if we rely on cache
+                    // The mount effect should have done this, but duplicate key to fail safe
+                    return;
+                }
+            }
 
-                        // Extract unique dates for Dropdown
-                        const dates = Array.from(new Set(res.data.map((d: any) => d.date))).filter(Boolean) as string[];
-                        dates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+            if (isInitial || isNewRefresh) {
+                setLoading(true);
+                fetch(`/api/exam?type=datesheet&_t=${Date.now()}`)
+                    .then(res => res.json())
+                    .then(res => {
+                        if (res.data) {
+                            setAllDatesheet(res.data);
+                            setDatesheetData(res.data);
 
-                        dates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
-                        if (onDatesAvailable) onDatesAvailable(dates);
-                        if (onDatesAvailable) onDatesAvailable(dates);
-                        // Do NOT pass full data here, wait for the effect that updates 'datesheetData' state
-                    }
-                })
-                .catch(err => console.error(err))
-                .finally(() => setLoading(false));
+                            // Persist to local storage
+                            localStorage.setItem('lucid_exam_datesheet_cache', JSON.stringify(res.data));
+                            localStorage.setItem('lucid_exam_datesheet_timestamp', Date.now().toString());
+
+                            // Extract unique dates for Dropdown
+                            const dates = Array.from(new Set(res.data.map((d: any) => d.date))).filter(Boolean) as string[];
+                            dates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+
+                            dates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+                            if (onDatesAvailable) onDatesAvailable(dates);
+                            // Do NOT pass full data here, wait for the effect that updates 'datesheetData' state
+                        }
+                    })
+                    .catch(err => console.error(err))
+                    .finally(() => setLoading(false));
+            }
         }
     }, [view, refreshTrigger, onDatesAvailable]);
 

@@ -120,7 +120,7 @@ const ProcessSlotCard = memo(function ProcessSlotCard({ slotData, index = 0, day
                         : 'bg-blue-100/80 text-blue-800 border-blue-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-700/50';
 
                     if (isActive) {
-                        tagBg = 'bg-white/20 text-white border-white/30 backdrop-blur-md';
+                        tagBg = 'bg-white/20 text-white border-white/30 backdrop-blur-none md:backdrop-blur-md';
                     }
 
                     // Text Styles
@@ -152,7 +152,7 @@ const ProcessSlotCard = memo(function ProcessSlotCard({ slotData, index = 0, day
                                 </div>
 
                                 <div className="flex flex-col items-end text-right space-y-2 md:space-y-3">
-                                    <span className={`inline-block text-[8px] md:text-[9px] font-black px-2 md:px-3 py-0.5 md:py-1 rounded-lg shadow-sm border tracking-[0.05em] backdrop-blur-sm ${tagBg}`}>
+                                    <span className={`inline-block text-[8px] md:text-[9px] font-black px-2 md:px-3 py-0.5 md:py-1 rounded-lg shadow-sm border tracking-[0.05em] backdrop-blur-none md:backdrop-blur-sm ${tagBg}`}>
                                         {s.isLab ? 'LAB' : 'LECTURE'}
                                     </span>
 
