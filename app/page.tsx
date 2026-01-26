@@ -103,7 +103,8 @@ export default function Home() {
                 teacherName: '',
                 roomNumber: '',
                 date: '',
-                studentSearch: ''
+                studentSearch: '',
+                course: '' // NEW
             };
 
             if (mode === 'student') {

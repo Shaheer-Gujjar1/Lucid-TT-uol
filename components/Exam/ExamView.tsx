@@ -140,12 +140,14 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
     useEffect(() => {
         const isInitial = allSeating.length === 0;
         const isNewRefresh = refreshTrigger > lastHandledRefresh.current;
+        // Recovery: If we have data but no file list (e.g. bad cache), fetch again to populate selector
+        const isMissingFiles = allSeating.length > 0 && availableFiles.length === 0;
 
-        if (view === 'seating' && (isInitial || isNewRefresh)) {
+        if (view === 'seating' && (isInitial || isNewRefresh || isMissingFiles)) {
             if (isNewRefresh) lastHandledRefresh.current = refreshTrigger;
             fetchSeating(activeFileId || undefined, isNewRefresh);
         }
-    }, [view, refreshTrigger, allSeating.length]); // Keep length to handle initial load vs empty state
+    }, [view, refreshTrigger, allSeating.length, availableFiles.length]); // Keep length to handle initial load vs empty state
 
     // Handle File Switch
     const handleFileSwitch = (fileId: string) => {

@@ -44,7 +44,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                     {/* Intro */}
                     <div className="text-center pb-2">
                         <p className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
-                            Welcome to the all-new <strong>Lucid Aura∞ v6.1</strong>. <br />
+                            Welcome to the all-new <strong>Lucid Aura∞ v6.3</strong>. <br />
                             Now with a powerful Exam Suite and enhanced dark mode.
                         </p>
                     </div>
@@ -84,8 +84,8 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                             <i className="fas fa-bolt"></i> Powerful Features
                         </h3>
                         <div className="space-y-4">
-                            <FeatureRow icon="fa-search" title="Smart Seating Search" desc="Type your Name or ID to instantly find your seat allocation in the exam hall." />
-                            <FeatureRow icon="fa-download" title="Export & Print" desc="Download high-quality images of your timetable or print purely." />
+                            <FeatureRow icon="fa-search" title="Smart Exam Suite" desc="Search seats by Name/ID, or browse by Class/Course. Auto-handles multi-file exam plans." />
+                            <FeatureRow icon="fa-download" title="Universal Export" desc="Download high-quality images of your Timetable, Datesheet & Seating Plan instantly." />
                             <FeatureRow icon="fa-calendar-alt" title="Events Hub" desc="Manage assignments, quizzes, and personalized events with reminders." />
                             <FeatureRow icon="fa-moon" title="Enhanced Dark Mode" desc="A completely redesigned dark experience that is easy on the eyes." />
                         </div>
@@ -111,7 +111,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
 
                 {/* Footer */}
                 <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-center shrink-0">
-                    <p className="text-xs text-slate-400 font-bold">Version 6.1.4 • Made with ❤️</p>
+                    <p className="text-xs text-slate-400 font-bold">Version 6.3.6 • Made with ❤️</p>
                 </div>
             </div>
         </div>
