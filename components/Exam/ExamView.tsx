@@ -14,8 +14,11 @@ interface ExamViewProps {
         roomNumber: string;
         date?: string;
         studentSearch?: string;
+        course?: string;
     };
     onDatesAvailable?: (dates: string[]) => void;
+    onDatesheetLoaded?: (data: DatesheetEntry[]) => void; // NEW
+    onSeatingLoaded?: (data: SeatingPlanEntry[]) => void; // NEW
     availableDates?: string[];
     refreshTrigger?: number;
 }
@@ -25,7 +28,7 @@ interface ExamFile {
     name: string;
 }
 
-export default function ExamView({ view, onViewChange, filters, onDatesAvailable, refreshTrigger = 0 }: ExamViewProps) {
+export default function ExamView({ view, onViewChange, filters, onDatesAvailable, onDatesheetLoaded, onSeatingLoaded, refreshTrigger = 0 }: ExamViewProps) {
     const [datesheetData, setDatesheetData] = useState<DatesheetEntry[]>([]);
     const [seatingData, setSeatingData] = useState<SeatingPlanEntry[]>([]);
 
@@ -68,7 +71,9 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
                 // Propagate dates to parent even from cache
                 const dates = Array.from(new Set(data.map((d: any) => d.date))).filter(Boolean) as string[];
                 dates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+                dates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
                 if (onDatesAvailable) onDatesAvailable(dates);
+                if (onDatesheetLoaded) onDatesheetLoaded(data); // NEW
             }
 
             const cachedSeating = localStorage.getItem('lucid_exam_seating_cache');
@@ -76,6 +81,15 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
                 const data = JSON.parse(cachedSeating);
                 setAllSeating(data);
                 setSeatingData(data);
+            }
+
+            // Load File List Cache
+            const cachedFiles = localStorage.getItem('lucid_exam_files_cache');
+            if (cachedFiles) {
+                try {
+                    const files = JSON.parse(cachedFiles);
+                    if (files && files.length > 0) setAvailableFiles(files);
+                } catch (e) { console.error('Error parsing file cache', e); }
             }
         } catch (e) {
             console.error('Error loading exam cache', e);
@@ -101,7 +115,17 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
                     // Persist to local storage
                     localStorage.setItem('lucid_exam_seating_cache', JSON.stringify(res.data));
 
-                    if (res.files && res.files.length > 0) setAvailableFiles(res.files);
+                    if (res.files && res.files.length > 0) {
+                        // Protective Check: If we are fetching a specific fileId, and the response only contains 1 file,
+                        // and we previously had more than 1 file, assume it's an API echo and DO NOT overwrite our full list.
+                        const isSuspiciousEcho = fileId && res.files.length === 1 && availableFiles.length > 1;
+
+                        if (!isSuspiciousEcho) {
+                            setAvailableFiles(res.files);
+                            // Persist File List
+                            localStorage.setItem('lucid_exam_files_cache', JSON.stringify(res.files));
+                        }
+                    }
                     if (res.activeFileId) setActiveFileId(res.activeFileId);
                 }
             })
@@ -151,7 +175,10 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
                         const dates = Array.from(new Set(res.data.map((d: any) => d.date))).filter(Boolean) as string[];
                         dates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
 
+                        dates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
                         if (onDatesAvailable) onDatesAvailable(dates);
+                        if (onDatesAvailable) onDatesAvailable(dates);
+                        // Do NOT pass full data here, wait for the effect that updates 'datesheetData' state
                     }
                 })
                 .catch(err => console.error(err))
@@ -177,7 +204,28 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
                     s.studentId.toLowerCase().includes(term)
                 );
             }
+
+            // New Filters (Course, Program, Semester, Section)
+            if (filters.course) {
+                const term = filters.course.toLowerCase();
+                filtered = filtered.filter(s => s.courseTitle.toLowerCase().includes(term));
+            }
+
+            if (filters.program) {
+                const term = filters.program.toUpperCase();
+                filtered = filtered.filter(s => s.studentClass && s.studentClass.toUpperCase().startsWith(term));
+            }
+
+            if (filters.semester) {
+                filtered = filtered.filter(s => s.studentClass && s.studentClass.includes(filters.semester));
+            }
+
+            if (filters.section) {
+                const sec = filters.section.toUpperCase();
+                filtered = filtered.filter(s => s.studentClass && s.studentClass.endsWith(sec));
+            }
             setSeatingData(filtered);
+            if (onSeatingLoaded) onSeatingLoaded(filtered); // NEW
 
         } else {
             // Filter Datesheet
@@ -191,6 +239,7 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
             if (filters.date) filtered = filtered.filter(d => d.date === filters.date);
 
             setDatesheetData(filtered);
+            if (onDatesheetLoaded) onDatesheetLoaded(filtered); // Correctly pass filtered data
         }
     }, [view, allSeating, allDatesheet, debouncedSearchName, debouncedSearchRoom, filters]);
 

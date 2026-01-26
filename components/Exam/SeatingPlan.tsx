@@ -49,11 +49,11 @@ export default function SeatingPlan({ data, loading }: SeatingPlanProps) {
                 {visibleData.map((seat, idx) => (
                     <div
                         key={`${seat.studentId}-${idx}`}
-                        className="animate-fade-in-up group relative p-[1px] rounded-2xl bg-gradient-to-br from-indigo-500/5 via-indigo-500/0 to-transparent dark:from-indigo-900/10 dark:via-transparent border border-indigo-100/50 dark:border-indigo-500/20 shadow-sm md:hover:shadow-lg md:hover:shadow-indigo-500/5 md:hover:scale-[1.01] transition-all duration-300"
+                        className="animate-fade-in-up group relative p-[1px] rounded-2xl bg-gradient-to-br from-indigo-500/10 to-transparent dark:from-indigo-900/20 dark:to-transparent border border-indigo-100/50 dark:border-indigo-500/20 shadow-sm md:hover:shadow-lg md:hover:shadow-indigo-500/5 md:hover:scale-[1.01] transition-all duration-300"
                         style={{ animationDelay: `${Math.min(idx * 50, 500)}ms` }}
                     >
                         {/* Inner Card - Matching ProcessSlotCard "Occupied" Style */}
-                        <div className="relative p-4 md:p-5 rounded-xl bg-gradient-to-br from-blue-50/40 to-white/60 dark:from-slate-800/90 dark:to-slate-900/60 backdrop-blur-md border border-blue-100/50 dark:border-slate-700/50 overflow-hidden h-full">
+                        <div className="relative p-4 md:p-5 rounded-xl bg-white/70 dark:bg-slate-900/60 backdrop-blur-md border border-blue-50/50 dark:border-slate-700/50 overflow-hidden h-full">
 
                             {/* Left Side Bar (Accent Pill) */}
                             <div className="absolute left-0 top-4 bottom-4 w-1 bg-indigo-500 rounded-r-full opacity-60 group-hover:opacity-100 transition-opacity"></div>

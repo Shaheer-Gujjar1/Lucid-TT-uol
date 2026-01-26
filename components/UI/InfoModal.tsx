@@ -27,7 +27,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                             <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-md">
                                 <i className="fas fa-info text-white"></i>
                             </div>
-                            <h2 className="text-2xl font-black text-white tracking-tight">Lucid Timetable</h2>
+                            <h2 className="text-2xl font-black text-white tracking-tight">Lucid Aura∞</h2>
                         </div>
                         <button
                             onClick={onClose}
@@ -44,7 +44,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                     {/* Intro */}
                     <div className="text-center pb-2">
                         <p className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
-                            Welcome to the all-new <strong>Lucid Timetable v6.1</strong>. <br />
+                            Welcome to the all-new <strong>Lucid Aura∞ v6.1</strong>. <br />
                             Now with a powerful Exam Suite and enhanced dark mode.
                         </p>
                     </div>

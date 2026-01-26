@@ -11,6 +11,8 @@ import WeekView from '@/components/Timetable/WeekView';
 import TimetablePrintView from '@/components/Timetable/TimetablePrintView';
 import ViewToggle from '@/components/Timetable/ViewToggle';
 import ExamView from '@/components/Exam/ExamView';
+import DatesheetDownloadModal from '@/components/Exam/DatesheetDownloadModal';
+import SeatingPlanDownloadModal from '@/components/Exam/SeatingPlanDownloadModal'; // NEW
 import Toast from '@/components/UI/Toast';
 import InfoModal from '@/components/UI/InfoModal';
 import { ProcessedSlot, DAYS, processDayData } from '@/lib/parser';
@@ -28,10 +30,15 @@ export default function Home() {
         teacherName: '',
         roomNumber: '',
         date: '',
-        studentSearch: ''
+        studentSearch: '',
+        course: '' // NEW
     });
 
     const [availableExamDates, setAvailableExamDates] = useState<string[]>([]);
+    const [datesheetData, setDatesheetData] = useState<any[]>([]);
+    const [seatingData, setSeatingData] = useState<any[]>([]); // NEW
+    const [showDatesheetDownloadModal, setShowDatesheetDownloadModal] = useState(false);
+    const [showSeatingPlanDownloadModal, setShowSeatingPlanDownloadModal] = useState(false); // NEW
     const handleDatesAvailable = useCallback((dates: string[]) => {
         setAvailableExamDates(dates);
     }, []);
@@ -350,58 +357,68 @@ export default function Home() {
     };
 
     const handleDownload = async () => {
+        // NEW: Handle Datesheet Mode Download
+        if (mode === 'exam' && examView === 'datesheet') {
+            setShowDatesheetDownloadModal(true);
+            return;
+        }
+
         if (view !== 'day') {
             setToastMsg('Download is only available for Day View');
             return;
         }
 
         try {
-            const html2canvas = (await import('html2canvas')).default;
-            const element = document.getElementById('timetable-download-view');
+            const { toPng } = await import('html-to-image');
+            const element = document.getElementById('timetable-print-view');
 
             if (!element) {
-                setToastMsg('Download view not found');
+                setToastMsg('Could not find printable view');
                 return;
             }
 
-            const canvas = await html2canvas(element, {
-                scale: 2,
-                backgroundColor: '#e9d5ff',
-                logging: false,
-                useCORS: true,
-                onclone: (clonedDoc) => {
-                    // Force simple colors on the cloned body/html to prevent html2canvas from detecting 'lab()' or 'oklch()' variables
-                    // from Tailwind v4 defaults, which causes it to crash.
-                    clonedDoc.documentElement.style.backgroundColor = '#ffffff';
-                    clonedDoc.body.style.backgroundColor = '#ffffff';
-                    clonedDoc.body.style.color = '#000000';
+            // Small delay to ensure render
+            await new Promise(r => setTimeout(r, 100));
 
-                    // Force Light Mode for consistent download design
-                    clonedDoc.documentElement.classList.remove('dark');
-
-                    // Optimize for Capture: Remove Blur and Shadows to prevent rendering artifacts
-                    const allElements = clonedDoc.querySelectorAll('*');
-                    allElements.forEach((el) => {
-                        if (el instanceof HTMLElement) {
-                            el.style.backdropFilter = 'none'; // Fix gray boxes
-                            el.style.boxShadow = 'none';      // Fix shadow scaling artifacts
-                        }
-                    });
-
-                    // Also try to nullify any style attributes that might contain vars
-                    clonedDoc.documentElement.removeAttribute('style');
+            // Generate Image using html-to-image
+            const dataUrl = await toPng(element, {
+                backgroundColor: '#ffffff',
+                cacheBust: true,
+                pixelRatio: 2,
+                skipFonts: true, // Prevent CORS errors from external stylesheets
+                filter: (node) => {
+                    // Exclude any elements that might cause issues if needed
+                    return true;
                 }
             });
 
+            // Create download link
+            const dateStr = new Date().toLocaleDateString('en-GB').replace(/\//g, '-'); // DD-MM-YYYY
+            let filename = `Timetable-${filters.day}`;
+
+            if (mode === 'student') {
+                const prog = filters.program || 'Program';
+                const sem = filters.semester || '';
+                const sec = filters.section || '';
+                filename = `Timetable-${prog}-${sem}${sec}-${filters.day}-${dateStr}`;
+            } else if (mode === 'room') {
+                filename = `Timetable-${filters.roomNumber || 'Room'}-${filters.day}-${dateStr}`;
+            } else if (mode === 'teacher') {
+                filename = `Timetable-${filters.teacherName || 'Teacher'}-${filters.day}-${dateStr}`;
+            }
+
+            // Cleanup any double dashes from empty filters
+            filename = filename.replace(/--+/g, '-').replace(/-$/, '');
+
             const link = document.createElement('a');
-            link.download = `timetable-${filters.day}-${Date.now()}.png`;
-            link.href = canvas.toDataURL('image/png');
+            link.download = `${filename}.png`;
+            link.href = dataUrl;
             link.click();
 
-            setToastMsg('Timetable downloaded successfully!');
+            setToastMsg('Schedule Downloaded!');
         } catch (error) {
-            console.error('Download error:', error);
-            setToastMsg('Failed to download timetable');
+            console.error('Download failed:', error);
+            setToastMsg('Download failed. Please try again.');
         }
     };
 
@@ -527,6 +544,8 @@ export default function Home() {
                                 onViewChange={setExamView}
                                 filters={filters}
                                 onDatesAvailable={handleDatesAvailable}
+                                onDatesheetLoaded={setDatesheetData} // NEW
+                                onSeatingLoaded={setSeatingData} // NEW
                                 availableDates={availableExamDates}
                                 refreshTrigger={examRefreshTrigger}
                             />
@@ -583,7 +602,14 @@ export default function Home() {
 
                         {/* Download */}
                         <button
-                            onClick={handleDownload}
+                            onClick={() => {
+                                if (mode === 'exam') {
+                                    if (examView === 'datesheet') setShowDatesheetDownloadModal(true);
+                                    else setShowSeatingPlanDownloadModal(true);
+                                } else {
+                                    handleDownload(); // Timetable Download
+                                }
+                            }}
                             className="w-12 h-12 bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 rounded-full shadow-lg shadow-purple-500/20 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-purple-100 dark:border-slate-700"
                             title="Download Timetable"
                         >
@@ -612,19 +638,38 @@ export default function Home() {
 
                 <InfoModal isOpen={showInfoModal} onClose={() => setShowInfoModal(false)} />
 
+                <DatesheetDownloadModal
+                    isOpen={showDatesheetDownloadModal}
+                    onClose={() => setShowDatesheetDownloadModal(false)}
+                    data={datesheetData}
+                    filters={filters}
+                    onToast={setToastMsg}
+                />
+
+                {/* NEW: Seating Plan Download Modal */}
+                <SeatingPlanDownloadModal
+                    isOpen={showSeatingPlanDownloadModal}
+                    onClose={() => setShowSeatingPlanDownloadModal(false)}
+                    data={seatingData}
+                    filters={filters}
+                    onToast={setToastMsg}
+                />
+
                 {toastMsg && <Toast message={toastMsg} onClose={() => setToastMsg(null)} />}
             </div>
 
-            {/* Print View (Hidden standardly, visible on print) */}
+            {/* Print View (Hidden standardly, visible for capture) */}
             {mode !== 'exam' && (
-                <TimetablePrintView
-                    slots={slots as ProcessedSlot[]}
-                    day={filters.day}
-                    mode={mode}
-                    room={mode === 'room' ? filters.roomNumber : undefined}
-                    filters={filters}
-                    generatedAt={generatedAt}
-                />
+                <div style={{ position: 'fixed', left: '-9999px', top: 0, opacity: 0, pointerEvents: 'none' }}>
+                    <TimetablePrintView
+                        slots={slots as ProcessedSlot[]}
+                        day={filters.day}
+                        mode={mode}
+                        room={mode === 'room' ? filters.roomNumber : undefined}
+                        filters={filters}
+                        generatedAt={generatedAt}
+                    />
+                </div>
             )}
         </div>
     );

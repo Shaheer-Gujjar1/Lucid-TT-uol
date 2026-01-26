@@ -14,6 +14,7 @@ interface Filters {
     roomNumber: string;
     date?: string;
     studentSearch?: string;
+    course?: string; // NEW
 }
 
 interface FilterBarProps {
@@ -69,7 +70,7 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
             {/* Filter Content */}
             {/* Filter Content */}
             <div className={`grid transition-all duration-500 ease-in-out ${isExpanded ? 'grid-rows-[1fr] mt-6' : 'grid-rows-[0fr] mt-0'} ${isExpanded && allowOverflow ? 'overflow-visible' : 'overflow-hidden'}`}>
-                <div className={`overflow-hidden ${isExpanded ? 'md:overflow-visible' : 'md:overflow-hidden'} transition-all duration-300 ${activeDropdown ? (mode=== 'student' ? 'pb-32' : mode === 'exam' ? 'pb-27' : mode === 'room' ? 'pb-66' : mode === 'teacher' ? 'pb-39' : 'pb-60') : 'pb-1'} md:pb-1 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
+                <div className={`overflow-hidden ${isExpanded ? 'md:overflow-visible' : 'md:overflow-hidden'} transition-all duration-300 ${activeDropdown ? (mode === 'student' ? 'pb-32' : mode === 'exam' ? 'pb-27' : mode === 'room' ? 'pb-66' : mode === 'teacher' ? 'pb-39' : 'pb-60') : 'pb-1'} md:pb-1 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
                     {mode === 'student' && (
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-6 relative z-[105]">
                             <Dropdown label="Program" value={filters.program} options={PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" isOpen={activeDropdown === 'program'} onToggle={(v) => setActiveDropdown(v ? 'program' : null)} />
@@ -122,6 +123,18 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                         <div className="mb-6 relative z-[105]">
                             {examView === 'seating' ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Seating Plan Guidance Tip */}
+                                    <div className="col-span-1 md:col-span-2 bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800 rounded-xl p-3 flex items-start gap-3 mb-2">
+                                        <i className="fas fa-lightbulb text-indigo-500 mt-0.5 animate-pulse"></i>
+                                        <div>
+                                            <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400">Smart Search Tip</p>
+                                            <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 leading-tight">
+                                                You can find your seat by searching your <strong>Name / ID</strong> directly.
+                                                <span className="block mt-1 text-indigo-500 font-bold">Note: You do NOT need to set every class filter. Use them only if you want to browse a specific section.</span>
+                                            </p>
+                                        </div>
+                                    </div>
+
                                     {/* Student Search */}
                                     <div className="flex flex-col gap-2 relative">
                                         <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Student Name / ID</label>
@@ -136,6 +149,22 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                                             />
                                         </div>
                                     </div>
+
+                                    {/* Course Search */}
+                                    <div className="flex flex-col gap-2 relative">
+                                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Course</label>
+                                        <div className="relative">
+                                            <i className="fas fa-book absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
+                                            <input
+                                                type="text"
+                                                value={filters.course || ''}
+                                                onChange={(e) => setFilter('course', e.target.value)}
+                                                placeholder="Filter by Course..."
+                                                className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner"
+                                            />
+                                        </div>
+                                    </div>
+
                                     {/* Room Search */}
                                     <div className="flex flex-col gap-2 relative">
                                         <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Room Number</label>
@@ -149,6 +178,13 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                                                 className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner"
                                             />
                                         </div>
+                                    </div>
+
+                                    {/* Class Filters (Program, Semester, Section) */}
+                                    <div className="col-span-1 md:col-span-2 grid grid-cols-3 gap-4">
+                                        <Dropdown label="Program" value={filters.program} options={EXAM_PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" isOpen={activeDropdown === 'program'} onToggle={(v) => setActiveDropdown(v ? 'program' : null)} />
+                                        <Dropdown label="Semester" value={filters.semester} options={SEMESTERS} onChange={(v) => setFilter('semester', v)} icon="fa-layer-group" isOpen={activeDropdown === 'semester'} onToggle={(v) => setActiveDropdown(v ? 'semester' : null)} />
+                                        <Dropdown label="Section" value={filters.section} options={SECTIONS} onChange={(v) => setFilter('section', v)} icon="fa-users" isOpen={activeDropdown === 'section'} onToggle={(v) => setActiveDropdown(v ? 'section' : null)} />
                                     </div>
                                 </div>
                             ) : (
