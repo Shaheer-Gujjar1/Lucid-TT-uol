@@ -57,7 +57,8 @@ function InlineDatesheetPrintView({ data, filters, generatedAt }: { data: Datesh
             fontSize: '12px',
             fontWeight: 700,
             display: 'inline-block',
-            marginTop: '8px'
+            marginTop: '8px',
+            whiteSpace: 'nowrap'
         },
         dateBlock: {
             marginBottom: '24px',
@@ -103,7 +104,7 @@ function InlineDatesheetPrintView({ data, filters, generatedAt }: { data: Datesh
         td: {
             padding: '10px 12px',
             borderBottom: '1px solid #f1f5f9',
-            verticalAlign: 'top' as const,
+            verticalAlign: 'middle' as const, // Changed to middle for row alignment
             color: '#334155',
             fontWeight: 600
         },
@@ -155,8 +156,8 @@ function InlineDatesheetPrintView({ data, filters, generatedAt }: { data: Datesh
                             <thead>
                                 <tr>
                                     <th style={{ ...styles.th, width: '15%' }}>Time</th>
-                                    <th style={{ ...styles.th, width: '50%' }}>Course</th>
-                                    <th style={{ ...styles.th, width: '20%' }}>Program</th>
+                                    <th style={{ ...styles.th, width: '45%' }}>Course</th>
+                                    <th style={{ ...styles.th, width: '25%' }}>Program</th>
                                     <th style={{ ...styles.th, width: '15%', textAlign: 'right' }}>Venue</th>
                                 </tr>
                             </thead>
@@ -170,11 +171,26 @@ function InlineDatesheetPrintView({ data, filters, generatedAt }: { data: Datesh
                                             <span style={styles.courseTitle}>{exam.courseTitle}</span>
                                         </td>
                                         <td style={styles.td}>
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0px' }}>
-                                                <span style={{ fontSize: '11px', fontWeight: 900, color: '#334155' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                <span style={{
+                                                    background: '#f1f5f9',
+                                                    padding: '4px 8px',
+                                                    borderRadius: '6px',
+                                                    fontSize: '11px',
+                                                    fontWeight: 800,
+                                                    color: '#334155'
+                                                }}>
                                                     {exam.program}
                                                 </span>
-                                                <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
+                                                <span style={{
+                                                    background: '#eff6ff',
+                                                    color: '#3b82f6',
+                                                    padding: '4px 8px',
+                                                    borderRadius: '6px',
+                                                    fontSize: '11px',
+                                                    fontWeight: 800,
+                                                    textTransform: 'uppercase'
+                                                }}>
                                                     {exam.semester}{exam.section}
                                                 </span>
                                             </div>

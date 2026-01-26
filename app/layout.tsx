@@ -39,7 +39,7 @@ export default function RootLayout({
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
             </head>
             <body
-                className={`${spaceGrotesk.variable} ${manrope.variable} antialiased bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-sans`}
+                className={`${spaceGrotesk.variable} ${manrope.variable} antialiased bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-sans`}
                 suppressHydrationWarning
             >
                 <NotificationManager />
