@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     }
 
     const day = searchParams.get('day');
-    const mode = searchParams.get('mode') as 'student' | 'teacher' | 'room' | 'subject';
+    const mode = searchParams.get('mode') as 'student' | 'teacher' | 'room';
 
     if (!day || !mode) {
         return NextResponse.json({ error: 'Missing parameters' }, { status: 400 });
