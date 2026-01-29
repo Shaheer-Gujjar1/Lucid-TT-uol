@@ -31,14 +31,14 @@ export default function Home() {
         roomNumber: '',
         date: '',
         studentSearch: '',
-        course: '' // NEW
+        course: '' // Used for Exam Course Search AND Subject Mode
     });
 
     const [availableExamDates, setAvailableExamDates] = useState<string[]>([]);
     const [datesheetData, setDatesheetData] = useState<any[]>([]);
-    const [seatingData, setSeatingData] = useState<any[]>([]); // NEW
+    const [seatingData, setSeatingData] = useState<any[]>([]);
     const [showDatesheetDownloadModal, setShowDatesheetDownloadModal] = useState(false);
-    const [showSeatingPlanDownloadModal, setShowSeatingPlanDownloadModal] = useState(false); // NEW
+    const [showSeatingPlanDownloadModal, setShowSeatingPlanDownloadModal] = useState(false);
     const handleDatesAvailable = useCallback((dates: string[]) => {
         setAvailableExamDates(dates);
     }, []);
@@ -99,12 +99,12 @@ export default function Home() {
                 program: '',
                 semester: '',
                 section: '',
-                day: prev.day,
+                day: prev.day || DAYS[(new Date().getDay() + 6) % 7],
                 teacherName: '',
                 roomNumber: '',
                 date: '',
                 studentSearch: '',
-                course: '' // NEW
+                course: ''
             };
 
             if (mode === 'student') {
@@ -112,7 +112,6 @@ export default function Home() {
                 if (stored) {
                     try {
                         const prefs = JSON.parse(stored);
-                        // Strictly apply only student fields
                         return {
                             ...resetFilters,
                             program: prefs.program || '',
@@ -138,8 +137,13 @@ export default function Home() {
                 return resetFilters;
             }
 
+            else if (mode === 'room') {
+                // Room prefs if any (currently none explicitly saved in savePreferences for room, but good practice to allow)
+                return resetFilters;
+            }
+
             else if (mode === 'exam') {
-                // Datesheet: Load specific prefs
+                // ... (exam logic unchanged)
                 if (examView === 'datesheet') {
                     const stored = localStorage.getItem('lucid_exam_datesheet_prefs');
                     if (stored) {
@@ -154,7 +158,6 @@ export default function Home() {
                         } catch (e) { console.error(e); }
                     }
                 }
-                // Seating Plan: Restore ONLY student search
                 if (examView === 'seating') {
                     const stored = localStorage.getItem('lucid_exam_seating_prefs');
                     if (stored) {
@@ -221,15 +224,28 @@ export default function Home() {
     }, []);
 
     const fetchData = useCallback(async () => {
-        if (mode === 'exam') return;
+        console.log(`FetchData TRIGGERED. Mode: ${mode}, View: ${view}`);
+        console.log('Current Filters:', filters);
+
+        if (mode === 'exam') {
+            console.log("FetchData skipping: Exam mode");
+            return;
+        }
         const activeDay = view === 'week' ? 'all' : filters.day;
-        if (!activeDay) return;
+        if (!activeDay) {
+            console.log("FetchData skipping: No active day");
+            return;
+        }
+
+        // DEBUG LOGGING
+        console.log(`FetchData PROCEEDING. Day: ${activeDay}`);
 
         // TRY LOCAL FILTERING WITH PERFECT PARITY (Using processDayData)
         const localRawData = responseCache.current['full_data'];
 
         // Only proceed with local filtering if we have the RAW data structure (dictionary of days)
         if (localRawData && typeof localRawData === 'object' && !Array.isArray(localRawData)) {
+            console.log("Using local raw data cache.");
             try {
                 if (view === 'week') {
                     const weekResult = DAYS.map(d => {
@@ -240,30 +256,31 @@ export default function Home() {
                         };
                     });
                     setSlots(weekResult);
-                    // If we successfully filtered locally, we return early.
-                    // UNLESS the local data was empty for some reason, but we trust sync_service
                     return;
                 } else {
                     const dayValues = localRawData[filters.day] || [];
+                    console.log(`Processing local data for day ${filters.day}. Row count: ${dayValues.length}`);
                     const dayResult = processDayData(dayValues, mode, filters);
+                    console.log(`Processed result count: ${dayResult.length}`);
                     setSlots(dayResult);
                     return;
                 }
             } catch (e) {
                 console.error("Local filtering failed", e);
             }
+        } else {
+            console.log("No local raw data found. Falling back or waiting for sync.");
         }
 
-        // FALLBACK TO API (Only if local data is missing)
-
-        if (mode === 'student' && !filters.program && !filters.semester && !filters.section) {
-            // Avoid hitting API for empty searches if not needed, or just clear slots
+        // FALLBACK TO API (Only if local data is missing - unlikely with sync)
+        if (mode === 'student' && !filters.program && !filters.semester && !filters.section && !filters.course) {
             if (!localRawData) setSlots([]);
             return;
         }
         if (mode === 'teacher' && !filters.teacherName) return;
         if (mode === 'room' && !filters.roomNumber) return;
 
+        // API Params construction (Fallback)
         const params = new URLSearchParams({
             day: activeDay,
             mode,
@@ -272,12 +289,14 @@ export default function Home() {
             ...(filters.section && { section: filters.section }),
             ...(filters.teacherName && { teacherName: filters.teacherName }),
             ...(filters.roomNumber && { roomNumber: filters.roomNumber }),
+            ...(filters.course && { subject: filters.course }), // subject param
         });
 
+        // ... (fetch logic)
         setLoading(true);
         setError(null);
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
 
         try {
             const res = await fetch(`/api/timetable?${params}`, { signal: controller.signal });
@@ -285,21 +304,16 @@ export default function Home() {
             const data = await res.json();
             setSlots(data.slots || []);
         } catch (err: any) {
-            if (err.name === 'AbortError') {
-                setError('Request timed out. Please try again.');
-            } else {
-                setError('Failed to load data');
-            }
+            if (err.name === 'AbortError') setError('Request timed out. Please try again.');
+            else setError('Failed to load data');
         } finally {
             clearTimeout(timeoutId);
             setLoading(false);
         }
     }, [mode, filters, view]);
 
-    // Trigger fetchData when dependencies change (with debounce)
     useEffect(() => {
-        const timer = setTimeout(fetchData, 400);
-        return () => clearTimeout(timer);
+        fetchData();
     }, [fetchData]);
 
     const handleSetFilter = (key: keyof typeof filters, value: string) => {
@@ -320,6 +334,7 @@ export default function Home() {
             }));
             setToastMsg('Teacher preferences saved!');
         } else if (mode === 'exam' && examView === 'datesheet') {
+            // ... (exam prefs)
             localStorage.setItem('lucid_exam_datesheet_prefs', JSON.stringify({
                 program: filters.program,
                 semester: filters.semester,
@@ -327,7 +342,6 @@ export default function Home() {
             }));
             setToastMsg('Datesheet preferences saved!');
         } else if (mode === 'exam' && examView === 'seating') {
-            // NEW: Save ONLY student search for Seating Plan as requested
             localStorage.setItem('lucid_exam_seating_prefs', JSON.stringify({
                 studentSearch: filters.studentSearch
             }));
@@ -338,7 +352,6 @@ export default function Home() {
     const clearPreferences = () => {
         if (mode === 'student') {
             localStorage.removeItem('lucid_student_prefs');
-            // Also clear legacy key
             localStorage.removeItem('lucid_timetable_preferences');
             setFilters(prev => ({ ...prev, program: '', semester: '', section: '' }));
             setToastMsg('Student preferences cleared!');
@@ -347,6 +360,7 @@ export default function Home() {
             setFilters(prev => ({ ...prev, teacherName: '' }));
             setToastMsg('Teacher preferences cleared!');
         } else if (mode === 'exam' && examView === 'datesheet') {
+            // ... (exam clear)
             localStorage.removeItem('lucid_exam_datesheet_prefs');
             setFilters(prev => ({ ...prev, program: '', semester: '', section: '' }));
             setToastMsg('Datesheet preferences cleared!');
@@ -358,7 +372,6 @@ export default function Home() {
     };
 
     const handleDownload = async () => {
-        // NEW: Handle Datesheet Mode Download
         if (mode === 'exam' && examView === 'datesheet') {
             setShowDatesheetDownloadModal(true);
             return;

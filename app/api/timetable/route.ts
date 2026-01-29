@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     }
 
     const day = searchParams.get('day');
-    const mode = searchParams.get('mode') as 'student' | 'teacher' | 'room';
+    const mode = searchParams.get('mode') as 'student' | 'teacher' | 'room' | 'subject';
 
     if (!day || !mode) {
         return NextResponse.json({ error: 'Missing parameters' }, { status: 400 });
@@ -113,6 +113,7 @@ export async function GET(request: NextRequest) {
                 section: searchParams.get('section') || undefined,
                 teacherName: searchParams.get('teacherName') || undefined,
                 roomNumber: searchParams.get('roomNumber') || undefined,
+                course: searchParams.get('subject') || undefined, // Map 'subject' param to 'course' filter
             });
 
             if (day === 'all') {

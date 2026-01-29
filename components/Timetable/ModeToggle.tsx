@@ -26,41 +26,41 @@ export default function ModeToggle({ mode, setMode }: ModeToggleProps) {
                     className={`flex items-center justify-center gap-2 py-2 md:py-4 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest transition-colors duration-300 ${mode === 'student' ? 'text-white' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'
                         }`}
                 >
-                <i className={`fas fa-user-graduate text-sm md:text-base ${mode === 'student' ? 'animate-bounce-short' : ''}`}></i>
-                <span className="hidden md:inline">Student</span>
-                <span className="md:hidden">Std</span>
-            </button>
+                    <i className={`fas fa-user-graduate text-sm md:text-base ${mode === 'student' ? 'animate-bounce-short' : ''}`}></i>
+                    <span className="hidden md:inline">Student</span>
+                    <span className="md:hidden">Std</span>
+                </button>
 
-            <button
-                onClick={() => setMode('teacher')}
-                className={`flex items-center justify-center gap-2 py-2 md:py-4 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest transition-colors duration-300 ${mode === 'teacher' ? 'text-white' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'
-                    }`}
-            >
-                <i className={`fas fa-chalkboard-teacher text-sm md:text-base ${mode === 'teacher' ? 'animate-bounce-short' : ''}`}></i>
-                <span className="hidden md:inline">Teacher</span>
-                <span className="md:hidden">Tchr</span>
-            </button>
+                <button
+                    onClick={() => setMode('teacher')}
+                    className={`flex items-center justify-center gap-2 py-2 md:py-4 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest transition-colors duration-300 ${mode === 'teacher' ? 'text-white' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'
+                        }`}
+                >
+                    <i className={`fas fa-chalkboard-teacher text-sm md:text-base ${mode === 'teacher' ? 'animate-bounce-short' : ''}`}></i>
+                    <span className="hidden md:inline">Teacher</span>
+                    <span className="md:hidden">Tchr</span>
+                </button>
 
-            <button
-                onClick={() => setMode('room')}
-                className={`flex items-center justify-center gap-2 py-2 md:py-4 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest transition-colors duration-300 ${mode === 'room' ? 'text-white' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'
-                    }`}
-            >
-                <i className={`fas fa-door-open text-sm md:text-base ${mode === 'room' ? 'animate-bounce-short' : ''}`}></i>
-                <span className="hidden md:inline">Room</span>
-                <span className="md:hidden">Room</span>
-            </button>
+                <button
+                    onClick={() => setMode('room')}
+                    className={`flex items-center justify-center gap-2 py-2 md:py-4 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest transition-colors duration-300 ${mode === 'room' ? 'text-white' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'
+                        }`}
+                >
+                    <i className={`fas fa-door-open text-sm md:text-base ${mode === 'room' ? 'animate-bounce-short' : ''}`}></i>
+                    <span className="hidden md:inline">Room</span>
+                    <span className="md:hidden">Room</span>
+                </button>
 
-            <button
-                onClick={() => setMode('exam')}
-                className={`flex items-center justify-center gap-2 py-2 md:py-4 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest transition-colors duration-300 ${mode === 'exam' ? 'text-white' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'
-                    }`}
-            >
-                <i className={`fas fa-file-signature text-sm md:text-base ${mode === 'exam' ? 'animate-bounce-short' : ''}`}></i>
-                <span className="hidden md:inline">Exam</span>
-                <span className="md:hidden">Exm</span>
-            </button>
-        </div>
+                <button
+                    onClick={() => setMode('exam')}
+                    className={`flex items-center justify-center gap-2 py-2 md:py-4 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest transition-colors duration-300 ${mode === 'exam' ? 'text-white' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'
+                        }`}
+                >
+                    <i className={`fas fa-file-signature text-sm md:text-base ${mode === 'exam' ? 'animate-bounce-short' : ''}`}></i>
+                    <span className="hidden md:inline">Exam</span>
+                    <span className="md:hidden">Exm</span>
+                </button>
+            </div>
         </div >
     );
 }

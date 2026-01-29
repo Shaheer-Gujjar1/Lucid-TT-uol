@@ -465,11 +465,15 @@ function isBiologyCourse(fullCellContent: string, isStudentMode: boolean, select
     return biologyKeywords.some(keyword => lowerCellContent.includes(keyword));
 }
 
-export function processDayData(dayData: string[][], mode: 'student' | 'teacher' | 'room', filters: any): ProcessedSlot[] {
+export function processDayData(dayData: string[][], mode: 'student' | 'teacher' | 'room' | 'exam', filters: any): ProcessedSlot[] {
     const timeRow = dayData.find(r => r.some(c => c && /\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2}/i.test(c)));
-    if (!timeRow) return [];
+    if (!timeRow) {
+        console.warn("Parser: No time row found for this day!", dayData.length > 0 ? dayData[0] : "Empty dayData");
+        return [];
+    }
 
     const TIMES_DAY = timeRow.slice(1).filter(t => t && /\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2}/i.test(t));
+    console.log(`Parser: Found time row. Times detected: ${TIMES_DAY.length}`);
     const processedSlots: ProcessedSlot[] = Array.from({ length: TIMES_DAY.length }, () => ({ time: "", entries: [] }));
 
     for (let i = 0; i < TIMES_DAY.length; i++) {
@@ -484,16 +488,17 @@ export function processDayData(dayData: string[][], mode: 'student' | 'teacher' 
             let matches: ClassMatch[] = [];
 
             if (mode === "student") {
-                const { program, semester, section } = filters;
+                const { program, semester, section, course } = filters;
                 const allMatches = parseAllClasses(cell);
 
+                // ... (roman conversion logic unchanged)
                 const convertToComparable = (val: string) => {
                     if (!val) return val;
                     const romanMap: Record<string, string> = {
                         'I': '1', 'II': '2', 'III': '3', 'IV': '4', 'V': '5',
                         'VI': '6', 'VII': '7', 'VIII': '8', 'IX': '9', 'X': '10',
                         'i': '1', 'ii': '2', 'iii': '3', 'iv': '4', 'v': '5',
-                        'vi': '6', 'vii': '7', 'viii': '8', 'ix': '9', 'x': '10'
+                        'vi': '6', 'vii': '7', 'viii': '8', 'ix': '9', 'x': 10
                     }
                     const normalized = val.toString().trim();
                     return romanMap[normalized] || normalized;
@@ -506,27 +511,39 @@ export function processDayData(dayData: string[][], mode: 'student' | 'teacher' 
                     const filterSec = (section || '').toUpperCase();
                     const matchSec = (c.section || '').toUpperCase();
 
-                    // Specific handling for "Section A" vs "A" if needed, but assuming simple match for now
-                    // If filter has section, match must have same section.
-                    // If match has no section (e.g. "BSCS-5"), and filter is "A", it generally shouldn't match unless loose mode.
-                    // We stick to strict: if filter section is set, match section must equal it.
-                    // Exception: If classes are merged (e.g. BSCS-5), it might be valid for all.
-                    // But usually merged means "All Sections". 
-
                     const programMatch = !filterProg || matchProg === filterProg;
                     const semesterMatch = !semester || convertToComparable(c.semester) === convertToComparable(semester);
                     const sectionMatch = !filterSec || matchSec === filterSec || (matchSec === "" && !filterSec);
 
                     return programMatch && semesterMatch && sectionMatch;
                 });
+
+                // COURSE FILTER (Refinement)
+                if (course) {
+                    const courseLower = course.trim().toLowerCase();
+                    const cellLower = cell.toLowerCase();
+                    const extractedCourse = cell.split("\n")[0].replace(/^\d+\.\s*/, "").trim().toLowerCase();
+                    if (!cellLower.includes(courseLower) && !extractedCourse.includes(courseLower)) {
+                        matches = [];
+                    }
+                }
             }
             else if (mode === "teacher") {
-                const { teacherName } = filters;
+                const { teacherName, course } = filters;
                 if (!teacherName) continue;
                 const instructor = extractInstructor(cell);
                 if (instructor.toLowerCase().includes(teacherName.toLowerCase())) {
                     matches = parseAllClasses(cell);
                     if (matches.length === 0) matches = [{ program: '', semester: '', section: '' }];
+
+                    // COURSE FILTER (Refinement)
+                    if (course) {
+                        const courseLower = course.trim().toLowerCase();
+                        const cellLower = cell.toLowerCase();
+                        if (!cellLower.includes(courseLower)) {
+                            matches = [];
+                        }
+                    }
                 }
             }
             else if (mode === "room") {
@@ -544,7 +561,7 @@ export function processDayData(dayData: string[][], mode: 'student' | 'teacher' 
             for (const match of matches) {
                 if (mode === 'student' && !match.program) continue;
 
-                const course = cell.split("\n")[0].replace(/^\d+\.\s*/, "").trim();
+                const courseTitle = cell.split("\n")[0].replace(/^\d+\.\s*/, "").trim();
                 // Biology filter check
                 const prog = filters.program || "";
                 if (mode === "student" && isBiologyCourse(cell, true, prog)) continue;
@@ -558,16 +575,16 @@ export function processDayData(dayData: string[][], mode: 'student' | 'teacher' 
                 if (programToUse === "MLT" || programToUse === "HND") {
                     isLab = false;
                 } else {
-                    isLab = /lab/i.test(course.toLowerCase()) || /lab/i.test(cell.toLowerCase());
+                    isLab = /lab/i.test(courseTitle.toLowerCase()) || /lab/i.test(cell.toLowerCase());
                 }
 
-                const isCSITLabCourse = isCSITLab(course, cell);
+                const isCSITLabCourse = isCSITLab(courseTitle, cell);
 
                 let classStr = 'Unknown';
                 if (match.program) {
                     classStr = `${match.program}-${match.semester}${match.section || ''}`;
                 } else {
-                    // Fallback for teacher/room mode if no strict parse
+                    // Fallback for teacher/room/subject mode if no strict parse
                     const classMatch = cell.match(/(BSCS|BSSE|BSAI|BS\w+|BBA\w*|BSAF\w*|BSDM\w*|BS\w*|PharmD|DPT|MLT|HND|RIT|Nursing|BS\s\w+|BS\s\d+|BBA\s\w+|BSAF\s\w+|BSDM\s\w+)[-\s]*(\d+|[IVX]+)([ABC])?/gi);
                     if (classMatch) classStr = classMatch[0];
                 }
@@ -599,7 +616,7 @@ export function processDayData(dayData: string[][], mode: 'student' | 'teacher' 
                 for (let slotIdx = startSlotIndex; slotIdx < startSlotIndex + numSlots; slotIdx++) {
                     if (slotIdx >= 0 && slotIdx < processedSlots.length) {
                         processedSlots[slotIdx].entries.push({
-                            course,
+                            course: courseTitle,
                             room,
                             instructor,
                             isLab,

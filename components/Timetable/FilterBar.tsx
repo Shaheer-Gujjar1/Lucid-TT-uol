@@ -27,6 +27,10 @@ interface FilterBarProps {
     availableDates?: string[];
 }
 
+// ...
+
+
+
 export default function FilterBar({ mode, examView, filters, setFilter, onSave, onClear, availableDates }: FilterBarProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [allowOverflow, setAllowOverflow] = useState(false);
@@ -73,17 +77,34 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                 <div className={`overflow-hidden ${isExpanded ? 'md:overflow-visible' : 'md:overflow-hidden'} transition-all duration-300 ${activeDropdown ? (mode === 'student' ? 'pb-32' : mode === 'exam' ? (activeDropdown === 'semester' ? 'pb-60' : 'pb-27') : mode === 'room' ? 'pb-66' : mode === 'teacher' ? 'pb-39' : 'pb-60') : 'pb-1'} md:pb-1 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
                     <div key={mode} className="animate-fade-in-up"> {/* Added Animation Wrapper */}
                         {mode === 'student' && (
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-6 relative z-[105]">
-                                <Dropdown label="Program" value={filters.program} options={PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" isOpen={activeDropdown === 'program'} onToggle={(v) => setActiveDropdown(v ? 'program' : null)} />
-                                <Dropdown label="Semester" value={filters.semester} options={SEMESTERS} onChange={(v) => setFilter('semester', v)} icon="fa-layer-group" isOpen={activeDropdown === 'semester'} onToggle={(v) => setActiveDropdown(v ? 'semester' : null)} />
-                                <Dropdown label="Section" value={filters.section} options={SECTIONS} onChange={(v) => setFilter('section', v)} icon="fa-users" isOpen={activeDropdown === 'section'} onToggle={(v) => setActiveDropdown(v ? 'section' : null)} />
-                                <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
+                            <div className="flex flex-col gap-4 mb-6 relative z-[105]">
+                                {/* Row 1: Dropdowns */}
+                                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
+                                    <Dropdown label="Program" value={filters.program} options={PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" isOpen={activeDropdown === 'program'} onToggle={(v) => setActiveDropdown(v ? 'program' : null)} />
+                                    <Dropdown label="Semester" value={filters.semester} options={SEMESTERS} onChange={(v) => setFilter('semester', v)} icon="fa-layer-group" isOpen={activeDropdown === 'semester'} onToggle={(v) => setActiveDropdown(v ? 'semester' : null)} />
+                                    <Dropdown label="Section" value={filters.section} options={SECTIONS} onChange={(v) => setFilter('section', v)} icon="fa-users" isOpen={activeDropdown === 'section'} onToggle={(v) => setActiveDropdown(v ? 'section' : null)} />
+                                    <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
+                                </div>
+                                {/* Row 2: Subject Search (Optional) */}
+                                <div className="flex flex-col gap-2 relative">
+                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Subject / Course (Optional)</label>
+                                    <div className="relative">
+                                        <i className="fas fa-book-open absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
+                                        <input
+                                            type="text"
+                                            value={filters.course || ''}
+                                            onChange={(e) => setFilter('course', e.target.value)}
+                                            placeholder="Strict Search (e.g. 'Calculus')"
+                                            className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner placeholder:font-medium"
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         )}
 
                         {/* Teacher & Room Modes with Z-Index fix */}
                         {mode === 'teacher' && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 relative z-[105]">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 relative z-[105]">
                                 <div className="flex flex-col gap-2 relative">
                                     <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Teacher Name</label>
                                     <div className="relative">
@@ -96,24 +117,18 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                                             className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner"
                                         />
                                     </div>
-                                </div>
-                                <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
-                            </div>
-                        )}
-
-                        {mode === 'room' && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 relative z-[105]">
-                                <div className="flex flex-col gap-2 relative">
-                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Room Number</label>
-                                    <div className="relative">
-                                        <i className="fas fa-door-open absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
-                                        <input
-                                            type="text"
-                                            value={filters.roomNumber}
-                                            onChange={(e) => setFilter('roomNumber', e.target.value)}
-                                            placeholder="e.g. 107"
-                                            className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner"
-                                        />
+                                    <div className="flex flex-col gap-2 relative">
+                                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Subject / Course (Optional)</label>
+                                        <div className="relative">
+                                            <i className="fas fa-book-open absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
+                                            <input
+                                                type="text"
+                                                value={filters.course || ''}
+                                                onChange={(e) => setFilter('course', e.target.value)}
+                                                placeholder="Strict Search (e.g. 'Calculus')"
+                                                className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner placeholder:font-medium"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                                 <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />

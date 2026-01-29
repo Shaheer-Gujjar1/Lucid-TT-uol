@@ -44,7 +44,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                     {/* Intro */}
                     <div className="text-center pb-2">
                         <p className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
-                            Welcome to the all-new <strong>Lucid Aura∞ v6.3</strong>. <br />
+                            Welcome to the all-new <strong>Lucid Aura∞ v6.4</strong>. <br />
                             Now with a powerful Exam Suite and enhanced dark mode.
                         </p>
                     </div>
@@ -111,7 +111,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
 
                 {/* Footer */}
                 <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-center shrink-0">
-                    <p className="text-xs text-slate-400 font-bold">Version 6.3.9 • Made with ❤️</p>
+                    <p className="text-xs text-slate-400 font-bold">Version 6.4.5 • Made with ❤️</p>
                 </div>
             </div>
         </div>
