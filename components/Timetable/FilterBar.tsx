@@ -134,6 +134,34 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                                 <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
                             </div>
                         )}
+                        {/* Room Mode */}
+                        {mode === 'room' && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 relative z-[105]">
+                                <div className="flex flex-col gap-2 relative">
+                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Room Number</label>
+                                    <div className="relative">
+                                        <i className="fas fa-door-open absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
+                                        <input
+                                            type="text"
+                                            value={filters.roomNumber}
+                                            onChange={(e) => setFilter('roomNumber', e.target.value)}
+                                            placeholder="e.g. 107"
+                                            className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner"
+                                        />
+                                    </div>
+                                </div>
+                                <Dropdown
+                                    label="Day"
+                                    value={filters.day}
+                                    options={DAYS_OPTIONS}
+                                    onChange={(v) => setFilter('day', v)}
+                                    icon="fa-calendar-day"
+                                    isOpen={activeDropdown === 'day'}
+                                    onToggle={(v) => setActiveDropdown(v ? 'day' : null)}
+                                />
+                            </div>
+                        )}
+
                         {/* Exam Mode */}
                         {mode === 'exam' && (
                             <div className="mb-6 relative z-[105]">
