@@ -1,0 +1,284 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { toPng } from 'html-to-image';
+import { Semester, calculateSemesterGPA } from '@/lib/gpa_utils';
+
+interface GPAReportDownloadModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    semesters: Semester[];
+    cgpa: number;
+    totalCredits: number;
+    onToast: (msg: string) => void;
+}
+
+// Inline Print View Component for Report Generation
+function InlineGPAReportView({ semesters, cgpa, totalCredits, generatedAt }: { semesters: Semester[], cgpa: number, totalCredits: number, generatedAt: string }) {
+
+    const styles = {
+        container: {
+            width: '1220px',
+            background: '#ffffff',
+            padding: '50px',
+            fontFamily: 'var(--font-manrope), sans-serif',
+            color: '#1e293b',
+        },
+        headerBlock: {
+            borderBottom: '2px solid #e2e8f0',
+            marginBottom: '40px',
+            paddingBottom: '25px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'end'
+        },
+        title: {
+            fontSize: '36px',
+            fontFamily: 'var(--font-space), sans-serif',
+            fontWeight: 800,
+            color: '#334155',
+            lineHeight: 1,
+            marginBottom: '10px'
+        },
+        subtitle: {
+            fontSize: '16px',
+            color: '#64748b',
+            fontWeight: 600
+        },
+        statsRow: {
+            display: 'flex',
+            gap: '30px',
+            marginBottom: '40px'
+        },
+        statCard: {
+            background: '#f8fafc',
+            border: '1px solid #e2e8f0',
+            borderRadius: '12px',
+            padding: '20px 30px',
+            minWidth: '200px'
+        },
+        statLabel: {
+            fontSize: '12px',
+            textTransform: 'uppercase' as const,
+            fontWeight: 700,
+            color: '#64748b',
+            letterSpacing: '1px',
+            marginBottom: '5px'
+        },
+        statValue: {
+            fontSize: '32px',
+            fontWeight: 800,
+            color: '#1e293b'
+        },
+        semesterBlock: {
+            marginBottom: '30px',
+            breakInside: 'avoid' as const,
+            border: '1px solid #f1f5f9',
+            borderRadius: '12px',
+            overflow: 'hidden'
+        },
+        semesterHeader: {
+            background: '#f8fafc',
+            padding: '12px 20px',
+            borderBottom: '1px solid #e2e8f0',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+        },
+        semesterTitle: {
+            fontSize: '16px',
+            fontWeight: 800,
+            color: '#334155'
+        },
+        semesterStats: {
+            fontSize: '14px',
+            color: '#64748b',
+            fontWeight: 600,
+            whiteSpace: 'nowrap' as const
+        },
+        table: {
+            width: '100%',
+            borderCollapse: 'collapse' as const,
+            fontSize: '13px'
+        },
+        th: {
+            textAlign: 'left' as const,
+            padding: '10px 20px',
+            color: '#94a3b8',
+            fontWeight: 700,
+            textTransform: 'uppercase' as const,
+            fontSize: '11px',
+            letterSpacing: '0.5px',
+            borderBottom: '1px solid #e2e8f0',
+            background: '#ffffff'
+        },
+        td: {
+            padding: '12px 20px',
+            borderBottom: '1px solid #f1f5f9',
+            verticalAlign: 'middle' as const,
+            color: '#334155',
+            fontWeight: 600
+        },
+        gradeBadge: {
+            background: '#eff6ff',
+            color: '#3b82f6',
+            padding: '4px 8px',
+            borderRadius: '6px',
+            fontSize: '12px',
+            fontWeight: 800,
+            display: 'inline-block',
+            minWidth: '30px',
+            textAlign: 'center' as const
+        },
+        footer: {
+            marginTop: '50px',
+            borderTop: '1px solid #e2e8f0',
+            paddingTop: '20px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            fontSize: '12px',
+            color: '#94a3b8',
+            fontWeight: 500
+        }
+    };
+
+    return (
+        <div id="gpa-report-view" style={styles.container}>
+            {/* Header */}
+            <div style={styles.headerBlock}>
+                <div>
+                    <h1 style={styles.title}>
+                        Lucid <span style={{ color: '#7c3aed' }}>GPA Report</span>
+                    </h1>
+                    <p style={styles.subtitle}>Detailed Academic Performance Summary</p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '18px', fontWeight: 800 }}>{generatedAt.split(',')[0]}</div>
+                    <div style={{ color: '#64748b', fontSize: '14px' }}>Generated by Lucid Aura∞ v6.5.3</div>
+                </div>
+            </div>
+
+            {/* Top Stats */}
+            <div style={styles.statsRow}>
+                <div style={styles.statCard}>
+                    <div style={styles.statLabel}>Current CGPA</div>
+                    <div style={{ ...styles.statValue, color: '#7c3aed' }}>{cgpa.toFixed(2)}</div>
+                </div>
+                <div style={styles.statCard}>
+                    <div style={styles.statLabel}>Total Credits</div>
+                    <div style={{ ...styles.statValue, color: '#0ea5e9' }}>{totalCredits}</div>
+                </div>
+                <div style={styles.statCard}>
+                    <div style={styles.statLabel}>Semesters</div>
+                    <div style={styles.statValue}>{semesters.length}</div>
+                </div>
+            </div>
+
+            {/* Semesters Table */}
+            <div>
+                {semesters.map((sem, idx) => {
+                    const { gpa, totalCredits } = calculateSemesterGPA(sem.subjects);
+                    return (
+                        <div key={sem.id} style={styles.semesterBlock}>
+                            <div style={styles.semesterHeader}>
+                                <div style={styles.semesterTitle}>{sem.name}</div>
+                                <div style={styles.semesterStats}>
+                                    SGPA: <span style={{ color: '#0f172a', fontWeight: 800 }}>{gpa}</span> • Credits: {totalCredits}
+                                </div>
+                            </div>
+                            <table style={styles.table}>
+                                <thead>
+                                    <tr>
+                                        <th style={{ ...styles.th, width: '60%' }}>Subject</th>
+                                        <th style={{ ...styles.th, width: '20%' }}>Credits</th>
+                                        <th style={{ ...styles.th, width: '20%', textAlign: 'center' }}>Grade</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {sem.subjects.map((sub, sIdx) => (
+                                        <tr key={sub.id}>
+                                            <td style={styles.td}>{sub.name}</td>
+                                            <td style={styles.td}>{sub.creditHours}</td>
+                                            <td style={{ ...styles.td, textAlign: 'center' }}>
+                                                <span style={{
+                                                    ...styles.gradeBadge,
+                                                    background: sub.grade === 'F' ? '#fef2f2' : '#eff6ff',
+                                                    color: sub.grade === 'F' ? '#ef4444' : '#3b82f6'
+                                                }}>
+                                                    {sub.grade}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* Footer */}
+            <div style={styles.footer}>
+                <div>https://luciduol.netlify.app/</div>
+                <div>{generatedAt}</div>
+            </div>
+        </div>
+    );
+}
+
+export default function GPAReportDownloadModal({ isOpen, onClose, semesters, cgpa, totalCredits, onToast }: GPAReportDownloadModalProps) {
+    const [isGenerating, setIsGenerating] = useState(false);
+    const printRef = useRef<HTMLDivElement>(null);
+
+    const handleDownload = async () => {
+        if (!printRef.current) return;
+        setIsGenerating(true);
+
+        try {
+            // Wait for fonts/layout
+            await new Promise(r => setTimeout(r, 500));
+
+            const dataUrl = await toPng(printRef.current, {
+                backgroundColor: '#ffffff',
+                cacheBust: true,
+                pixelRatio: 2,
+                skipFonts: true,
+            });
+
+            const link = document.createElement('a');
+            link.download = `Lucid_GPA_Report_${new Date().toISOString().split('T')[0]}.png`;
+            link.href = dataUrl;
+            link.click();
+
+            onToast('Report Downloaded Successfully!');
+            onClose();
+        } catch (e) {
+            console.error("Download failed", e);
+            onToast("Failed to generate report.");
+            onClose();
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
+    // Auto-trigger download when opened
+    useEffect(() => {
+        if (isOpen && !isGenerating) {
+            handleDownload();
+        }
+    }, [isOpen, isGenerating]);
+
+    if (!isOpen) return null;
+
+    return (
+        // Hidden Container for Capture
+        <div style={{ position: 'fixed', left: '-9999px', top: 0, opacity: 0, pointerEvents: 'none' }}>
+            <div ref={printRef}>
+                <InlineGPAReportView
+                    semesters={semesters}
+                    cgpa={cgpa}
+                    totalCredits={totalCredits}
+                    generatedAt={new Date().toLocaleString()}
+                />
+            </div>
+        </div>
+    );
+}
