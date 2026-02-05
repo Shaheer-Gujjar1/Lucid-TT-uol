@@ -180,7 +180,17 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
                 fetchSeating(fileToFetch, isNewRefresh);
             }
         }
-    }, [view, refreshTrigger, allSeating.length, availableFiles.length]); // Keep length to handle initial load vs empty state
+    }, [view, refreshTrigger, allSeating.length, availableFiles.length]);
+
+    // Auto-Select First File if None Active
+    useEffect(() => {
+        if (view === 'seating' && availableFiles.length > 0 && !activeFileId) {
+            const firstId = availableFiles[0].id;
+            setActiveFileId(firstId);
+            // Optionally fetch if data is empty? But data might be there from generic fetch.
+            // Just sync state.
+        }
+    }, [view, availableFiles, activeFileId]);
 
     // Handle File Switch
     const handleFileSwitch = (fileId: string) => {
@@ -276,7 +286,26 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
                 filtered = filtered.filter(s => s.studentClass && s.studentClass.endsWith(sec));
             }
             setSeatingData(filtered);
-            if (onSeatingLoaded) onSeatingLoaded(filtered); // NEW
+            if (onSeatingLoaded) onSeatingLoaded(filtered);
+
+            // CHAT FEEDBACK LOGIC (Multi-Slot)
+            if (debouncedSearchName && view === 'seating') {
+                if (filtered.length === 0 && availableFiles.length > 1) {
+                    const currentFileIndex = availableFiles.findIndex(f => f.id === activeFileId);
+
+                    if (currentFileIndex === 0) {
+                        const nextFile = availableFiles[1];
+                        window.dispatchEvent(new CustomEvent('lucid-chat-feedback', {
+                            detail: {
+                                type: 'search_empty_slot',
+                                currentSlot: availableFiles[0].name,
+                                nextSlotId: nextFile.id,
+                                nextSlotName: nextFile.name
+                            }
+                        }));
+                    }
+                }
+            }
 
         } else {
             // Filter Datesheet
@@ -285,14 +314,33 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
                 const term = filters.program.toLowerCase();
                 filtered = filtered.filter(d => d.program.toLowerCase().includes(term) || d.courseCode.toLowerCase().includes(term));
             }
+            if (filters.course) {
+                const term = filters.course.toLowerCase();
+                filtered = filtered.filter(d =>
+                    d.courseTitle.toLowerCase().includes(term) ||
+                    d.courseCode.toLowerCase().includes(term)
+                );
+            }
             if (filters.semester) filtered = filtered.filter(d => d.semester === filters.semester);
             if (filters.section) filtered = filtered.filter(d => d.section === filters.section);
             if (filters.date) filtered = filtered.filter(d => d.date === filters.date);
 
             setDatesheetData(filtered);
-            if (onDatesheetLoaded) onDatesheetLoaded(filtered); // Correctly pass filtered data
+            if (onDatesheetLoaded) onDatesheetLoaded(filtered);
         }
     }, [view, allSeating, allDatesheet, debouncedSearchName, debouncedSearchRoom, filters]);
+
+    // LISTEN FOR CHAT ACTIONS (Switch File)
+    useEffect(() => {
+        const handleExamAction = (e: CustomEvent) => {
+            const { type, fileId } = e.detail;
+            if (type === 'switch_file' && fileId) {
+                handleFileSwitch(fileId);
+            }
+        };
+        window.addEventListener('lucid-exam-action', handleExamAction as EventListener);
+        return () => window.removeEventListener('lucid-exam-action', handleExamAction as EventListener);
+    }, [handleFileSwitch]);
 
 
     return (

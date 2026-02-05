@@ -1,8 +1,9 @@
-
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Layout/Navbar';
+import LucidChat from '@/components/Chat/LucidChat';
 import Footer from '@/components/Layout/Footer';
 import ModeToggle from '@/components/Timetable/ModeToggle';
 import FilterBar from '@/components/Timetable/FilterBar';
@@ -12,13 +13,14 @@ import TimetablePrintView from '@/components/Timetable/TimetablePrintView';
 import ViewToggle from '@/components/Timetable/ViewToggle';
 import ExamView from '@/components/Exam/ExamView';
 import DatesheetDownloadModal from '@/components/Exam/DatesheetDownloadModal';
-import SeatingPlanDownloadModal from '@/components/Exam/SeatingPlanDownloadModal'; // NEW
+import SeatingPlanDownloadModal from '@/components/Exam/SeatingPlanDownloadModal';
 import Toast from '@/components/UI/Toast';
 import InfoModal from '@/components/UI/InfoModal';
 import { ProcessedSlot, DAYS, processDayData } from '@/lib/parser';
 import { checkAndSync, detectSheetChanges } from '@/lib/sync_service';
 
 export default function Home() {
+    const router = useRouter();
     const [mode, setMode] = useState<'student' | 'teacher' | 'room' | 'exam'>('student');
     const [examView, setExamView] = useState<'datesheet' | 'seating'>('datesheet');
     const [view, setView] = useState<'day' | 'week'>('day');
@@ -516,6 +518,147 @@ export default function Home() {
         }
     };
 
+    // --- LUCID CHAT HANDLER ---
+    const handleChatAction = useCallback((result: any) => {
+        console.log("Chat Action:", result);
+        const { intent, entities } = result;
+
+        // 1. SET STUDENT PROFILE (New Intent)
+        if (intent === 'set_profile' || (intent === 'filter_mode' && (entities.program || entities.semester || entities.section))) {
+            setMode('student');
+            setFilters(prev => {
+                const newFilters = { ...prev };
+                if (entities.program) newFilters.program = entities.program;
+                if (entities.semester) newFilters.semester = entities.semester;
+                if (entities.section) newFilters.section = entities.section;
+                return newFilters;
+            });
+
+            // Auto-save preferences logic (Replicated from savePreferences)
+            // We need a timeout to allow state to settle or just save values directly? state might be stale here.
+            // Better to save the VALUES we just derived.
+            setTimeout(() => {
+                const newPrefs = {
+                    program: entities.program || filters.program,
+                    semester: entities.semester || filters.semester,
+                    section: entities.section || filters.section
+                };
+                // Merge with existing if needed, but for now strict overwrite is safer for "setting profile"
+                localStorage.setItem('lucid_student_prefs', JSON.stringify(newPrefs));
+            }, 100);
+
+            setToastMsg(`Profile set to ${entities.program || ''} ${entities.semester || ''}${entities.section || ''}`);
+            return;
+        }
+
+        // 2. MODE SWITCHING
+        if (intent === 'filter_mode' && entities.mode) {
+            if (entities.mode === 'student') setMode('student');
+            if (entities.mode === 'teacher') setMode('teacher');
+            if (entities.mode === 'room') setMode('room');
+            if (entities.mode === 'subject') setMode('subject' as any); // If we add subject mode later
+            setToastMsg(`Switched to ${entities.mode} mode`);
+        }
+
+        // 3. VIEW SWITCHING (Week vs Day)
+        if (intent === 'change_view' || entities.view) {
+            if (entities.view === 'week') setView('week');
+            if (entities.view === 'day') setView('day');
+            // If it was just a view change, we don't necessarily need to toast if engine response is clear
+            // But a toast confirms the action visually
+            setToastMsg(`Switched to ${entities.view} view`);
+        }
+
+        // 3. DAY FILTERING
+        if (entities.day) {
+            const capitalizedDay = entities.day.charAt(0).toUpperCase() + entities.day.slice(1);
+            if (DAYS.includes(capitalizedDay)) {
+                setFilters(prev => ({ ...prev, day: capitalizedDay }));
+                setToastMsg(`Switched to ${capitalizedDay}`);
+            }
+        }
+
+        // 4. SEARCH & QUERIES
+        if (entities.query && entities.query !== 'CLEAR_ALL') {
+            // Smart mapping based on current mode or if mode was just switched
+            // Fix: Calculate target mode upfront to avoid race condition
+            let targetMode = entities.mode || mode;
+            if (entities.feature === 'seating' || entities.feature === 'datesheet') targetMode = 'exam';
+
+            // Heuristic: If query contains digits, it might be a room (e.g. 202) -> Room Mode
+            // If query starts with 'sir' or 'mam' -> Teacher Mode (handled in engine usually, but safety net here)
+            // For now, let's trust the engine's 'mode' entity if present.
+
+            if (targetMode === 'teacher') {
+                setFilters(prev => ({ ...prev, teacherName: entities.query }));
+                setToastMsg(`Searching Teacher: ${entities.query}`);
+                if (mode !== 'teacher') setMode('teacher');
+            }
+            else if (targetMode === 'room') {
+                setFilters(prev => ({ ...prev, roomNumber: entities.query }));
+                setToastMsg(`Searching Room: ${entities.query}`);
+                if (mode !== 'room') setMode('room');
+            }
+            // Logic for Exam (Seating or Datesheet) Search
+            else if (targetMode === 'exam' || ((mode === 'exam' || targetMode === 'exam_guest') && (examView === 'seating' || examView === 'datesheet'))) {
+                const isDatesheet = entities.feature === 'datesheet' || (examView === 'datesheet' && !entities.feature);
+
+                const applySearch = () => {
+                    if (isDatesheet) {
+                        setFilters(prev => ({ ...prev, course: entities.query }));
+                        setToastMsg(`Searching Datesheet for: ${entities.query}`);
+                    } else {
+                        setFilters(prev => ({ ...prev, studentSearch: entities.query }));
+                        setToastMsg(`Searching Student: ${entities.query}`);
+                    }
+                };
+
+                const targetView = isDatesheet ? 'datesheet' : 'seating';
+
+                if (mode !== 'exam' || examView !== targetView) {
+                    if (mode !== 'exam') setMode('exam');
+                    setExamView(targetView);
+                    // Add delay to allow view to load and bypass mode-reset effects
+                    setTimeout(applySearch, isDatesheet ? 500 : 1000);
+                } else {
+                    applySearch();
+                }
+            }
+            else {
+                // Default fallback if no specific mode inferred? 
+                // Maybe assume teacher if query looks like name, or room if digits..
+            }
+        }
+
+        // 5. ACTION: CLEAR
+        if (entities.query === 'CLEAR_ALL') {
+            clearPreferences();
+        }
+
+        // 6. NAVIGATION / FEATURES
+        if (entities.feature) {
+            if (entities.feature === 'events') router.push('/events');
+            if (entities.feature === 'about') setShowInfoModal(true);
+            if (entities.feature === 'datesheet') {
+                setMode('exam');
+                setExamView('datesheet');
+            }
+            if (entities.feature === 'seating') {
+                setMode('exam');
+                setExamView('seating');
+            }
+            if (entities.feature === 'gpa') router.push('/gpa');
+        }
+        // --- LUCID CHAT HANDLER ---
+    }, [mode, router, filters]);
+
+    // LISTEN FOR GLOBAL CHAT EVENTS
+    useEffect(() => {
+        const handleEvent = (e: CustomEvent) => handleChatAction(e.detail);
+        window.addEventListener('lucid-chat-action', handleEvent as EventListener);
+        return () => window.removeEventListener('lucid-chat-action', handleEvent as EventListener);
+    }, [handleChatAction]);
+
     return (
         <div className="min-h-screen pb-10">
             <div className="print:hidden">
@@ -571,6 +714,8 @@ export default function Home() {
                     </div>
 
                     <Footer />
+
+                    {/* Chatbot is now Global in Layout.tsx */}
                 </div>
 
                 {/* Floating Action Buttons */}
@@ -612,6 +757,26 @@ export default function Home() {
                             title="Refresh Data"
                         >
                             <i className="fas fa-sync-alt"></i>
+                        </button>
+
+                        {/* AI Chat Bot (NEW) */}
+                        <button
+                            onClick={() => {
+                                // Robust activation using the global fallback
+                                if (typeof window !== 'undefined') {
+                                    if ((window as any).LucidChatToggle) {
+                                        (window as any).LucidChatToggle();
+                                    } else {
+                                        // Final fallback: Event
+                                        window.dispatchEvent(new CustomEvent('lucid-chat-toggle'));
+                                    }
+                                }
+                                setIsFabExpanded(false);
+                            }}
+                            className="w-12 h-12 bg-white dark:bg-slate-800 text-fuchsia-600 dark:text-fuchsia-400 rounded-full shadow-lg shadow-fuchsia-500/10 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-fuchsia-100 dark:border-slate-700"
+                            title="AI Assistant"
+                        >
+                            <i className="fas fa-robot"></i>
                         </button>
 
                         {/* Download */}

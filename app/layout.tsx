@@ -1,4 +1,5 @@
 import NotificationManager from "@/components/Layout/NotificationManager";
+import LucidChat from "@/components/Chat/LucidChat"; // Global Chat
 import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Manrope } from "next/font/google";
 import Script from "next/script";
@@ -53,6 +54,8 @@ export default function RootLayout({
                         gtag('config', 'G-376YYK5WW5');
                     `}
                 </Script>
+                {/* GLOBAL CHATBOT */}
+                <LucidChat />
             </body>
         </html>
     );

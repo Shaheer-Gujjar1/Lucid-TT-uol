@@ -238,6 +238,26 @@ export default function EventsPage() {
                         {isOnline ? 'Online' : 'Offline'}
                     </div>
 
+                    {/* AI Chat Bot (NEW) */}
+                    <button
+                        onClick={() => {
+                            // Robust activation using the global fallback
+                            if (typeof window !== 'undefined') {
+                                if ((window as any).LucidChatToggle) {
+                                    (window as any).LucidChatToggle();
+                                } else {
+                                    // Final fallback: Event
+                                    window.dispatchEvent(new CustomEvent('lucid-chat-toggle'));
+                                }
+                            }
+                            setIsFabExpanded(false);
+                        }}
+                        className="w-12 h-12 bg-white dark:bg-slate-800 text-fuchsia-600 dark:text-fuchsia-400 rounded-full shadow-lg shadow-fuchsia-500/10 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-fuchsia-100 dark:border-slate-700"
+                        title="AI Assistant"
+                    >
+                        <i className="fas fa-robot"></i>
+                    </button>
+
                     {/* Add Event Button */}
                     <button
                         onClick={() => {
@@ -271,7 +291,7 @@ export default function EventsPage() {
 
                     <button
                         onClick={() => setIsFabExpanded(!isFabExpanded)}
-                        className={`w-14 h-14 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-xl shadow-indigo-500/40 flex items-center justify-center hover:scale-105 active:scale-95 transition-all duration-300 border-2 border-white/20 pointer-events-auto relative z-50 animate-pulse`}
+                        className={`w-14 h-14 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-xl shadow-indigo-500/40 flex items-center justify-center hover:scale-105 active:scale-95 transition-all duration-300 border-2 border-white/20 pointer-events-auto relative z-50`}
                     >
                         <i className={`fas fa-chevron-up text-xl transition-transform duration-300 ${isFabExpanded ? 'rotate-180' : ''}`}></i>
                     </button>
