@@ -181,7 +181,7 @@ const GPAStats = ({ cgpa, totalCredits, semesters, previousCGPA }: GPAStatsProps
                     </svg>
 
                     {/* Inner Content */}
-                    <div className={`absolute inset-2 bg-white dark:bg-slate-900 rounded-full shadow-inner flex flex-col items-center justify-center border-4 z-10 transition-colors duration-500 ${borderColor}`}>
+                    <div className={`absolute inset-2 bg-white dark:bg-slate-900 rounded-full shadow-inner flex flex-col items-center justify-center border-[6px] z-10 transition-colors duration-500 ${borderColor}`}>
                         <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mt-1">CGPA</span>
                         <div className="text-2xl md:text-3xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-br from-indigo-600 to-pink-500 leading-none pb-1">
                             {animatedCGPA.toFixed(2)}

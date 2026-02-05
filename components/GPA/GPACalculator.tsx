@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { GPAState, Semester, calculateCGPA } from '@/lib/gpa_utils';
 import { saveGPAState, loadGPAState, clearGPAState } from '@/lib/db';
 import SemesterCard from './SemesterCard';
@@ -53,6 +53,69 @@ const GPACalculator = () => {
         }
     }, [state, loading]);
 
+    // History State for Undo/Redo
+    const [history, setHistory] = useState<GPAState[]>([]);
+    const [historyIndex, setHistoryIndex] = useState(-1); // Points to the current state in history
+
+    const ignoreNextHistoryUpdate = useRef(false);
+
+    // Filter out initial load to avoid empty history issues or double sets
+    useEffect(() => {
+        if (!loading && state.semesters.length > 0 && history.length === 0) {
+            setHistory([state]);
+            setHistoryIndex(0);
+        }
+    }, [loading, state]);
+
+    // Undo/Redo Handlers
+    const addToHistory = (newState: GPAState) => {
+        const currentHistory = history.slice(0, historyIndex + 1);
+        const newHistory = [...currentHistory, newState];
+
+        // Limit history size to 50 steps to prevent memory bloat
+        if (newHistory.length > 50) newHistory.shift();
+
+        setHistory(newHistory);
+        setHistoryIndex(newHistory.length - 1);
+        setState(newState);
+    };
+
+    const handleUndo = () => {
+        if (historyIndex > 0) {
+            const prevIndex = historyIndex - 1;
+            setHistoryIndex(prevIndex);
+            setState(history[prevIndex]);
+        }
+    };
+
+    const handleRedo = () => {
+        if (historyIndex < history.length - 1) {
+            const nextIndex = historyIndex + 1;
+            setHistoryIndex(nextIndex);
+            setState(history[nextIndex]);
+        }
+    };
+
+    // Keyboard Shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+                e.preventDefault();
+                if (e.shiftKey) {
+                    handleRedo();
+                } else {
+                    handleUndo();
+                }
+            } else if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+                e.preventDefault();
+                handleRedo();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [history, historyIndex]);
+
     const { cgpa, totalCredits } = calculateCGPA(state.semesters, state.previousCGPA, state.previousCredits);
 
     const addSemester = () => {
@@ -61,27 +124,31 @@ const GPACalculator = () => {
             name: `Semester ${state.semesters.length + 1}`,
             subjects: []
         };
-        setState(prev => ({ ...prev, semesters: [...prev.semesters, newSemester] }));
+        const newState = { ...state, semesters: [...state.semesters, newSemester] };
+        addToHistory(newState);
     };
 
     const updateSemester = (id: string, updated: Semester) => {
-        setState(prev => ({
-            ...prev,
-            semesters: prev.semesters.map(s => s.id === id ? updated : s)
-        }));
+        const newState = {
+            ...state,
+            semesters: state.semesters.map(s => s.id === id ? updated : s)
+        };
+        addToHistory(newState);
     };
 
     const deleteSemester = (id: string) => {
-        setState(prev => ({
-            ...prev,
-            semesters: prev.semesters.filter(s => s.id !== id)
-        }));
+        const newState = {
+            ...state,
+            semesters: state.semesters.filter(s => s.id !== id)
+        };
+        addToHistory(newState);
     };
 
     const handleReset = async () => {
         if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
             await clearGPAState();
-            setState({ previousCGPA: 0, previousCredits: 0, semesters: [] });
+            const newState = { previousCGPA: 0, previousCredits: 0, semesters: [] };
+            addToHistory(newState);
         }
     };
 
@@ -90,41 +157,55 @@ const GPACalculator = () => {
     return (
         <div className="max-w-5xl mx-auto pb-20">
             {/* Extended Header Layout (Restored) */}
-            <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl shadow-indigo-500/30 mb-8 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-32 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+            <div className="animate-fade-in-up">
+                <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-[2.5rem] p-8 md:p-12 text-white shadow-2xl shadow-indigo-500/30 mb-8 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-32 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
 
-                <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
-                    {/* Welcome / Intro Section */}
-                    <div className="flex-1 text-center md:text-left">
-                        <h1 className="text-3xl md:text-5xl font-black mb-2 tracking-tight">GPA Calculator</h1>
-                        <p className="text-indigo-200 font-medium max-w-md">Track your academic progress with precision. Add semesters below to get started.</p>
-                    </div>
+                    <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
+                        {/* Welcome / Intro Section */}
+                        <div className="flex-1 text-center md:text-left">
+                            <h1 className="text-3xl md:text-5xl font-black mb-2 tracking-tight">GPA Calculator</h1>
+                            <p className="text-indigo-200 font-medium max-w-md">Track your academic progress with precision. Add semesters below to get started.</p>
+                        </div>
 
-                    {/* Previous/History Section */}
-                    <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10 w-full md:w-auto min-w-[300px]">
-                        <h3 className="text-sm font-bold uppercase tracking-widest mb-4 flex items-center justify-center md:justify-start gap-2">
-                            <i className="fas fa-history text-indigo-300"></i> Previous History
-                        </h3>
-                        <div className="flex gap-4">
-                            <div className="flex-1">
-                                <label className="text-[10px] uppercase tracking-wider text-indigo-200 font-bold block mb-1.5 opacity-80">Prev CGPA</label>
-                                <input
-                                    type="number"
-                                    value={state.previousCGPA || ''}
-                                    onChange={(e) => setState(prev => ({ ...prev, previousCGPA: parseFloat(e.target.value) || 0 }))}
-                                    className="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-white placeholder:text-white/30 font-bold focus:outline-none focus:bg-black/30 transition-all text-center"
-                                    placeholder="0.00"
-                                />
-                            </div>
-                            <div className="flex-1">
-                                <label className="text-[10px] uppercase tracking-wider text-indigo-200 font-bold block mb-1.5 opacity-80">Prev Credits</label>
-                                <input
-                                    type="number"
-                                    value={state.previousCredits || ''}
-                                    onChange={(e) => setState(prev => ({ ...prev, previousCredits: parseFloat(e.target.value) || 0 }))}
-                                    className="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-white placeholder:text-white/30 font-bold focus:outline-none focus:bg-black/30 transition-all text-center"
-                                    placeholder="0"
-                                />
+                        {/* Previous/History Section */}
+                        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10 w-full md:w-auto min-w-[300px]">
+                            <h3 className="text-sm font-bold uppercase tracking-widest mb-4 flex items-center justify-center md:justify-start gap-2">
+                                <i className="fas fa-history text-indigo-300"></i> Previous History
+                            </h3>
+                            <div className="flex gap-4">
+                                <div className="flex-1">
+                                    <label className="text-[10px] uppercase tracking-wider text-indigo-200 font-bold block mb-1.5 opacity-80">Prev CGPA</label>
+                                    <input
+                                        type="number"
+                                        value={state.previousCGPA || ''}
+                                        onChange={(e) => {
+                                            const val = parseFloat(e.target.value) || 0;
+                                            const newState = { ...state, previousCGPA: val };
+                                            // We don't want to spam history for every keystroke, so we just set state here directly
+                                            // Ideally we should debounce this for history, but for now direct update is fine for inputs
+                                            setState(newState);
+                                        }}
+                                        onBlur={() => addToHistory(state)} // Commit to history on blur
+                                        className="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-white placeholder:text-white/30 font-bold focus:outline-none focus:bg-black/30 transition-all text-center"
+                                        placeholder="0.00"
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <label className="text-[10px] uppercase tracking-wider text-indigo-200 font-bold block mb-1.5 opacity-80">Prev Credits</label>
+                                    <input
+                                        type="number"
+                                        value={state.previousCredits || ''}
+                                        onChange={(e) => {
+                                            const val = parseFloat(e.target.value) || 0;
+                                            const newState = { ...state, previousCredits: val };
+                                            setState(newState);
+                                        }}
+                                        onBlur={() => addToHistory(state)} // Commit on blur
+                                        className="w-full bg-black/20 border border-white/10 rounded-xl p-3 text-white placeholder:text-white/30 font-bold focus:outline-none focus:bg-black/30 transition-all text-center"
+                                        placeholder="0"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -132,41 +213,68 @@ const GPACalculator = () => {
             </div>
 
             {/* Actions Bar */}
-            <div className="flex justify-between items-center mb-6 px-2">
-                <h2 className="text-xl font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                    <i className="fas fa-layer-group text-indigo-500"></i>
-                    Semesters
-                </h2>
+            <div className="animate-fade-in-up">
+                <div className="flex justify-between items-center mb-6 px-2">
+                    <h2 className="text-xl font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
+                        <i className="fas fa-layer-group text-indigo-500"></i>
+                        Semesters
+                    </h2>
 
-                <button
-                    onClick={handleReset}
-                    className="text-red-400 hover:text-red-500 text-[10px] sm:text-xs font-bold uppercase tracking-widest flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
-                >
-                    <i className="fas fa-trash-can"></i> Reset All
-                </button>
-            </div>
+                    <div className="flex items-center gap-3">
+                        {/* Undo / Redo Buttons */}
+                        <div className="flex items-center gap-1 bg-white dark:bg-slate-800 p-1 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm mr-2">
+                            <button
+                                onClick={handleUndo}
+                                disabled={historyIndex <= 0}
+                                className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all ${historyIndex > 0 ? 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-indigo-500' : 'text-slate-300 dark:text-slate-700 cursor-not-allowed'}`}
+                                title="Undo (Ctrl+Z)"
+                            >
+                                <i className="fas fa-undo text-xs"></i>
+                            </button>
+                            <div className="w-[1px] h-4 bg-slate-200 dark:bg-slate-700"></div>
+                            <button
+                                onClick={handleRedo}
+                                disabled={historyIndex >= history.length - 1}
+                                className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all ${historyIndex < history.length - 1 ? 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-indigo-500' : 'text-slate-300 dark:text-slate-700 cursor-not-allowed'}`}
+                                title="Redo (Ctrl+Y)"
+                            >
+                                <i className="fas fa-redo text-xs"></i>
+                            </button>
+                        </div>
 
-            {/* Content Area */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {state.semesters.map(semester => (
-                    <SemesterCard
-                        key={semester.id}
-                        semester={semester}
-                        onUpdate={updateSemester}
-                        onDelete={deleteSemester}
-                    />
-                ))}
-
-                {/* Add Semester Button */}
-                <button
-                    onClick={addSemester}
-                    className="min-h-[200px] border-3 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl flex flex-col items-center justify-center gap-4 text-slate-400 hover:text-indigo-500 hover:border-indigo-500/30 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all group"
-                >
-                    <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xl group-hover:scale-110 transition-transform duration-300">
-                        <i className="fas fa-plus"></i>
+                        <button
+                            onClick={handleReset}
+                            className="text-red-400 hover:text-red-500 text-[10px] sm:text-xs font-bold uppercase tracking-widest flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+                        >
+                            <i className="fas fa-trash-can"></i> Reset
+                        </button>
                     </div>
-                    <span className="font-black text-sm uppercase tracking-widest">Add Semester</span>
-                </button>
+                </div>
+
+                {/* Content Area */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {state.semesters.map((semester, index) => (
+                        <SemesterCard
+                            key={semester.id}
+                            semester={semester}
+                            onUpdate={updateSemester}
+                            onDelete={deleteSemester}
+                            index={index}
+                        />
+                    ))}
+
+                    {/* Add Semester Button */}
+                    <button
+                        onClick={addSemester}
+                        className="min-h-[200px] border-3 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl flex flex-col items-center justify-center gap-4 text-slate-400 hover:text-indigo-500 hover:border-indigo-500/30 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all group animate-fade-in-up"
+                        style={{ animationDelay: `${Math.min(state.semesters.length * 150, 1500)}ms` }}
+                    >
+                        <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xl group-hover:scale-110 transition-transform duration-300">
+                            <i className="fas fa-plus"></i>
+                        </div>
+                        <span className="font-black text-sm uppercase tracking-widest">Add Semester</span>
+                    </button>
+                </div>
             </div>
 
             {/* Circular Floating Widget */}

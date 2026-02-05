@@ -11,7 +11,9 @@ export default function GPAPage() {
 
             <main className="container mx-auto px-4 pt-28 max-w-5xl">
                 <GPACalculator />
-                <Footer />
+                <div className="animate-fade-in-up">
+                    <Footer />
+                </div>
             </main>
         </div>
     );

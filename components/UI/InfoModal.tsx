@@ -41,7 +41,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
 
                     <button
                         onClick={onClose}
-                        className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all backdrop-blur-md"
+                        className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all backdrop-blur-md z-50"
                     >
                         <i className="fas fa-times text-lg"></i>
                     </button>
@@ -76,12 +76,12 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                         <div className="space-y-6 animate-fade-in">
                             <div className="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/30 text-center">
                                 <p className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    <span className="font-bold text-indigo-600 dark:text-indigo-400">Lucid Aura∞ v6.5.3</span> is the premier academic utility for UOL students. It redefines your university experience by seamlessly integrating dynamic timetables, intelligent exam planning, and performance tracking into one unified, high-performance interface.
+                                    <span className="font-bold text-indigo-600 dark:text-indigo-400">Lucid Aura∞ v6.5.12</span> is the premier academic utility for UOL students. It redefines your university experience by seamlessly integrating dynamic timetables, intelligent exam planning, and performance tracking into one unified, high-performance interface.
                                 </p>
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
-                                <StatCard label="Version" value="6.5.3" icon="fa-code-branch" />
+                                <StatCard label="Version" value="6.5.12" icon="fa-code-branch" />
                                 <StatCard label="Release" value="Feb 2026" icon="fa-calendar-check" />
                             </div>
 
@@ -133,11 +133,18 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                                 desc="Check the availability of any room on campus to find a free slot for self-study or meetings."
                             />
                             <FeatureRow
+                                icon="fa-arrows-alt-h"
+                                color="text-orange-500"
+                                bg="bg-orange-50 dark:bg-orange-900/20"
+                                title="Smart Gestures"
+                                desc="Swipe left or right on the Timetable to instantly switch between days."
+                            />
+                            <FeatureRow
                                 icon="fa-chart-pie"
                                 color="text-emerald-500"
                                 bg="bg-emerald-50 dark:bg-emerald-900/20"
                                 title="GPA Calculator"
-                                desc="Track your academic progress with visual trends. Generate professional 'Lucid Reports' for your records."
+                                desc="Track your academic progress with trends. Now featuring Undo/Redo to fix mistakes instantly."
                             />
                             <FeatureRow
                                 icon="fa-cloud-download-alt"

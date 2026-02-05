@@ -7,10 +7,12 @@ import Dropdown from '@/components/UI/Dropdown';
 
 interface EventFormProps {
     onAdd: (event: Omit<AgendaEvent, 'id' | 'completed'>) => void;
+    initialData?: AgendaEvent | null;
+    onCancel?: () => void;
 }
 
-export default function EventForm({ onAdd }: EventFormProps) {
-    const [formData, setFormData] = useState({
+export default function EventForm({ onAdd, initialData, onCancel }: EventFormProps) {
+    const defaultData = {
         title: '',
         type: 'Assignment',
         course: '',
@@ -19,22 +21,34 @@ export default function EventForm({ onAdd }: EventFormProps) {
         description: '',
         priority: 'Medium' as 'High' | 'Medium' | 'Low',
         reminder: false
-    });
+    };
+
+    const [formData, setFormData] = useState(defaultData);
+
+    // Populate form when initialData changes
+    if (initialData && formData.title !== initialData.title && formData.date !== initialData.date) {
+        setFormData({
+            title: initialData.title,
+            type: initialData.type,
+            course: initialData.course || '',
+            date: initialData.date,
+            time: initialData.time || '',
+            description: initialData.description || '',
+            priority: initialData.priority,
+            reminder: initialData.reminder || false
+        });
+    }
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         onAdd(formData);
-        setFormData({
-            title: '',
-            type: 'Assignment',
-            course: '',
-            date: '',
-            time: '',
-            description: '',
-            priority: 'Medium',
-            reminder: false
-        });
+        setFormData(defaultData);
     };
+
+    const handleCancel = () => {
+        setFormData(defaultData);
+        if (onCancel) onCancel();
+    }
 
     const TYPES = [
         { label: 'Assignment', value: 'Assignment' },
@@ -57,12 +71,22 @@ export default function EventForm({ onAdd }: EventFormProps) {
         <form onSubmit={handleSubmit} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-6 md:p-8 rounded-[2.5rem] shadow-2xl shadow-indigo-500/5 border border-white/50 dark:border-slate-700/50 relative">
             <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-600 opacity-80 rounded-t-[2.5rem]"></div>
 
-            <h2 className="text-2xl font-black mb-8 text-slate-700 dark:text-white flex items-center gap-3">
-                <span className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-lg shadow-sm">
-                    <i className="fas fa-plus"></i>
-                </span>
-                New Event Details
-            </h2>
+            <div className="flex justify-between items-center mb-8">
+                <h2 className="text-2xl font-black text-slate-700 dark:text-white flex items-center gap-3">
+                    <span className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-lg shadow-sm">
+                        <i className={`fas ${initialData ? 'fa-edit' : 'fa-plus'}`}></i>
+                    </span>
+                    {initialData ? 'Edit Event' : 'New Event Details'}
+                </h2>
+                <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 text-slate-400 hover:text-red-500 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+                    title="Close"
+                >
+                    <i className="fas fa-times"></i>
+                </button>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div className="group">
@@ -119,7 +143,7 @@ export default function EventForm({ onAdd }: EventFormProps) {
                     </div>
                 </div>
                 <button type="submit" className="w-full md:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-10 py-4 rounded-full font-black hover:shadow-xl hover:shadow-indigo-500/30 hover:scale-[1.02] active:scale-95 transition-all text-sm uppercase tracking-wider flex items-center justify-center gap-3">
-                    <i className="fas fa-check"></i> Save Event
+                    <i className={`fas ${initialData ? 'fa-save' : 'fa-check'}`}></i> {initialData ? 'Update Event' : 'Save Event'}
                 </button>
             </div>
         </form>

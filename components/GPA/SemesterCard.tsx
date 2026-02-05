@@ -8,10 +8,15 @@ interface SemesterCardProps {
     semester: Semester;
     onUpdate: (id: string, updatedSemester: Semester) => void;
     onDelete: (id: string) => void;
+    index?: number;
 }
 
-const SemesterCard = ({ semester, onUpdate, onDelete }: SemesterCardProps) => {
+const SemesterCard = ({ semester, onUpdate, onDelete, index = 0 }: SemesterCardProps) => {
     const { gpa, totalCredits } = calculateSemesterGPA(semester.subjects);
+
+    // Stagger delay
+    const delay = Math.min(index * 150, 1500); // 150ms stagger
+    const style = { animationDelay: `${delay}ms` };
 
     const handleAddSubject = () => {
         const newSubject: Subject = {
@@ -39,7 +44,7 @@ const SemesterCard = ({ semester, onUpdate, onDelete }: SemesterCardProps) => {
     };
 
     return (
-        <div className="relative group transition-all duration-300 hover:-translate-y-1">
+        <div className="relative group transition-all duration-300 hover:-translate-y-1 animate-fade-in-up" style={style}>
             {/* Slot Border Gradient Pill - Refined */}
             <div className="absolute top-4 bottom-4 left-0 w-1 bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500 rounded-r-full opacity-60 group-hover:opacity-100 transition-opacity"></div>
 
