@@ -284,7 +284,7 @@ export default function TimetablePrintView({ slots, day, room, mode, date, filte
             </div>
 
             <div style={styles.footer}>
-                <div>Generated via Lucid Aura∞</div>
+                <div>https://luciduol.netlify.app</div>
                 <div>{generatedAt}</div>
             </div>
         </div >
