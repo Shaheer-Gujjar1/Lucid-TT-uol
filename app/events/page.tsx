@@ -67,14 +67,22 @@ export default function EventsPage() {
 
 
     useEffect(() => {
-        const stored = localStorage.getItem('lucid_timetable_events');
-        if (stored) {
-            try {
-                setEvents(JSON.parse(stored));
-            } catch (e) {
-                console.error("Failed to load events", e);
+        const loadEvents = () => {
+            const stored = localStorage.getItem('lucid_timetable_events');
+            if (stored) {
+                try {
+                    setEvents(JSON.parse(stored));
+                } catch (e) {
+                    console.error("Failed to load events", e);
+                }
             }
-        }
+        };
+
+        loadEvents();
+
+        // Listen for updates from AI Assistant or other components
+        window.addEventListener('lucid-events-updated', loadEvents);
+        return () => window.removeEventListener('lucid-events-updated', loadEvents);
     }, []);
 
     const saveEvents = (newEvents: AgendaEvent[]) => {

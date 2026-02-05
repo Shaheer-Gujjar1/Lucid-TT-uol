@@ -243,6 +243,24 @@ export default function LucidChat({ onAction }: LucidChatProps) {
         }
     };
 
+    const formatTo24h = (text: string) => {
+        const lower = text.toLowerCase().trim();
+        const ampmMatch = lower.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)/i);
+        if (ampmMatch) {
+            let hours = parseInt(ampmMatch[1]);
+            const minutes = ampmMatch[2] || "00";
+            const ampm = ampmMatch[3].toLowerCase();
+            if (ampm === 'pm' && hours < 12) hours += 12;
+            if (ampm === 'am' && hours === 12) hours = 0;
+            return `${hours.toString().padStart(2, '0')}:${minutes.padStart(2, '0')}`;
+        }
+        const standardMatch = lower.match(/^([01]\d|2[0-3]):?([0-5]\d)$/);
+        if (standardMatch) {
+            return `${standardMatch[1]}:${standardMatch[2]}`;
+        }
+        return text;
+    };
+
     const parseRelativeTime = (text: string) => {
         const lower = text.toLowerCase();
         if (lower.includes('after') || lower.includes('in')) {
@@ -254,14 +272,16 @@ export default function LucidChat({ onAction }: LucidChatProps) {
                 if (hMatch) now.setHours(now.getHours() + parseInt(hMatch[1]));
                 if (mMatch) now.setMinutes(now.getMinutes() + parseInt(mMatch[1]));
 
-                return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
             }
         }
         if (lower.includes('right now') || lower.includes('current time')) {
-            return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const now = new Date();
+            return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
         }
-        return text;
+        return formatTo24h(text);
     };
+
 
     // --- WIZARD LOGIC ---
     const processWizardStep = (text: string) => {
@@ -302,8 +322,16 @@ export default function LucidChat({ onAction }: LucidChatProps) {
         if (currentStep === 'time') {
             newData.time = parseRelativeTime(text);
             setWizard({ ...wizard, step: 'priority', data: newData });
-            return `Caught it (${newData.time}). What is the priority? (High, Medium, Low)`;
+
+            let displayTime = newData.time;
+            if (newData.time && newData.time.includes(':')) {
+                const [h, m] = newData.time.split(':');
+                const hh = parseInt(h);
+                displayTime = `${hh % 12 || 12}:${m} ${hh >= 12 ? 'PM' : 'AM'}`;
+            }
+            return `Caught it (${displayTime}). What is the priority? (High, Medium, Low)`;
         }
+
         if (currentStep === 'priority') {
             let prio: 'High' | 'Medium' | 'Low' = 'Medium';
             if (text.toLowerCase().includes('high')) prio = 'High';
@@ -326,34 +354,55 @@ export default function LucidChat({ onAction }: LucidChatProps) {
         if (currentStep === 'description') {
             newData.description = text.toLowerCase() === 'none' ? '' : text;
             setWizard({ ...wizard, step: 'confirm', data: newData });
-            return `Summary: Add "${newData.title}" (${newData.type}) for ${newData.course || 'N/A'} on ${newData.date} at ${newData.time || 'N/A'}. Confirm? (Yes/No)`;
+
+            let displayTime = newData.time || 'N/A';
+            if (newData.time && newData.time.includes(':')) {
+                const [h, m] = newData.time.split(':');
+                const hh = parseInt(h);
+                displayTime = `${hh % 12 || 12}:${m} ${hh >= 12 ? 'PM' : 'AM'}`;
+            }
+
+            return `Summary: Add "${newData.title}" (${newData.type}) for ${newData.course || 'N/A'} on ${newData.date} at ${displayTime}. Confirm? (Yes/No)`;
         }
+
         if (currentStep === 'confirm') {
-            if (text.toLowerCase().includes('yes') || text.toLowerCase().includes('yeah') || text.toLowerCase().includes('ok')) {
+            const isAffirmative = /\b(yes|yeah|ok|okay|sure|confirm|do it)\b/i.test(text);
+
+            if (isAffirmative) {
                 // SAVE EVENT
-                const newItem = {
-                    id: Date.now().toString(),
-                    title: newData.title || 'Untitled',
-                    date: newData.date || new Date().toISOString().split('T')[0],
-                    type: newData.type || 'Task',
-                    priority: newData.priority || 'Medium',
-                    completed: false,
-                    time: newData.time || '',
-                    description: newData.description || '',
-                    course: newData.course || '',
-                    reminder: false
-                };
+                try {
+                    const newItem = {
+                        id: Date.now().toString(),
+                        title: newData.title || 'Untitled',
+                        date: newData.date || new Date().toISOString().split('T')[0],
+                        type: newData.type || 'Task',
+                        priority: newData.priority || 'Medium',
+                        completed: false,
+                        time: newData.time || '',
+                        description: newData.description || '',
+                        course: newData.course || '',
+                        reminder: false
+                    };
 
-                // Load existing
-                const existing = JSON.parse(localStorage.getItem('lucid_timetable_events') || '[]');
-                const updated = [...existing, newItem];
-                localStorage.setItem('lucid_timetable_events', JSON.stringify(updated));
+                    // Load existing
+                    const existingStr = localStorage.getItem('lucid_timetable_events') || '[]';
+                    const existing = JSON.parse(existingStr);
+                    const updated = [...existing, newItem];
+                    localStorage.setItem('lucid_timetable_events', JSON.stringify(updated));
 
-                // Dispatch Update
-                window.dispatchEvent(new Event('lucid-events-updated'));
+                    // Dispatch Update for live listeners
+                    window.dispatchEvent(new CustomEvent('lucid-events-updated'));
 
-                setWizard({ active: false, step: 'title', data: {} });
-                return "Event added successfully! 🚀 Opening events...";
+                    setWizard({ active: false, step: 'title', data: {} });
+
+                    // Navigate to Events Page after a brief delay to show message
+                    setTimeout(() => router.push('/events'), 1000);
+
+                    return "Event added successfully! 🚀 Opening events...";
+                } catch (error) {
+                    console.error("Failed to save event:", error);
+                    return "Sorry, I couldn't save the event. Please try again.";
+                }
             } else {
                 setWizard({ active: false, step: 'title', data: {} });
                 return "Cancelled.";
@@ -376,8 +425,9 @@ export default function LucidChat({ onAction }: LucidChatProps) {
 
             // 1. WIZARD HANDLING (With Smart Escape)
             if (wizard.active) {
-                const escapeTerms = ['cancel', 'stop', 'exit', 'never mind', 'wrong', 'no'];
-                const isEscape = escapeTerms.some(t => userMsg.text.toLowerCase().includes(t));
+                // Ignore "none" for escape logic as it's a valid data input for optional fields
+                const isNone = userMsg.text.toLowerCase().trim() === 'none';
+                const isEscape = !isNone && /\b(cancel|abort|stop|exit|never mind)\b/i.test(userMsg.text);
 
                 const tentativeResult = processQuery(userMsg.text);
                 const isStrongIntent = (

@@ -8,7 +8,7 @@ interface InfoModalProps {
 }
 
 export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
-    const [activeTab, setActiveTab] = useState<'about' | 'features' | 'credits'>('about');
+    const [activeTab, setActiveTab] = useState<'about' | 'features' | 'aura' | 'credits'>('about');
 
     if (!isOpen) return null;
 
@@ -60,6 +60,12 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                         onClick={() => setActiveTab('features')}
                         icon="fa-bolt"
                         label="Features"
+                    />
+                    <TabButton
+                        active={activeTab === 'aura'}
+                        onClick={() => setActiveTab('aura')}
+                        icon="fa-robot"
+                        label="AI Aura"
                     />
                     <TabButton
                         active={activeTab === 'credits'}
@@ -174,6 +180,63 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                                 title="Dark Mode"
                                 desc="A complete dark theme redesign that is easy on the eyes and perfect for night owls."
                             />
+                        </div>
+                    )}
+
+                    {activeTab === 'aura' && (
+                        <div className="space-y-5 animate-fade-in">
+                            <div className="p-4 rounded-2xl bg-fuchsia-50 dark:bg-fuchsia-900/10 border border-fuchsia-100 dark:border-fuchsia-800/30">
+                                <h4 className="text-sm font-bold text-fuchsia-600 dark:text-fuchsia-400 mb-1 flex items-center gap-2">
+                                    <i className="fas fa-sparkles text-xs"></i>
+                                    Meet Lucid Aura
+                                </h4>
+                                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                    Your intelligent academic companion. Aura isn't just a chatbot; it's a context-aware engine that understands your schedule and automates your tasks.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <p className="text-[10px] uppercase tracking-widest font-bold text-slate-400 pl-1">Try Asking</p>
+                                <FeatureRow
+                                    icon="fa-search"
+                                    color="text-indigo-500"
+                                    bg="bg-indigo-50 dark:bg-indigo-900/20"
+                                    title="Teacher & Room Lookup"
+                                    desc="'Where is Sir Asif right now?' or 'Find a free slot in Room 102'"
+                                />
+                                <FeatureRow
+                                    icon="fa-calendar-plus"
+                                    color="text-fuchsia-500"
+                                    bg="bg-fuchsia-50 dark:bg-fuchsia-900/20"
+                                    title="Instant Event Creation"
+                                    desc="'Add a Quiz for DAAA after 2 hours' or 'Remind me about Assignment'"
+                                />
+                                <FeatureRow
+                                    icon="fa-filter"
+                                    color="text-emerald-500"
+                                    bg="bg-emerald-50 dark:bg-emerald-900/20"
+                                    title="Dynamic Navigation"
+                                    desc="'Show me tomorrow's timetable' or 'Go to Seating Plan'"
+                                />
+                            </div>
+
+                            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                                <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-tighter mb-2">Power User Tips</h4>
+                                <ul className="space-y-2">
+                                    <li className="flex items-start gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-medium lowercase leading-tight">
+                                        <i className="fas fa-check-circle text-indigo-500 mt-0.5"></i>
+                                        <span>Aura learns your name and class automatically when you search.</span>
+                                    </li>
+                                    <li className="flex items-start gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-medium lowercase leading-tight">
+                                        <i className="fas fa-check-circle text-indigo-500 mt-0.5"></i>
+                                        <span>Use relative time like "after 30 mins" for quick reminders.</span>
+                                    </li>
+                                    <li className="flex items-start gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-medium lowercase leading-tight">
+                                        <i className="fas fa-check-circle text-indigo-500 mt-0.5"></i>
+                                        <span>Type "cancel" at any time to exit the event creation wizard.</span>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     )}
 
