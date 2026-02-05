@@ -99,13 +99,13 @@ export const VIEWS: KeywordMatch[] = [
 // 5. COMMON RESPONSES (For "Chat" feel)
 export const RESPONSES = {
     greeting: [
-        "Hello! I'm Lucid Aura. How can I help with your timetable?",
+        "Hello! I'm Aura AI. How can I help with your timetable?",
         "Hey there! Need to find a class or teacher?",
         "Hi! Ask me anything like 'Where is Sir Asif?' or 'Show me Monday'."
     ],
     identity: [
-        "I am Lucid Aura, your personal AI assistant for the University of Lahore timetable. I can help you find classes, teachers, and rooms instantly! 🤖",
-        "I'm Lucid Aura, a smart assistant built to make navigating your schedule easier. Ask me to find a teacher or show your class timing.",
+        "I am Aura AI, your personal AI assistant for the Lucid Aura ∞ Application designed for UOL SGD. I can help you find classes, teachers, rooms, datesheet, exam seat and add events instantly! 🤖",
+        "I'm Aura AI, a smart assistant built to make navigating your schedule easier. Ask me to find a teacher or show your class timing.",
     ],
     help: [
         "I can help you filter the timetable! Try asking:\n• 'Show me BSCS 5 A'\n• 'Where is Sir Ali Tariq?'\n• 'Find Room 202'\n• 'Schedule for Friday'\n• 'Open GPA Calculator'",

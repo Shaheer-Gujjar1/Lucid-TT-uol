@@ -65,7 +65,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                         active={activeTab === 'aura'}
                         onClick={() => setActiveTab('aura')}
                         icon="fa-robot"
-                        label="AI Aura"
+                        label="Aura AI"
                     />
                     <TabButton
                         active={activeTab === 'credits'}
@@ -82,12 +82,12 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                         <div className="space-y-6 animate-fade-in">
                             <div className="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/30 text-center">
                                 <p className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    <span className="font-bold text-indigo-600 dark:text-indigo-400">Lucid Aura∞ v6.5.12</span> is the premier academic utility for UOL students. It redefines your university experience by seamlessly integrating dynamic timetables, intelligent exam planning, and performance tracking into one unified, high-performance interface.
+                                    <span className="font-bold text-indigo-600 dark:text-indigo-400">Lucid Aura∞ v6.6.10</span> is the premier academic utility for UOL students. It redefines your university experience by seamlessly integrating dynamic timetables, intelligent exam planning, and performance tracking into one unified, high-performance interface.
                                 </p>
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
-                                <StatCard label="Version" value="6.5.12" icon="fa-code-branch" />
+                                <StatCard label="Version" value="6.6.10" icon="fa-code-branch" />
                                 <StatCard label="Release" value="Feb 2026" icon="fa-calendar-check" />
                             </div>
 
@@ -188,7 +188,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                             <div className="p-4 rounded-2xl bg-fuchsia-50 dark:bg-fuchsia-900/10 border border-fuchsia-100 dark:border-fuchsia-800/30">
                                 <h4 className="text-sm font-bold text-fuchsia-600 dark:text-fuchsia-400 mb-1 flex items-center gap-2">
                                     <i className="fas fa-sparkles text-xs"></i>
-                                    Meet Lucid Aura
+                                    Meet Aura AI
                                 </h4>
                                 <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                                     Your intelligent academic companion. Aura isn't just a chatbot; it's a context-aware engine that understands your schedule and automates your tasks.

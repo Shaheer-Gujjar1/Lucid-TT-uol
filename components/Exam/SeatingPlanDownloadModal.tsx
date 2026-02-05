@@ -118,7 +118,7 @@ function InlineSeatingPrintView({ data, filters, generatedAt }: { data: SeatingP
                     <h1 style={styles.title}>
                         Lucid <span style={{ color: '#7c3aed' }}>Seating Plan</span>
                     </h1>
-                    <p style={styles.subtitle}>Generated via Lucid Aura∞ v6.5.12</p>
+                    <p style={styles.subtitle}>Generated via Lucid Aura∞ v6.6.10</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '16px', fontWeight: 800, color: '#1e293b' }}>

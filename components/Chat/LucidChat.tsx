@@ -113,7 +113,7 @@ export default function LucidChat({ onAction }: LucidChatProps) {
         }
 
         // Default Welcome (Only if no session)
-        let welcomeText = "Hi! I'm Lucid Aura. Ask me anything! (e.g., 'Where is Sir Asif?', 'Add Assignment')";
+        let welcomeText = "Hi! I'm Aura AI. Ask me anything! (e.g., 'Where is Sir Asif?', 'Add Assignment')";
         if (initialMemory.length > 0) {
             welcomeText = `Welcome back! I remember:\n${initialMemory.map(m => `• ${m}`).join('\n')}\n\nHow can I help you today?`;
         }
@@ -135,7 +135,7 @@ export default function LucidChat({ onAction }: LucidChatProps) {
     const handleClearChat = () => {
         const welcomeText = memory.length > 0
             ? `Memory preserved. Welcome back! I remember:\n${memory.map(m => `• ${m}`).join('\n')}\n\nHow can I help?`
-            : "Chat cleared. I'm Lucid Aura. Ask me anything!";
+            : "Chat cleared. I'm Aura AI. Ask me anything!";
 
         setMessages([{ id: Date.now(), text: welcomeText, sender: 'system', timestamp: new Date() }]);
         sessionStorage.removeItem('lucid_chat_session');
