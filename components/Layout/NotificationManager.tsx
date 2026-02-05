@@ -22,6 +22,13 @@ export default function NotificationManager() {
         // Run immediately
         runCheck();
 
+        // Register Service Worker for Mobile Notifications
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => console.log('SW Registered:', registration.scope))
+                .catch(err => console.error('SW Registration Failed:', err));
+        }
+
         // Listen for network recovery
         const handleOnline = () => {
             console.log('Network restored - Checking for missed notifications...');

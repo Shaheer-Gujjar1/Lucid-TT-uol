@@ -30,14 +30,27 @@ export const requestNotificationPermission = async (): Promise<boolean> => {
     return false;
 };
 
-export const sendNotification = (title: string, options?: NotificationOptions) => {
+export const sendNotification = async (title: string, options?: NotificationOptions) => {
     if (Notification.permission === 'granted') {
         try {
-            // Service Worker registration is required for persistent notifications on mobile but
-            // requires PWA setup. For now, we fallback to standard new Notification() which works 
-            // when app is open/minimized on desktop and some mobile scenarios.
+            // Priority: Service Worker (Required for Mobile Android/iOS)
+            if ('serviceWorker' in navigator) {
+                const registration = await navigator.serviceWorker.ready;
+                if (registration) {
+                    registration.showNotification(title, {
+                        icon: '/logo-primary.png',
+                        badge: '/logo-primary.png',
+                        // @ts-ignore - vibrate is valid in SW notification but TS definition might be missing it
+                        vibrate: [200, 100, 200],
+                        ...options
+                    });
+                    return;
+                }
+            }
+
+            // Fallback: Standard Web API (Desktop)
             new Notification(title, {
-                icon: '/logo-primary.png', // Assuming this exists, fallback if not
+                icon: '/logo-primary.png',
                 badge: '/logo-primary.png',
                 ...options
             });
