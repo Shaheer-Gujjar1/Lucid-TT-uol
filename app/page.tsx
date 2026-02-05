@@ -525,29 +525,28 @@ export default function Home() {
 
         // 1. SET STUDENT PROFILE (New Intent)
         if (intent === 'set_profile' || (intent === 'filter_mode' && (entities.program || entities.semester || entities.section))) {
+            const nextProgram = entities.program || filters.program;
+            const nextSemester = entities.semester || filters.semester;
+            const nextSection = entities.section || ''; // Default to All Sections for profile set
+
             setMode('student');
-            setFilters(prev => {
-                const newFilters = { ...prev };
-                if (entities.program) newFilters.program = entities.program;
-                if (entities.semester) newFilters.semester = entities.semester;
-                if (entities.section) newFilters.section = entities.section;
-                return newFilters;
-            });
+            setFilters(prev => ({
+                ...prev,
+                program: nextProgram,
+                semester: nextSemester,
+                section: nextSection
+            }));
 
             // Auto-save preferences logic (Replicated from savePreferences)
-            // We need a timeout to allow state to settle or just save values directly? state might be stale here.
-            // Better to save the VALUES we just derived.
-            setTimeout(() => {
-                const newPrefs = {
-                    program: entities.program || filters.program,
-                    semester: entities.semester || filters.semester,
-                    section: entities.section || filters.section
-                };
-                // Merge with existing if needed, but for now strict overwrite is safer for "setting profile"
-                localStorage.setItem('lucid_student_prefs', JSON.stringify(newPrefs));
-            }, 100);
+            // Save IMMEDIATELY so the mode-change useEffect picks up the new values
+            const newPrefs = {
+                program: nextProgram,
+                semester: nextSemester,
+                section: nextSection
+            };
+            localStorage.setItem('lucid_student_prefs', JSON.stringify(newPrefs));
 
-            setToastMsg(`Profile set to ${entities.program || ''} ${entities.semester || ''}${entities.section || ''}`);
+            setToastMsg(`Profile set to ${nextProgram} ${nextSemester} ${nextSection || 'All Sections'}`);
             return;
         }
 
@@ -590,14 +589,30 @@ export default function Home() {
             // For now, let's trust the engine's 'mode' entity if present.
 
             if (targetMode === 'teacher') {
-                setFilters(prev => ({ ...prev, teacherName: entities.query }));
-                setToastMsg(`Searching Teacher: ${entities.query}`);
-                if (mode !== 'teacher') setMode('teacher');
+                const applyTeacherSearch = () => {
+                    setFilters(prev => ({ ...prev, teacherName: entities.query }));
+                    setToastMsg(`Searching Teacher: ${entities.query}`);
+                };
+
+                if (mode !== 'teacher') {
+                    setMode('teacher');
+                    setTimeout(applyTeacherSearch, 800);
+                } else {
+                    applyTeacherSearch();
+                }
             }
             else if (targetMode === 'room') {
-                setFilters(prev => ({ ...prev, roomNumber: entities.query }));
-                setToastMsg(`Searching Room: ${entities.query}`);
-                if (mode !== 'room') setMode('room');
+                const applyRoomSearch = () => {
+                    setFilters(prev => ({ ...prev, roomNumber: entities.query }));
+                    setToastMsg(`Searching Room: ${entities.query}`);
+                };
+
+                if (mode !== 'room') {
+                    setMode('room');
+                    setTimeout(applyRoomSearch, 800);
+                } else {
+                    applyRoomSearch();
+                }
             }
             // Logic for Exam (Seating or Datesheet) Search
             else if (targetMode === 'exam' || ((mode === 'exam' || targetMode === 'exam_guest') && (examView === 'seating' || examView === 'datesheet'))) {

@@ -24,7 +24,7 @@ export interface KeywordMatch {
 // 1. MODES & FILTERS
 export const MODES: KeywordMatch[] = [
     { file: 'student', variations: ['student', 'std', 'batch', 'section', 'stu', 'study'], weight: 10 },
-    { file: 'teacher', variations: ['teacher', 'tchr', 'sir', 'mam', 'professor', 'faculty', 'lecturer', 'lec', 'instructor'], weight: 10 },
+    { file: 'teacher', variations: ['teacher', 'tchr', 'sir', 'mam', 'professor', 'faculty', 'lecturer', 'lec', 'instructor', 'schedule', 'timetable'], weight: 10 },
     { file: 'room', variations: ['room', 'hall', 'lab', 'class room', 'venue', 'location', 'place', 'where'], weight: 10 },
 ];
 
@@ -72,20 +72,34 @@ export const PROGRAMS_MAP: KeywordMatch[] = [
     { file: 'BSCS', variations: ['BSCS', 'CS', 'Computer Science'], weight: 10 },
     { file: 'BSIT', variations: ['BSIT', 'IT', 'Information Technology'], weight: 10 },
     { file: 'BSSE', variations: ['BSSE', 'SE', 'Software Engineering'], weight: 10 },
-    { file: 'BS DS', variations: ['BSDS', 'Data Science', 'DS'], weight: 10 },
-    { file: 'BS AI', variations: ['BSAI', 'AI', 'Artificial Intelligence'], weight: 10 },
-    { file: 'MCS', variations: ['MCS', 'Master'], weight: 10 },
+    { file: 'BSAI', variations: ['BSAI', 'AI', 'Artificial Intelligence'], weight: 10 },
+    { file: 'MCS', variations: ['MCS', 'Masters CS'], weight: 10 },
     { file: 'ADP', variations: ['ADP', 'Associate'], weight: 10 },
+    { file: 'PharmD', variations: ['PharmD', 'Pharm D', 'Pharmacy', 'Doctor of Pharmacy'], weight: 10 },
+    { file: 'DPT', variations: ['DPT', 'Physiotherapy', 'Physical Therapy', 'Doctor of Physical Therapy'], weight: 10 },
+    { file: 'MLT', variations: ['MLT', 'Medical Lab', 'Medical Laboratory Technology'], weight: 10 },
+    { file: 'HND', variations: ['HND', 'Higher National Diploma'], weight: 10 },
+    { file: 'RIT', variations: ['RIT', 'Radiology', 'Imaging Technology', 'Radiology Imaging'], weight: 10 },
+    { file: 'Nursing', variations: ['Nursing', 'BSN', 'BS Nursing', 'Nurse'], weight: 10 },
+    { file: 'BBA', variations: ['BBA', 'Business Administration', 'Business'], weight: 10 },
+    { file: 'BBA(2Y)', variations: ['BBA 2Y', 'BBA 2 Year', 'BBA Two Year'], weight: 10 },
+    { file: 'BSAF', variations: ['BSAF', 'Accounting', 'Accounting Finance', 'Accounting and Finance'], weight: 10 },
+    { file: 'BSAF(2Y)', variations: ['BSAF 2Y', 'BSAF 2 Year', 'BSAF Two Year'], weight: 10 },
+    { file: 'BSDM', variations: ['BSDM', 'Digital Marketing', 'Marketing'], weight: 10 },
+    { file: 'BS Math', variations: ['BS Math', 'BSMath', 'Mathematics', 'Maths'], weight: 10 },
+    { file: 'BSMDS', variations: ['BSMDS', 'Data Science', 'BS Data Science', 'MDS'], weight: 10 },
 ];
+
 
 export const PROGRAMS: string[] = PROGRAMS_MAP.map(p => p.file);
 
 export const SECTIONS: string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'M1', 'M2', 'E1', 'E2'];
 
 export const SEMESTER_MAP: Record<string, string> = {
-    '1': '1', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8',
-    '1st': '1', '2nd': '2', '3rd': '3', '4th': '4', '5th': '5', '6th': '6', '7th': '7', '8th': '8',
-    'first': '1', 'second': '2', 'third': '3', 'fourth': '4', 'fifth': '5', 'sixth': '6', 'seventh': '7', 'eighth': '8'
+    '0': '0', '1': '1', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8', '9': '9', '10': '10',
+    '1st': '1', '2nd': '2', '3rd': '3', '4th': '4', '5th': '5', '6th': '6', '7th': '7', '8th': '8', '9th': '9', '10th': '10',
+    'first': '1', 'second': '2', 'third': '3', 'fourth': '4', 'fifth': '5', 'sixth': '6', 'seventh': '7', 'eighth': '8', 'ninth': '9', 'tenth': '10',
+    'zero': '0'
 };
 
 export const SEMESTERS: string[] = Object.keys(SEMESTER_MAP);

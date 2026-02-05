@@ -25,6 +25,7 @@ export const EXAM_PROGRAMS = [
 ];
 
 export const SEMESTERS = [
+    { label: "All Semesters", value: "" },
     { label: "0", value: "0" },
     { label: "1", value: "1" },
     { label: "2", value: "2" },

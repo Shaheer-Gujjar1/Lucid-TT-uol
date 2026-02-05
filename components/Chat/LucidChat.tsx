@@ -62,7 +62,7 @@ export default function LucidChat({ onAction }: LucidChatProps) {
 
     // Context State for Multi-turn conversation
     const [context, setContext] = useState<{
-        type: 'name_search' | 'confirm_slot_switch' | 'name_conflict' | 'confirm_profile_identity' | null,
+        type: 'name_search' | 'confirm_slot_switch' | 'name_conflict' | 'confirm_profile_identity' | 'teacher_name_prompt' | 'search_disambiguation' | null,
         data?: any
     }>({ type: null });
 
@@ -451,7 +451,19 @@ export default function LucidChat({ onAction }: LucidChatProps) {
 
             // 2. CONTEXT HANDLING (If not handled by Wizard)
             if (!responseText) {
-                if (context.type === 'name_search') {
+                // Universal Smart Escape for Contexts
+                const tentativeResult = processQuery(userMsg.text);
+                const isStrongIntent = (
+                    tentativeResult.intent === 'navigation' ||
+                    tentativeResult.intent === 'search' ||
+                    tentativeResult.intent === 'set_profile'
+                ) && tentativeResult.confidence > 0.8;
+
+                if (context.type && isStrongIntent) {
+                    setContext({ type: null });
+                    // Fall through to default query handling
+                }
+                else if (context.type === 'name_search') {
                     const nameQuery = userMsg.text.replace(/(my name is|i am|search for|find)/gi, '').trim();
                     const knownName = memory.find(m => m.startsWith('User name is'))?.replace('User name is ', '');
 
@@ -484,35 +496,84 @@ export default function LucidChat({ onAction }: LucidChatProps) {
                         setContext({ type: null });
                     }
                 }
+                else if (context.type === 'teacher_name_prompt') {
+                    // User provided a teacher name after being prompted
+                    const teacherName = userMsg.text.trim();
+                    if (teacherName.length > 1) {
+                        responseText = `Searching for "${teacherName}"...`;
+                        rawResult = {
+                            intent: 'search',
+                            entities: { query: teacherName, mode: 'teacher' },
+                            confidence: 1,
+                            response: responseText
+                        };
+                        setContext({ type: null });
+                    } else {
+                        responseText = "Please enter a valid teacher name.";
+                    }
+                }
+                else if (context.type === 'search_disambiguation') {
+                    const text = userMsg.text.toLowerCase();
+                    const isTeacher = ['teacher', 'sir', 'mam', 'prof', 'lec', 'yes', 'tchr'].some(k => text.includes(k));
+                    const isStudent = ['student', 'group', 'batch', 'section', 'std'].some(k => text.includes(k));
+
+                    if (isTeacher) {
+                        responseText = `Searching for Teacher "${context.data.query}"...`;
+                        rawResult = {
+                            intent: 'search',
+                            entities: { query: context.data.query, mode: 'teacher' },
+                            confidence: 1,
+                            response: responseText
+                        };
+                        setContext({ type: null });
+                    } else if (isStudent) {
+                        responseText = `Searching for Student group "${context.data.query}"...`;
+                        rawResult = {
+                            intent: 'search',
+                            entities: { query: context.data.query, mode: 'student' },
+                            confidence: 1,
+                            response: responseText
+                        };
+                        setContext({ type: null });
+                    } else {
+                        responseText = "I didn't catch that. Is this a teacher or a student group?";
+                        // No early return, let finishing logic clear typing indicator
+                    }
+                }
                 else if (context.type === 'confirm_profile_identity') {
+
                     const text = userMsg.text.toLowerCase();
                     const isStudent = ['student', 'std', 'stu', 'i am', 'yes'].some(k => text.includes(k));
                     const isTeacher = ['teacher', 'sir', 'mam', 'prof', 'lec'].some(k => text.includes(k));
 
                     if (isStudent) {
-                        responseText = `Got it! Saved "${context.data.program} ${context.data.semester} ${context.data.section}" as your profile. Showing your timetable...`;
+                        const sectionDisplay = context.data.section || 'All Sections';
+                        responseText = `Got it! Saved "${context.data.program} ${context.data.semester} ${sectionDisplay}" as your profile. Showing your timetable...`;
                         rawResult = {
                             intent: 'set_profile' as any,
-                            entities: context.data,
+                            entities: { ...context.data, section: context.data.section || '' },
                             confidence: 1,
                             response: responseText
                         };
+                        setContext({ type: null });
                     } else if (isTeacher) {
-                        responseText = `Showing timetable for ${context.data.program} ${context.data.semester} ${context.data.section}. (Not saved as profile)`;
+                        const sectionDisplay = context.data.section || 'All Sections';
+                        responseText = `Showing timetable for ${context.data.program} ${context.data.semester} ${sectionDisplay}. (Not saved as profile)`;
                         rawResult = {
                             intent: 'filter_mode',
-                            entities: { ...context.data, mode: 'student' }, // We still show student view of that class
+                            entities: { ...context.data, mode: 'student', section: context.data.section || '' }, // We still show student view of that class
                             confidence: 1,
                             response: responseText
                         };
+                        setContext({ type: null });
                     } else {
                         responseText = "I didn't catch that. Are you a student or a teacher?";
-                        return; // Keep context
+                        // No early return
                     }
-                    setContext({ type: null });
                 }
-                // 3. DEFAULT QUERY HANDLING
-                else {
+
+                // 3. FINAL/DEFAULT QUERY HANDLING
+                if (!responseText) {
                     rawResult = processQuery(userMsg.text);
                     responseText = rawResult.response;
 
@@ -556,6 +617,19 @@ export default function LucidChat({ onAction }: LucidChatProps) {
                             responseText = "Opening Seating Plan in Exam Mode. To find your seat, I need your name. What is your name?";
                             setContext({ type: 'name_search' });
                         }
+                    }
+
+                    // Handle ambiguous teacher/student query
+                    if (rawResult && (rawResult.intent as string) === 'search_ambiguous') {
+                        responseText = `I found "${rawResult.entities.query}". Is this a teacher or a student group?\n\nTip: You can use parentheses like (${rawResult.entities.query}) to always search for teachers!`;
+                        setContext({ type: 'search_disambiguation', data: { query: rawResult.entities.query } });
+                        rawResult = null;
+                    }
+
+                    // Handle vague teacher query
+                    if (rawResult && (rawResult.intent as string) === 'prompt_teacher_name') {
+                        setContext({ type: 'teacher_name_prompt' });
+                        rawResult = null; // Wait for user to provide name
                     }
                 }
             }
@@ -638,7 +712,7 @@ export default function LucidChat({ onAction }: LucidChatProps) {
                                 <i className="fas fa-robot"></i>
                             </div>
                             <div>
-                                <h3 className="font-black text-slate-800 dark:text-white text-sm">Lucid Aura</h3>
+                                <h3 className="font-black text-slate-800 dark:text-white text-sm">Lucid Chat</h3>
                                 <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">AI Assistant • Online</p>
                             </div>
                         </div>

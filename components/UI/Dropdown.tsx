@@ -68,7 +68,7 @@ export default function Dropdown({ label, value, options, onChange, placeholder 
                 {icon && (
                     <i className={`fas ${icon} absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500`}></i>
                 )}
-                <span className={!value ? 'text-slate-400' : ''}>
+                <span className={(value === null || value === undefined || (value === '' && !selectedOption)) ? 'text-slate-400' : ''}>
                     {selectedOption ? selectedOption.label : placeholder}
                 </span>
                 <i className={`fas fa-chevron-down text-[10px] transition-transform duration-300 ${show ? 'rotate-180 text-indigo-500' : 'text-slate-400'}`}></i>
@@ -80,12 +80,14 @@ export default function Dropdown({ label, value, options, onChange, placeholder 
                     <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden ring-1 ring-black/5">
                         <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
                             <div className="p-2 space-y-1">
-                                <button
-                                    onMouseDown={(e) => { e.preventDefault(); handleSelect(''); }}
-                                    className="w-full text-left px-5 py-3 rounded-xl text-sm font-bold text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-                                >
-                                    {placeholder}
-                                </button>
+                                {!options.some(opt => opt.value === '') && (
+                                    <button
+                                        onMouseDown={(e) => { e.preventDefault(); handleSelect(''); }}
+                                        className="w-full text-left px-5 py-3 rounded-xl text-sm font-bold text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                                    >
+                                        {placeholder}
+                                    </button>
+                                )}
                                 {options.map((opt) => (
                                     <button
                                         key={opt.value}

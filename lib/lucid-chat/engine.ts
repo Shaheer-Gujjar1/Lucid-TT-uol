@@ -84,14 +84,59 @@ export const processQuery = (input: string): ParsedResult => {
     }
 
     // 1. QUICK PHRASES
+    // Room Search Priority (New: Fix for "ongoing in room 112" / "schedule of room 117")
+    const roomKeywords = ['room', 'hall', 'lab', 'venue', 'location', 'place'];
+    const hasRoomKeyword = roomKeywords.some(k => new RegExp(`\\b${k}\\b`, 'i').test(input));
+    const roomNumberMatch = input.match(/\b\d{3}[a-z]?\b/i);
+
+    if (hasRoomKeyword || roomNumberMatch) {
+        let roomQuery = roomNumberMatch ? roomNumberMatch[0] : '';
+        if (roomQuery) {
+            result.intent = 'search';
+            result.entities.mode = 'room';
+            result.entities.query = roomQuery;
+            result.response = `Searching for Room ${roomQuery}...`;
+            result.confidence = 10;
+            return result;
+        }
+    }
+
     // Next/Current Class Logic
-    if (input.match(/(next|upcoming|current|my) class/i) || input.match(/where is my class/i)) {
+    const teacherKeywords = ['teacher', 'sir', 'mam', 'madam', 'professor', 'prof', 'faculty', 'lecturer', 'instructor', 'dr', 'mr', 'ms', 'miss', 'mrs'];
+    const hasTeacherKeyword = teacherKeywords.some(k => new RegExp(`\\b${k}\\b`, 'i').test(input));
+
+    if ((input.match(/(next|upcoming|current|my) class/i) || input.match(/where is my class/i)) && !hasTeacherKeyword) {
         result.intent = 'filter_mode';
         result.entities.mode = 'student';
         result.entities.day = 'today'; // Will trigger current slot highlight in UI
         result.response = "Here is your schedule for today.";
         result.confidence = 9;
         return result;
+    }
+
+    // Vague Teacher Query Detection (No specific name provided)
+    const scheduleKeywords = ['schedule', 'timetable', 'classes', 'class', 'teach', 'when', 'where', 'find', 'show', 'search'];
+    const hasScheduleKeyword = scheduleKeywords.some(k => new RegExp(`\\b${k}\\b`, 'i').test(cleanInput)) ||
+        ['schedule', 'timetable'].some(k => input.toLowerCase().includes(k));
+
+    if (hasTeacherKeyword && hasScheduleKeyword) {
+        // Check if there's an actual name after the teacher keyword
+        const namePattern = /(?:sir|mam|madam|prof|dr|mr|ms|miss|mrs)\s+([a-zA-Z]+(?:\s+[a-zA-Z]+)?)/i;
+        const nameMatch = cleanInput.match(namePattern);
+        const hasActualName = nameMatch && nameMatch[1] && nameMatch[1].length > 2;
+
+        if (!hasActualName) {
+            // Safety: Check if input has a multi-word sequence that doesn't match the honorific pattern
+            // (e.g., "Ali Tariq" but no "Sir" prefix)
+            const words = cleanInput.split(' ').filter(w => w.length > 2);
+            if (words.length < 2) {
+                result.intent = 'prompt_teacher_name' as any;
+                result.entities.mode = 'teacher';
+                result.response = "Sure! Please tell me the teacher's name. For example: \"Sir Ahmed\" or \"Ms. Saba\".";
+                result.confidence = 9;
+                return result;
+            }
+        }
     }
 
     // 1. Detect Greeting
@@ -276,10 +321,13 @@ export const processQuery = (input: string): ParsedResult => {
         let cleanText = input.toLowerCase();
         [...MODES, ...DAYS, ...FEATURES].forEach(cat => cat.variations.forEach(v => cleanText = cleanText.replace(new RegExp(`\\b${v}\\b`, 'gi'), '')));
         Object.values(INTENTS).flat().forEach(v => cleanText = cleanText.replace(new RegExp(`\\b${v}\\b`, 'gi'), ''));
-        const stopWords = ['my', 'name', 'is', 'i', 'am', 'find', 'search', 'looking', 'for', 'show', 'me', 'the', 'seat', 'on', 'at', 'in', 'how', 'many', 'do', 'does', 'free', 'by', 'now', 'is', 'are', 'remember', 'a', 'an'];
+        const stopWords = ['my', 'name', 'is', 'i', 'am', 'find', 'search', 'looking', 'for', 'show', 'me', 'the', 'seat', 'on', 'at', 'in', 'how', 'many', 'do', 'does', 'free', 'by', 'now', 'is', 'are', 'remember', 'a', 'an', 'of', 'schedule', 'timetable', 'next', 'upcoming', 'class', 'which', 'ongoing'];
         stopWords.forEach(sw => cleanText = cleanText.replace(new RegExp(`\\b${sw}\\b`, 'gi'), ''));
 
-        const potentialQuery = cleanText.trim().replace(/\s+/g, ' ');
+        // Strip parentheses and common special chars for name identification
+        const normalizedText = cleanText.replace(/[()]/g, ' ').replace(/\s+/g, ' ').trim();
+        const potentialQuery = normalizedText;
+
         if (potentialQuery.length > 2) {
             result.entities.query = potentialQuery;
             if (result.intent === 'unknown') result.intent = 'search';
@@ -289,12 +337,21 @@ export const processQuery = (input: string): ParsedResult => {
                 const honorifics = ['sir', 'mam', 'maam', 'dr', 'mr', 'ms', 'prof', 'teacher', 'instructor'];
                 // Teacher Heuristic: Multi-word alphabetic query + context words
                 const isMultiWordName = potentialQuery.split(' ').length >= 2 && /^[a-zA-Z\s]+$/.test(potentialQuery);
-                const hasClassContext = ['class', 'classes', 'free', 'lecture'].some(k => input.toLowerCase().includes(k));
+                const hasClassContext = ['class', 'classes', 'free', 'lecture', 'schedule', 'timetable'].some(k => input.toLowerCase().includes(k));
+                const hasHonorific = honorifics.some(h => input.toLowerCase().includes(h));
+                const hasParentheses = /\(.*\)/.test(input);
 
-                if (honorifics.some(h => input.toLowerCase().includes(h))) result.entities.mode = 'teacher';
-                else if (isMultiWordName && hasClassContext) result.entities.mode = 'teacher';
-                else if (/\b\d{3}\b/.test(potentialQuery) || /nb-|ob-|room|lab/i.test(potentialQuery)) result.entities.mode = 'room';
-                else if (/\b(sec|section|batch)\b/i.test(input)) result.entities.mode = 'student';
+                if (hasHonorific || hasParentheses) {
+                    result.entities.mode = 'teacher';
+                } else if (isMultiWordName && hasClassContext) {
+                    // Ambiguous case: could be teacher or student group with multiple words (less common but possible)
+                    result.intent = 'search_ambiguous' as any;
+                    result.entities.mode = 'teacher'; // Tentative default
+                } else if (/\b\d{3}\b/.test(potentialQuery) || /nb-|ob-|room|lab/i.test(potentialQuery)) {
+                    result.entities.mode = 'room';
+                } else if (/\b(sec|section|batch)\b/i.test(input)) {
+                    result.entities.mode = 'student';
+                }
             }
 
             if (result.entities.feature === 'datesheet') {
