@@ -51,6 +51,13 @@ export default function RootLayout({
                         window.dataLayer = window.dataLayer || [];
                         function gtag(){dataLayer.push(arguments);}
                         gtag('js', new Date());
+
+                        // PWA Context Injection
+                        const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+                        if (isPWA) {
+                            gtag('set', { 'app_context': 'pwa' });
+                        }
+
                         gtag('config', 'G-376YYK5WW5');
                     `}
                 </Script>

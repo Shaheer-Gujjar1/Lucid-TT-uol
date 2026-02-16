@@ -9,6 +9,7 @@ self.addEventListener('activate', (event) => {
     event.waitUntil(self.clients.claim());
 });
 
+
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
 
@@ -26,4 +27,14 @@ self.addEventListener('notificationclick', (event) => {
             return clients.openWindow('/');
         })
     );
+});
+
+// HARDENED GA4: Bypass cache for analytics
+self.addEventListener('fetch', (event) => {
+    const url = event.request.url;
+    if (url.match(/(google-analytics|analytics\.google|googletagmanager)/)) {
+        // Force network request, bypassing SW cache for analytics
+        event.respondWith(fetch(event.request));
+        return;
+    }
 });
