@@ -141,35 +141,57 @@ function calculateSimilarity(str1: string, str2: string): number {
     return (matchCount / longerLength) * 100;
 }
 
-function areCoursesDuplicates(course1: string, course2: string): boolean {
-    const normalized1 = normalizeCourseName(course1);
-    const normalized2 = normalizeCourseName(course2);
+function areDuplicateEntries(entry1: SlotEntry, entry2: SlotEntry): boolean {
+    const normalized1 = normalizeCourseName(entry1.course);
+    const normalized2 = normalizeCourseName(entry2.course);
+
+    const hasMergedKeyword = normalized1.includes('merged') || normalized2.includes('merged');
+    const similarity = calculateSimilarity(normalized1, normalized2);
+
+    const sameRoom = entry1.room === entry2.room && entry1.room !== "TBD" && entry1.room !== "Not Listed";
+
+    const t1 = entry1.instructor.toLowerCase().replace(/^(mr\.?|ms\.?|mrs\.?|miss|dr\.?|prof\.?)\s*/, '').replace(/[^a-z]/g, '');
+    const t2 = entry2.instructor.toLowerCase().replace(/^(mr\.?|ms\.?|mrs\.?|miss|dr\.?|prof\.?)\s*/, '').replace(/[^a-z]/g, '');
+
+    const isInvalidTeacher = (t: string) => t.includes('newfaculty') || t.includes('newfaulty') || t === '' || t === 'notlisted';
+
+    const teacherMatch = (t1 === t2) ||
+        (t1.includes(t2) && t2.length > 3) ||
+        (t2.includes(t1) && t1.length > 3) ||
+        isInvalidTeacher(t1) ||
+        isInvalidTeacher(t2);
+
+    if (!teacherMatch && !sameRoom) {
+        return false;
+    }
+
+    if (hasMergedKeyword && sameRoom) return true;
+    if (sameRoom && similarity >= 50 && teacherMatch) return true;
 
     if ((normalized1.includes('numerical analysis') && normalized2.includes('numerical computing')) ||
         (normalized1.includes('numerical computing') && normalized2.includes('numerical analysis'))) {
         return true;
     }
 
-    if (normalized1 === normalized2) {
-        return true;
-    }
+    if (normalized1 === normalized2) return true;
 
-    const similarity = calculateSimilarity(normalized1, normalized2);
-    return similarity >= 80;
+    return similarity >= 80 && (sameRoom || teacherMatch);
 }
 
 function prioritizeCourse(courses: SlotEntry[]): SlotEntry {
-    const numericalComputing = courses.find(c => normalizeCourseName(c.course).includes('numerical computing'));
-    if (numericalComputing) {
-        return numericalComputing;
+    const validNamed = courses.filter(c => {
+        const inst = c.instructor.toLowerCase();
+        return inst !== "not listed" && !inst.includes("new faculty") && !inst.includes("new faulty");
+    });
+
+    const candidates = validNamed.length > 0 ? validNamed : courses;
+
+    const merged = candidates.filter(c => c.course.toLowerCase().includes('merged'));
+    if (merged.length > 0) {
+        return merged.sort((a, b) => b.course.length - a.course.length)[0];
     }
 
-    const withRoomInfo = courses.find(c => c.room && c.room !== "TBD" && c.room !== "Not Listed");
-    if (withRoomInfo) {
-        return withRoomInfo;
-    }
-
-    return courses[0];
+    return candidates.sort((a, b) => b.course.length - a.course.length)[0];
 }
 
 function removeDuplicateCourses(courses: SlotEntry[]): SlotEntry[] {
@@ -187,7 +209,7 @@ function removeDuplicateCourses(courses: SlotEntry[]): SlotEntry[] {
         for (let j = i + 1; j < courses.length; j++) {
             if (usedIndices.has(j)) continue;
 
-            if (areCoursesDuplicates(courses[i].course, courses[j].course)) {
+            if (areDuplicateEntries(courses[i], courses[j])) {
                 group.push(courses[j]);
                 usedIndices.add(j);
             }
@@ -195,16 +217,60 @@ function removeDuplicateCourses(courses: SlotEntry[]): SlotEntry[] {
         groups.push(group);
     }
 
-    return groups.map(group => prioritizeCourse(group));
+    return groups.map(group => {
+        const prioritized = prioritizeCourse(group);
+        const uniqueClasses = Array.from(new Set(group.map(g => g.class).filter(c => c && c !== 'Unknown')));
+
+        if (uniqueClasses.length > 1) {
+            const mergedEntry = { ...prioritized };
+            mergedEntry.class = uniqueClasses.join(', ');
+            return mergedEntry;
+        }
+
+        return prioritized;
+    });
+}
+
+function cleanInstructorString(inst: string): string {
+    let cleaned = inst.replace(/\b(room|lab|class).*/i, '').trim();
+    cleaned = cleaned.split(/\s*[-–(]\s*/)[0].trim();
+    cleaned = cleaned.replace(/\b\d{1,2}[:.]\d{2}.*/, '').trim();
+    cleaned = cleaned.replace(/\s{2,}.*/, '').trim();
+    cleaned = cleaned.replace(/[,;]\s*.*/, '').trim();
+    return cleaned || "Not Listed";
 }
 
 function extractInstructor(text: string): string {
     const lines = text.split("\n");
+    const pattern = /\b(Mr\.?|Ms\.?|Mrs\.?|Mister|Miss|Doctor|Dr\.?|Muhammad|Mufti|Hafiz|Prof\.?|New\s+Faculty|New\s+Faulty)\b/i;
+
+    let fallbackInst: string | null = null;
+
     for (let i = lines.length - 1; i >= 0; i--) {
-        const line = lines[i];
-        if (/Mr\.|Ms\.|Mrs\.|Dr\.|Muhammad|Mufti|Hafiz|Prof/i.test(line)) return line.trim();
+        const line = lines[i].trim();
+        const match = line.match(pattern);
+
+        if (match && match.index !== undefined) {
+            let inst = line.substring(match.index).trim();
+            inst = cleanInstructorString(inst);
+
+            if (!inst.toLowerCase().includes('new faculty') && !inst.toLowerCase().includes('new faulty')) {
+                return inst;
+            } else if (!fallbackInst) {
+                fallbackInst = inst;
+            }
+        }
     }
-    return lines[lines.length - 1]?.trim() || "Not Listed";
+
+    let bottomStr = lines[lines.length - 1]?.trim() || "Not Listed";
+    if (bottomStr !== "Not Listed") {
+        bottomStr = cleanInstructorString(bottomStr);
+        if (!bottomStr.toLowerCase().includes('new faculty') && !bottomStr.toLowerCase().includes('new faulty')) {
+            return bottomStr;
+        }
+    }
+
+    return fallbackInst || bottomStr;
 }
 
 function extractRoomCSIT(roomFromColumn: string, cellContent: string): string {
@@ -561,7 +627,18 @@ export function processDayData(dayData: string[][], mode: 'student' | 'teacher' 
             for (const match of matches) {
                 if (mode === 'student' && !match.program) continue;
 
-                const courseTitle = cell.split("\n")[0].replace(/^\d+\.\s*/, "").trim();
+                let courseTitle = cell.split("\n")[0].replace(/^\d+\.\s*/, "").trim();
+                const instructorPattern = /\b(Mr\.?|Ms\.?|Mrs\.?|Mister|Miss|Doctor|Dr\.?|Muhammad|Mufti|Hafiz|Prof\.?|New\s+Faculty|New\s+Faulty)\b/i;
+                const matchPos = courseTitle.search(instructorPattern);
+                if (matchPos > 0) {
+                    const instNameFull = extractInstructor(courseTitle);
+                    if (instNameFull !== "Not Listed") {
+                        courseTitle = courseTitle.replace(instNameFull, "").replace(/\s{2,}/g, " ").trim();
+                        courseTitle = courseTitle.replace(/[-–,]$/, "").trim();
+                    } else {
+                        courseTitle = courseTitle.substring(0, matchPos).trim();
+                    }
+                }
                 // Biology filter check
                 const prog = filters.program || "";
                 if (mode === "student" && isBiologyCourse(cell, true, prog)) continue;
