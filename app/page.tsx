@@ -67,6 +67,7 @@ export default function Home() {
     const [showDeveloperDownloadModal, setShowDeveloperDownloadModal] = useState(false);
     const [showChronicleExportModal, setShowChronicleExportModal] = useState(false);
     const [examRefreshTrigger, setExamRefreshTrigger] = useState(0);
+    const [syncVersion, setSyncVersion] = useState(0);
 
     useEffect(() => {
         if (mounted && isInitialLoad) {
@@ -209,23 +210,25 @@ export default function Home() {
                     try {
                         const localData = JSON.parse(localDataStr);
                         responseCache.current['full_data'] = localData;
-                        fetchData(); // Trigger initial render with local data
+                        setSyncVersion(v => v + 1);
                     } catch (e) {
                         console.error("Error parsing local data", e);
                     }
+                } else {
+                    // Force loading if no cache exists for a new user
+                    setLoading(true);
                 }
 
                 // Trigger sync (if first time or forced elsewhere)
                 const freshData = await checkAndSync();
                 if (freshData) {
                     responseCache.current['full_data'] = freshData;
-                    fetchData(); // Re-render with fresh synced data
+                    setSyncVersion(v => v + 1);
                 }
             } catch (e) {
                 console.error('Sync failed', e);
-                if (!responseCache.current['full_data']) {
-                    fetchData();
-                }
+            } finally {
+                setLoading(false);
             }
         };
         initSync();
@@ -257,7 +260,7 @@ export default function Home() {
                 setToastMsg('Schedule updated! Refreshing...');
                 const updatedData = await checkAndSync(true); // Force sync
                 responseCache.current['full_data'] = updatedData;
-                fetchData();
+                setSyncVersion(v => v + 1);
             }
 
             // Schedule next check with potentially new interval
@@ -369,7 +372,7 @@ export default function Home() {
             clearTimeout(timeoutId);
             setLoading(false);
         }
-    }, [mode, filters, view]);
+    }, [mode, filters, view, syncVersion]); // Added syncVersion to avoid stale closure
 
     useEffect(() => {
         fetchData();
