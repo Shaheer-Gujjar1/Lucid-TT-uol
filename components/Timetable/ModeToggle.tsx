@@ -1,26 +1,31 @@
 
 'use client';
 
+import { useSettings } from '@/lib/settings';
+
 interface ModeToggleProps {
     mode: 'student' | 'teacher' | 'room' | 'exam';
     setMode: (mode: 'student' | 'teacher' | 'room' | 'exam') => void;
 }
 
 export default function ModeToggle({ mode, setMode }: ModeToggleProps) {
+    const { settings, mounted } = useSettings();
+    if (!mounted) return null; // Wait for settings to mount to avoid layout jumps
+
     return (
         <div className="bg-white md:bg-white/80 dark:bg-slate-900 md:dark:bg-slate-900/80 backdrop-blur-none md:backdrop-blur-md rounded-full p-1.5 w-full max-w-3xl mx-auto shadow-sm md:shadow-[0_8px_32px_rgba(0,0,0,0.06)] mb-8 border border-white/40 dark:border-slate-800/50 relative isolate">
 
             {/* Sliding Pill */}
             <div
-                className={`absolute top-1.5 bottom-1.5 w-[24%] bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full shadow-md shadow-indigo-500/30 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] -z-10
+                className={`absolute top-1.5 bottom-1.5 ${settings.enableRoomMode ? 'w-[24%]' : 'w-[32.33%]'} bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full shadow-md shadow-indigo-500/30 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] -z-10
                 ${mode === 'student' ? 'left-[0.5%]' : ''}
-                ${mode === 'teacher' ? 'left-[25.5%]' : ''}
+                ${mode === 'teacher' ? (settings.enableRoomMode ? 'left-[25.5%]' : 'left-[33.83%]') : ''}
                 ${mode === 'room' ? 'left-[50.5%]' : ''}
-                ${mode === 'exam' ? 'left-[75.5%]' : ''}
+                ${mode === 'exam' ? (settings.enableRoomMode ? 'left-[75.5%]' : 'left-[67.16%]') : ''}
                 `}
             />
 
-            <div className="grid grid-cols-4 gap-0 relative">
+            <div className={`grid ${settings.enableRoomMode ? 'grid-cols-4' : 'grid-cols-3'} gap-0 relative`}>
                 <button
                     onClick={() => setMode('student')}
                     className={`flex items-center justify-center gap-2 py-2 md:py-4 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest transition-colors duration-300 ${mode === 'student' ? 'text-white' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'
@@ -41,15 +46,17 @@ export default function ModeToggle({ mode, setMode }: ModeToggleProps) {
                     <span className="md:hidden">Tchr</span>
                 </button>
 
-                <button
-                    onClick={() => setMode('room')}
-                    className={`flex items-center justify-center gap-2 py-2 md:py-4 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest transition-colors duration-300 ${mode === 'room' ? 'text-white' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'
-                        }`}
-                >
-                    <i className={`fas fa-door-open text-sm md:text-base ${mode === 'room' ? 'animate-bounce-short' : ''}`}></i>
-                    <span className="hidden md:inline">Room</span>
-                    <span className="md:hidden">Room</span>
-                </button>
+                {settings.enableRoomMode && (
+                    <button
+                        onClick={() => setMode('room')}
+                        className={`flex items-center justify-center gap-2 py-2 md:py-4 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest transition-colors duration-300 ${mode === 'room' ? 'text-white' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'
+                            }`}
+                    >
+                        <i className={`fas fa-door-open text-sm md:text-base ${mode === 'room' ? 'animate-bounce-short' : ''}`}></i>
+                        <span className="hidden md:inline">Room</span>
+                        <span className="md:hidden">Room</span>
+                    </button>
+                )}
 
                 <button
                     onClick={() => setMode('exam')}

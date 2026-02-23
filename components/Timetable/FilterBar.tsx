@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import Dropdown from '@/components/UI/Dropdown';
 import { PROGRAMS, EXAM_PROGRAMS, SEMESTERS, SECTIONS, DAYS_OPTIONS, TEACHERS } from '@/lib/constants';
+import { useSettings } from '@/lib/settings';
 
 interface Filters {
     program: string;
@@ -32,6 +33,7 @@ interface FilterBarProps {
 
 
 export default function FilterBar({ mode, examView, filters, setFilter, onSave, onClear, availableDates }: FilterBarProps) {
+    const { settings } = useSettings();
     const [isExpanded, setIsExpanded] = useState(false);
     const [allowOverflow, setAllowOverflow] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -86,19 +88,21 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                                     <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
                                 </div>
                                 {/* Row 2: Subject Search (Optional) */}
-                                <div className="flex flex-col gap-2 relative">
-                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Subject / Course (Optional)</label>
-                                    <div className="relative">
-                                        <i className="fas fa-book-open absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
-                                        <input
-                                            type="text"
-                                            value={filters.course || ''}
-                                            onChange={(e) => setFilter('course', e.target.value)}
-                                            placeholder="Strict Search (e.g. 'Calculus')"
-                                            className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner placeholder:font-medium"
-                                        />
+                                {settings.enableCourseSearch && (
+                                    <div className="flex flex-col gap-2 relative">
+                                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Subject / Course (Optional)</label>
+                                        <div className="relative">
+                                            <i className="fas fa-book-open absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
+                                            <input
+                                                type="text"
+                                                value={filters.course || ''}
+                                                onChange={(e) => setFilter('course', e.target.value)}
+                                                placeholder="Strict Search (e.g. 'Calculus')"
+                                                className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner placeholder:font-medium"
+                                            />
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
                         )}
 
@@ -117,19 +121,21 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                                             className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner"
                                         />
                                     </div>
-                                    <div className="flex flex-col gap-2 relative">
-                                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Subject / Course (Optional)</label>
-                                        <div className="relative">
-                                            <i className="fas fa-book-open absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
-                                            <input
-                                                type="text"
-                                                value={filters.course || ''}
-                                                onChange={(e) => setFilter('course', e.target.value)}
-                                                placeholder="Strict Search (e.g. 'Calculus')"
-                                                className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner placeholder:font-medium"
-                                            />
+                                    {settings.enableCourseSearch && (
+                                        <div className="flex flex-col gap-2 relative">
+                                            <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Subject / Course (Optional)</label>
+                                            <div className="relative">
+                                                <i className="fas fa-book-open absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
+                                                <input
+                                                    type="text"
+                                                    value={filters.course || ''}
+                                                    onChange={(e) => setFilter('course', e.target.value)}
+                                                    placeholder="Strict Search (e.g. 'Calculus')"
+                                                    className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner placeholder:font-medium"
+                                                />
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                                 <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
                             </div>

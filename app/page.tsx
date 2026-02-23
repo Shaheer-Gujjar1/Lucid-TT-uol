@@ -23,8 +23,10 @@ import { checkAndSync, detectSheetChanges } from '@/lib/sync_service';
 
 export default function Home() {
     const router = useRouter();
-    const { settings } = useSettings();
+    const { settings, mounted } = useSettings();
     const [mode, setMode] = useState<'student' | 'teacher' | 'room' | 'exam'>('student');
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
+
     const [examView, setExamView] = useState<'datesheet' | 'seating'>('datesheet');
     const [view, setView] = useState<'day' | 'week'>('day');
     const [filters, setFilters] = useState({
@@ -58,6 +60,13 @@ export default function Home() {
     const [showInfoModal, setShowInfoModal] = useState(false);
     const [showSettingsModal, setShowSettingsModal] = useState(false);
     const [examRefreshTrigger, setExamRefreshTrigger] = useState(0);
+
+    useEffect(() => {
+        if (mounted && isInitialLoad) {
+            setMode(settings.defaultMode as any);
+            setIsInitialLoad(false);
+        }
+    }, [mounted, settings.defaultMode, isInitialLoad]);
 
     useEffect(() => {
         setGeneratedAt(new Date().toLocaleString());
@@ -215,7 +224,7 @@ export default function Home() {
         };
         initSync();
 
-        // Setup Change Detection Heartbeat (Every 5 minutes)
+        // Setup Change Detection Heartbeat (Every 1 minute to catch quick sessions)
         const interval = setInterval(async () => {
             const changed = await detectSheetChanges();
             if (changed) {
@@ -224,7 +233,7 @@ export default function Home() {
                 responseCache.current['full_data'] = updatedData;
                 fetchData();
             }
-        }, 300000);
+        }, 60000);
 
         return () => clearInterval(interval);
     }, []);

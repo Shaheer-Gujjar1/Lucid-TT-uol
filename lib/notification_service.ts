@@ -1,8 +1,10 @@
 'use client';
 
 import { AgendaEvent } from '@/components/Events/types';
+import { ProcessedSlot } from '@/lib/parser';
 
 const NOTIFICATION_LOG_KEY = 'lucid_notification_log';
+const CLASS_NOTIF_LOG_KEY = 'lucid_class_notification_log';
 
 interface NotificationLog {
     [eventId: string]: {
@@ -131,5 +133,63 @@ export const checkEventNotifications = (events: AgendaEvent[]) => {
 
     if (logChanged) {
         localStorage.setItem(NOTIFICATION_LOG_KEY, JSON.stringify(currentLog));
+    }
+};
+
+export const checkClassNotifications = (slots: ProcessedSlot[], strategy: 'all_classes' | 'after_free') => {
+    if (typeof window === 'undefined' || !('Notification' in window) || Notification.permission !== 'granted') {
+        return;
+    }
+
+    const now = new Date();
+    const currentLog: Record<string, boolean> = JSON.parse(localStorage.getItem(CLASS_NOTIF_LOG_KEY) || '{}');
+    let logChanged = false;
+
+    // We only care about today, so we get today's date string prefix: YYYY-MM-DD
+    const todayStr = now.toISOString().split('T')[0];
+
+    for (let i = 0; i < slots.length; i++) {
+        const slot = slots[i];
+        if (!slot.entries || slot.entries.length === 0) continue; // Free slot
+
+        // Apply after_free logic: check if previous slot is free
+        if (strategy === 'after_free' && i > 0) {
+            const prevSlot = slots[i - 1];
+            if (prevSlot.entries && prevSlot.entries.length > 0) {
+                continue; // Previous slot was not free, skip notification
+            }
+        }
+
+        // Parse time: "08:00 - 09:30" => "08:00"
+        const timeMatch = slot.time.match(/(\d{1,2}:\d{2})/);
+        if (!timeMatch) continue;
+
+        const startTimeStr = timeMatch[1];
+        // Create full date object for comparison
+        const classTime = new Date(`${todayStr}T${startTimeStr.padStart(5, '0')}:00`);
+        // Handle timezone/parsing oddities if needed, assuming local time aligns
+
+        if (isNaN(classTime.getTime())) continue;
+
+        const diffMs = classTime.getTime() - now.getTime();
+        const diffMins = Math.round(diffMs / (1000 * 60));
+
+        // Generate a unique ID for this slot to prevent spamming
+        const logId = `${todayStr}-${slot.time}`;
+
+        // Notify 5 minutes before the class starts
+        if (diffMins <= 5 && diffMins > 0 && !currentLog[logId]) {
+            // Very simple notification, no details of the slot/lecture as requested
+            sendNotification('Class Starting Soon!', {
+                body: `You have a class starting in ${diffMins} minutes.`,
+                tag: 'class-alert'
+            });
+            currentLog[logId] = true;
+            logChanged = true;
+        }
+    }
+
+    if (logChanged) {
+        localStorage.setItem(CLASS_NOTIF_LOG_KEY, JSON.stringify(currentLog));
     }
 };

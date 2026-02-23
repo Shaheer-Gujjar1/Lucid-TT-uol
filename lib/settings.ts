@@ -8,6 +8,10 @@ export interface AppSettings {
     enableOnlineIndicator: boolean;
     enableAuraAI: boolean;
     enableAppInfo: boolean;
+    defaultMode: 'student' | 'teacher';
+    enableCourseSearch: boolean;
+    notificationStrategy: 'none' | 'events_only' | 'all_classes' | 'after_free';
+    enableRoomMode: boolean;
 }
 
 const defaultSettings: AppSettings = {
@@ -16,6 +20,10 @@ const defaultSettings: AppSettings = {
     enableOnlineIndicator: true,
     enableAuraAI: true,
     enableAppInfo: true,
+    defaultMode: 'student',
+    enableCourseSearch: true,
+    notificationStrategy: 'events_only',
+    enableRoomMode: true,
 };
 
 export function getSettings(): AppSettings {
@@ -34,6 +42,12 @@ export function getSettings(): AppSettings {
 export function saveSettings(settings: AppSettings) {
     if (typeof window === 'undefined') return;
     localStorage.setItem('lucid_settings', JSON.stringify(settings));
+    window.dispatchEvent(new Event('lucid_settings_changed'));
+}
+
+export function resetSettings() {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem('lucid_settings', JSON.stringify(defaultSettings));
     window.dispatchEvent(new Event('lucid_settings_changed'));
 }
 
