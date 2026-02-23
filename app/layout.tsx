@@ -16,7 +16,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-    title: "Lucid Aura∞ v6.7.1",
+    title: "Lucid Aura∞ v6.9.8",
     icons: {
         icon: "/favicon.ico",
     },

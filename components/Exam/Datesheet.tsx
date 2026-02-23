@@ -16,7 +16,7 @@ export default function Datesheet({ data, loading }: DatesheetProps) {
 
     if (!data || data.length === 0) {
         return (
-            <div className="bg-white/50 border-2 border-dashed border-slate-300 dark:border-slate-700 p-20 rounded-[3rem] text-center animate-fade-in flex flex-col items-center justify-center min-h-[40vh]">
+            <div className="bg-white/5 md:bg-white/10 border-2 border-dashed border-slate-300 dark:border-slate-700/50 p-20 rounded-[3rem] text-center animate-fade-in flex flex-col items-center justify-center min-h-[40vh] backdrop-blur-sm">
                 <div className="inline-block animate-bounce duration-[2000ms]">
                     <i className="fas fa-calendar-times text-6xl text-slate-300 dark:text-slate-600 mb-6"></i>
                 </div>

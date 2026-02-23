@@ -57,14 +57,14 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
             <div className="flex justify-between items-center cursor-pointer group" onClick={() => setIsExpanded(!isExpanded)}>
                 <div className="flex items-center gap-4">
                     <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 transition-transform duration-500 ${isExpanded ? 'rotate-180 scale-110' : 'group-hover:scale-105'}`}>
-                        <i className={`fas ${isExpanded ? 'fa-times' : 'fa-filter'} text-xl`}></i>
+                        <i className={`fas ${isExpanded ? 'fa-times' : 'fa-sliders-h'} text-xl`}></i>
                     </div>
                     <div>
                         <h2 className="text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight">
-                            {isExpanded ? 'Hide Filters' : 'Show Filters'}
+                            {isExpanded ? 'Condense Selection' : 'Refine Selection'}
                         </h2>
                         <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest group-hover:text-indigo-500 transition-colors">
-                            {mode.charAt(0).toUpperCase() + mode.slice(1)} Mode
+                            {mode === 'student' ? 'Learner Perspective' : mode === 'teacher' ? 'Lecturer Perspective' : mode === 'room' ? 'Spatial Dashboard' : 'Crucible'}
                         </p>
                     </div>
                 </div>
@@ -73,8 +73,8 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                 </div>
             </div>
 
-            {/* Filter Content */}
-            {/* Filter Content */}
+            {/* Refined Selection Criteria */}
+            {/* Refined Selection Criteria */}
             <div className={`grid transition-all duration-500 ease-in-out ${isExpanded ? 'grid-rows-[1fr] mt-6' : 'grid-rows-[0fr] mt-0'} ${isExpanded && allowOverflow ? 'overflow-visible' : 'overflow-hidden'}`}>
                 <div className={`overflow-hidden ${isExpanded ? 'md:overflow-visible' : 'md:overflow-hidden'} transition-all duration-300 ${activeDropdown ? (mode === 'student' ? 'pb-32' : mode === 'exam' ? (activeDropdown === 'semester' ? 'pb-60' : 'pb-27') : mode === 'room' ? 'pb-66' : mode === 'teacher' ? 'pb-39' : 'pb-60') : 'pb-1'} md:pb-1 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
                     <div key={mode} className="animate-fade-in-up"> {/* Added Animation Wrapper */}
@@ -82,15 +82,15 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                             <div className="flex flex-col gap-4 mb-6 relative z-[105]">
                                 {/* Row 1: Dropdowns */}
                                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
-                                    <Dropdown label="Program" value={filters.program} options={PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" isOpen={activeDropdown === 'program'} onToggle={(v) => setActiveDropdown(v ? 'program' : null)} />
-                                    <Dropdown label="Semester" value={filters.semester} options={SEMESTERS} onChange={(v) => setFilter('semester', v)} icon="fa-layer-group" isOpen={activeDropdown === 'semester'} onToggle={(v) => setActiveDropdown(v ? 'semester' : null)} />
-                                    <Dropdown label="Section" value={filters.section} options={SECTIONS} onChange={(v) => setFilter('section', v)} icon="fa-users" isOpen={activeDropdown === 'section'} onToggle={(v) => setActiveDropdown(v ? 'section' : null)} />
-                                    <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
+                                    <Dropdown label="Faculty Discipline" value={filters.program} options={PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" isOpen={activeDropdown === 'program'} onToggle={(v) => setActiveDropdown(v ? 'program' : null)} />
+                                    <Dropdown label="Academic Term" value={filters.semester} options={SEMESTERS} onChange={(v) => setFilter('semester', v)} icon="fa-layer-group" isOpen={activeDropdown === 'semester'} onToggle={(v) => setActiveDropdown(v ? 'semester' : null)} />
+                                    <Dropdown label="Cohort" value={filters.section} options={SECTIONS} onChange={(v) => setFilter('section', v)} icon="fa-users" isOpen={activeDropdown === 'section'} onToggle={(v) => setActiveDropdown(v ? 'section' : null)} />
+                                    <Dropdown label="Temporal Frame" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
                                 </div>
                                 {/* Row 2: Subject Search (Optional) */}
                                 {settings.enableCourseSearch && (
                                     <div className="flex flex-col gap-2 relative">
-                                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Subject / Course (Optional)</label>
+                                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Subject Discovery (Optional)</label>
                                         <div className="relative">
                                             <i className="fas fa-book-open absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
                                             <input
@@ -110,14 +110,14 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                         {mode === 'teacher' && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 relative z-[105]">
                                 <div className="flex flex-col gap-2 relative">
-                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Teacher Name</label>
+                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Lecturer Identity</label>
                                     <div className="relative">
                                         <i className="fas fa-chalkboard-teacher absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
                                         <input
                                             type="text"
                                             value={filters.teacherName}
                                             onChange={(e) => setFilter('teacherName', e.target.value)}
-                                            placeholder="e.g. Dr. Smith"
+                                            placeholder="e.g. Prof. Alexander"
                                             className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner"
                                         />
                                     </div>
@@ -137,14 +137,14 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                                         </div>
                                     )}
                                 </div>
-                                <Dropdown label="Day" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
+                                <Dropdown label="Temporal Frame" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
                             </div>
                         )}
                         {/* Room Mode */}
                         {mode === 'room' && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 relative z-[105]">
                                 <div className="flex flex-col gap-2 relative">
-                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Room Number</label>
+                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Spatial Designation</label>
                                     <div className="relative">
                                         <i className="fas fa-door-open absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
                                         <input
@@ -157,7 +157,7 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                                     </div>
                                 </div>
                                 <Dropdown
-                                    label="Day"
+                                    label="Temporal Frame"
                                     value={filters.day}
                                     options={DAYS_OPTIONS}
                                     onChange={(v) => setFilter('day', v)}
@@ -209,7 +209,7 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                                                     type="text"
                                                     value={filters.course || ''}
                                                     onChange={(e) => setFilter('course', e.target.value)}
-                                                    placeholder="Filter by Course..."
+                                                    placeholder="Discovery Search (e.g. 'Calculus')"
                                                     className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner"
                                                 />
                                             </div>
@@ -224,7 +224,7 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                                                     type="text"
                                                     value={filters.roomNumber || ''}
                                                     onChange={(e) => setFilter('roomNumber', e.target.value)}
-                                                    placeholder="Filter by Room..."
+                                                    placeholder="Discovery Spatial..."
                                                     className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner"
                                                 />
                                             </div>

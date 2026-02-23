@@ -1,7 +1,6 @@
 
 const RAW_DATA_KEY = 'lucid_raw_sheet_data';
 const SYNC_METADATA_KEY = 'lucid_sync_metadata';
-const SYNC_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
 
 export interface SyncMetadata {
     lastSync: number;
@@ -26,18 +25,16 @@ export async function checkAndSync(force: boolean = false) {
 
     const metadataStr = localStorage.getItem(SYNC_METADATA_KEY);
     const metadata = metadataStr ? JSON.parse(metadataStr) : null;
-    const now = Date.now();
+    const cachedData = localStorage.getItem(RAW_DATA_KEY);
 
-    // Check if we need to sync based on time
-    if (!force && metadata && (now - metadata.lastSync < SYNC_INTERVAL)) {
-        const cachedData = localStorage.getItem(RAW_DATA_KEY);
-        if (cachedData) {
-            console.log('Sync not needed, using cached data');
-            return JSON.parse(cachedData);
-        }
+    // If not forced and we have cached data, just return it.
+    // The heartbeat will handle change detection.
+    if (!force && cachedData) {
+        console.log('Using cached data, change detection will handle updates');
+        return JSON.parse(cachedData);
     }
 
-    console.log(force ? 'Manual refresh triggered' : '24h sync triggered');
+    const now = Date.now();
     try {
         const data = await fetchAllTimetableData();
 

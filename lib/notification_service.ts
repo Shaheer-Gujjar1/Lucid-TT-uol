@@ -32,14 +32,14 @@ export const requestNotificationPermission = async (): Promise<boolean> => {
     return false;
 };
 
-export const sendNotification = async (title: string, options?: NotificationOptions) => {
+export const sendNotification = async (title: string, options?: NotificationOptions & { showTrigger?: any }) => {
     if (Notification.permission === 'granted') {
         try {
-            // Priority: Service Worker (Required for Mobile Android/iOS)
+            // Priority: Service Worker (Required for Mobile Android/iOS or scheduled triggers)
             if ('serviceWorker' in navigator) {
                 const registration = await navigator.serviceWorker.ready;
                 if (registration) {
-                    registration.showNotification(title, {
+                    await registration.showNotification(title, {
                         icon: '/logo-primary.png',
                         badge: '/logo-primary.png',
                         // @ts-ignore - vibrate is valid in SW notification but TS definition might be missing it
@@ -51,6 +51,8 @@ export const sendNotification = async (title: string, options?: NotificationOpti
             }
 
             // Fallback: Standard Web API (Desktop)
+            // Note: Standard Notification API does NOT support showTrigger, so it will just fire instantly
+            // if we fall back to this, which only happens if SW is completely dead/unsupported.
             new Notification(title, {
                 icon: '/logo-primary.png',
                 badge: '/logo-primary.png',
@@ -177,15 +179,41 @@ export const checkClassNotifications = (slots: ProcessedSlot[], strategy: 'all_c
         // Generate a unique ID for this slot to prevent spamming
         const logId = `${todayStr}-${slot.time}`;
 
-        // Notify 5 minutes before the class starts
-        if (diffMins <= 5 && diffMins > 0 && !currentLog[logId]) {
-            // Very simple notification, no details of the slot/lecture as requested
-            sendNotification('Class Starting Soon!', {
-                body: `You have a class starting in ${diffMins} minutes.`,
-                tag: 'class-alert'
-            });
-            currentLog[logId] = true;
-            logChanged = true;
+        if (!currentLog[logId]) {
+            // Target time is exactly 5 minutes BEFORE the class starts
+            const targetTimeMs = classTime.getTime() - (5 * 60 * 1000);
+
+            // If the target notification time is in the future, schedule it!
+            if (targetTimeMs > now.getTime()) {
+                // @ts-ignore - TimestampTrigger is experimental
+                if ('showTrigger' in Notification.prototype) {
+                    try {
+                        // @ts-ignore
+                        const trigger = new TimestampTrigger(targetTimeMs);
+                        sendNotification('Class Starting Soon!', {
+                            body: `You have a class starting at ${startTimeStr}.`,
+                            tag: `class-${logId}`,
+                            // @ts-ignore
+                            showTrigger: trigger
+                        });
+                        currentLog[logId] = true;
+                        logChanged = true;
+                        console.log(`Scheduled notification for class at ${startTimeStr}`);
+                    } catch (e) {
+                        console.error("Failed to schedule notification trigger", e);
+                    }
+                }
+            }
+            // Otherwise, if we already missed the 5 minute mark, but the class hasn't started yet
+            // (e.g. they opened the app 2 minutes before class), fire it immediately.
+            else if (diffMins > 0 && diffMins <= 5) {
+                sendNotification('Class Starting Soon!', {
+                    body: `You have a class starting in ${diffMins} minutes.`,
+                    tag: `class-${logId}`
+                });
+                currentLog[logId] = true;
+                logChanged = true;
+            }
         }
     }
 

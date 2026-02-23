@@ -15,7 +15,8 @@ export default function NotificationManager() {
             if (settings.notificationStrategy === 'none') return;
             try {
                 // 1. Events Check
-                if (settings.enableEvents) {
+                const strategyIncludesEvents = ['events_only', 'all_classes_and_events', 'after_free_and_events'].includes(settings.notificationStrategy);
+                if (settings.enableEvents && strategyIncludesEvents) {
                     const stored = localStorage.getItem('lucid_timetable_events');
                     if (stored) {
                         const events: AgendaEvent[] = JSON.parse(stored);
@@ -24,7 +25,8 @@ export default function NotificationManager() {
                 }
 
                 // 2. Classes Check
-                if (settings.notificationStrategy === 'all_classes' || settings.notificationStrategy === 'after_free') {
+                const strategyIncludesClasses = ['all_classes', 'after_free', 'all_classes_and_events', 'after_free_and_events'].includes(settings.notificationStrategy);
+                if (strategyIncludesClasses) {
                     const mode = settings.defaultMode || 'student';
                     const rawStr = localStorage.getItem('lucid_raw_sheet_data');
                     const prefsStr = mode === 'student' ? (localStorage.getItem('lucid_student_prefs') || localStorage.getItem('lucid_timetable_preferences')) : localStorage.getItem('lucid_teacher_prefs');
@@ -38,7 +40,9 @@ export default function NotificationManager() {
 
                         if (raw[todayList]) {
                             const slots = processDayData(raw[todayList], mode as any, prefs);
-                            checkClassNotifications(slots, settings.notificationStrategy);
+                            // Normalize the strategy for class checks (strip events)
+                            const classStrategy = settings.notificationStrategy.includes('after_free') ? 'after_free' : 'all_classes';
+                            checkClassNotifications(slots, classStrategy);
                         }
                     }
                 }

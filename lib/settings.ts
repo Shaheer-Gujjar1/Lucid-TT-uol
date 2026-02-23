@@ -10,20 +10,24 @@ export interface AppSettings {
     enableAppInfo: boolean;
     defaultMode: 'student' | 'teacher';
     enableCourseSearch: boolean;
-    notificationStrategy: 'none' | 'events_only' | 'all_classes' | 'after_free';
+    notificationStrategy: 'none' | 'events_only' | 'all_classes' | 'after_free' | 'all_classes_and_events' | 'after_free_and_events';
     enableRoomMode: boolean;
+    enableCrucible: boolean;
+    enableWeekView: boolean;
 }
 
 const defaultSettings: AppSettings = {
     enableGPA: true,
-    enableEvents: true,
+    enableEvents: false, // Harmonized: Events OFF
     enableOnlineIndicator: true,
-    enableAuraAI: true,
+    enableAuraAI: false, // Harmonized: Aura AI OFF
     enableAppInfo: true,
     defaultMode: 'student',
     enableCourseSearch: true,
-    notificationStrategy: 'events_only',
+    notificationStrategy: 'after_free', // Harmonized: Post-Resume Intelligence
     enableRoomMode: true,
+    enableCrucible: true,
+    enableWeekView: true,
 };
 
 export function getSettings(): AppSettings {

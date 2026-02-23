@@ -14,12 +14,17 @@ import ViewToggle from '@/components/Timetable/ViewToggle';
 import ExamView from '@/components/Exam/ExamView';
 import DatesheetDownloadModal from '@/components/Exam/DatesheetDownloadModal';
 import SeatingPlanDownloadModal from '@/components/Exam/SeatingPlanDownloadModal';
+import DeveloperDownloadModal from '@/components/UI/DeveloperDownloadModal';
+import ChronicleExportModal from '@/components/UI/ChronicleExportModal';
 import Toast from '@/components/UI/Toast';
 import InfoModal from '@/components/UI/InfoModal';
 import SettingsModal from '@/components/UI/SettingsModal';
 import { useSettings } from '@/lib/settings';
 import { ProcessedSlot, DAYS, processDayData } from '@/lib/parser';
 import { checkAndSync, detectSheetChanges } from '@/lib/sync_service';
+import CondensedWeekViewExport from '@/components/Timetable/CondensedWeekViewExport';
+
+
 
 export default function Home() {
     const router = useRouter();
@@ -59,6 +64,8 @@ export default function Home() {
     const [isFabExpanded, setIsFabExpanded] = useState(false);
     const [showInfoModal, setShowInfoModal] = useState(false);
     const [showSettingsModal, setShowSettingsModal] = useState(false);
+    const [showDeveloperDownloadModal, setShowDeveloperDownloadModal] = useState(false);
+    const [showChronicleExportModal, setShowChronicleExportModal] = useState(false);
     const [examRefreshTrigger, setExamRefreshTrigger] = useState(0);
 
     useEffect(() => {
@@ -208,7 +215,7 @@ export default function Home() {
                     }
                 }
 
-                // Trigger sync (24h or first time)
+                // Trigger sync (if first time or forced elsewhere)
                 const freshData = await checkAndSync();
                 if (freshData) {
                     responseCache.current['full_data'] = freshData;
@@ -216,7 +223,6 @@ export default function Home() {
                 }
             } catch (e) {
                 console.error('Sync failed', e);
-                // Ensure we try to fetch data even if sync fails, so we don't end up with empty slots if cache was missing
                 if (!responseCache.current['full_data']) {
                     fetchData();
                 }
@@ -224,8 +230,28 @@ export default function Home() {
         };
         initSync();
 
-        // Setup Change Detection Heartbeat (Every 1 minute to catch quick sessions)
-        const interval = setInterval(async () => {
+        // --- ADAPTIVE HEARTBEAT LOGIC ---
+        let timeoutId: NodeJS.Timeout;
+
+        const getSyncInterval = () => {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const currentTime = hours * 60 + minutes;
+
+            // 7:30 AM = 7*60 + 30 = 450
+            // 4:00 PM = 16*60 = 960
+            const peakStart = 7 * 60 + 30;
+            const peakEnd = 16 * 60;
+
+            if (currentTime >= peakStart && currentTime <= peakEnd) {
+                return 10000; // 10 seconds (Peak)
+            }
+            return 60000; // 60 seconds (Off-Peak)
+        };
+
+        const checkUpdates = async () => {
+            console.log(`[Heartbeat] Checking updates. Interval: ${getSyncInterval() / 1000}s`);
             const changed = await detectSheetChanges();
             if (changed) {
                 setToastMsg('Schedule updated! Refreshing...');
@@ -233,10 +259,28 @@ export default function Home() {
                 responseCache.current['full_data'] = updatedData;
                 fetchData();
             }
-        }, 60000);
 
-        return () => clearInterval(interval);
+            // Schedule next check with potentially new interval
+            timeoutId = setTimeout(checkUpdates, getSyncInterval());
+        };
+
+        // Start the adaptive cycle
+        timeoutId = setTimeout(checkUpdates, getSyncInterval());
+
+        return () => clearTimeout(timeoutId);
     }, []);
+
+    // --- FEATURE REDIRECTS ---
+    useEffect(() => {
+        if (!settings.enableCrucible && mode === 'exam') {
+            setMode('student');
+            setToastMsg('Crucible access is currently restricted.');
+        }
+        if (!settings.enableWeekView && view === 'week') {
+            setView('day');
+            setToastMsg('Week View is currently restricted.');
+        }
+    }, [settings.enableCrucible, settings.enableWeekView, mode, view]);
 
     const fetchData = useCallback(async () => {
         console.log(`FetchData TRIGGERED. Mode: ${mode}, View: ${view}`);
@@ -378,24 +422,32 @@ export default function Home() {
             // ... (exam clear)
             localStorage.removeItem('lucid_exam_datesheet_prefs');
             setFilters(prev => ({ ...prev, program: '', semester: '', section: '' }));
-            setToastMsg('Datesheet preferences cleared!');
+            setToastMsg('Chronicle configuration cleared!');
         } else if (mode === 'exam' && examView === 'seating') {
             localStorage.removeItem('lucid_exam_seating_prefs');
             setFilters(prev => ({ ...prev, studentSearch: '' }));
-            setToastMsg('Seating preferences cleared!');
+            setToastMsg('Seating criteria cleared!');
         }
     };
 
-    const handleDownload = async () => {
+    const handleDownload = async (isDevConfirmed: boolean = false, isExportConfirmed: boolean = false) => {
         if (mode === 'exam' && examView === 'datesheet') {
             setShowDatesheetDownloadModal(true);
             return;
         }
 
-        if (view !== 'day') {
-            setToastMsg('Download is only available for Day View');
-            return;
+        if (view === 'week') {
+            if (!isDevConfirmed) {
+                setShowDeveloperDownloadModal(true);
+                return;
+            }
+            if (!isExportConfirmed) {
+                setShowChronicleExportModal(true);
+                return;
+            }
         }
+
+        setToastMsg('Initiating Chronicle Export...');
 
         try {
             const { toPng } = await import('html-to-image');
@@ -436,7 +488,7 @@ export default function Home() {
                 filename = `Timetable-${filters.teacherName || 'Teacher'}-${filters.day}-${dateStr}`;
             }
 
-            // Cleanup any double dashes from empty filters
+            // Cleanup any double dashes from empty selections
             filename = filename.replace(/--+/g, '-').replace(/-$/, '');
 
             const link = document.createElement('a');
@@ -444,10 +496,12 @@ export default function Home() {
             link.href = dataUrl;
             link.click();
 
-            setToastMsg('Schedule Downloaded!');
+            setToastMsg('Chronicle Export Completed!');
         } catch (error) {
             console.error('Download failed:', error);
-            setToastMsg('Download failed. Please try again.');
+            setToastMsg('Export process encountered an interference.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -695,7 +749,7 @@ export default function Home() {
                 <div className="container mx-auto px-4 pt-28 max-w-5xl">
 
                     {/* View Toggle matching screenshot */}
-                    {mode !== 'exam' && (
+                    {mode !== 'exam' && settings.enableWeekView && (
                         <div className="animate-fade-in-up animation-delay-100">
                             <ViewToggle view={view} setView={setView} />
                         </div>
@@ -737,13 +791,50 @@ export default function Home() {
                         ) : view === 'day' ? (
                             <DayView slots={slots as ProcessedSlot[]} loading={loading} error={error} day={filters.day} />
                         ) : (
-                            <WeekView data={slots} loading={loading} error={error} />
+                            <div id="timetable-print-view" className="w-full overflow-x-auto">
+                                <WeekView data={slots} loading={loading} error={error} />
+                            </div>
                         )}
                     </div>
 
                     <Footer />
 
-                    {/* Chatbot is now Global in Layout.tsx */}
+                    <DeveloperDownloadModal
+                        isOpen={showDeveloperDownloadModal}
+                        onClose={() => setShowDeveloperDownloadModal(false)}
+                        onProceed={() => handleDownload(true)}
+                    />
+
+                    <ChronicleExportModal
+                        isOpen={showChronicleExportModal}
+                        onClose={() => setShowChronicleExportModal(false)}
+                        onExport={() => {
+                            setShowChronicleExportModal(false);
+                            handleDownload(true, true);
+                        }}
+                        dayCount={view === 'week' ? slots.filter((d: any) => d.slots && d.slots.some((s: any) => s.entries && s.entries.length > 0)).length : 0}
+                    />
+
+                    {/* Hidden Export Component */}
+                    <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+                        {view === 'week' ? (
+                            <CondensedWeekViewExport
+                                data={slots}
+                                mode={mode === 'exam' ? 'student' : mode as 'student' | 'teacher' | 'room'}
+                                filters={filters}
+                                generatedAt={new Date().toLocaleString()}
+                            />
+                        ) : (
+                            <TimetablePrintView
+                                slots={slots}
+                                day={filters.day}
+                                room={filters.roomNumber}
+                                mode={mode === 'exam' ? 'student' : mode as 'student' | 'teacher' | 'room'}
+                                filters={filters}
+                                generatedAt={new Date().toLocaleString()}
+                            />
+                        )}
+                    </div>
                 </div>
 
                 {/* Floating Action Buttons */}

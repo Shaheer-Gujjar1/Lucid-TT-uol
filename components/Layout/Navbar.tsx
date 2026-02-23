@@ -68,9 +68,9 @@ const Navbar = memo(function Navbar() {
     };
 
     const navItems = [
-        { href: '/', label: 'Timetable', icon: 'fa-table' },
-        ...(settings.enableGPA ? [{ href: '/gpa', label: 'GPA', icon: 'fa-calculator' }] : []),
-        ...(settings.enableEvents ? [{ href: '/events', label: 'Events', icon: 'fa-calendar-alt', badge: upcomingCount }] : [])
+        { href: '/', label: 'Chronicle', icon: 'fa-table' },
+        ...(settings.enableGPA ? [{ href: '/gpa', label: 'Performance', icon: 'fa-calculator' }] : []),
+        ...(settings.enableEvents ? [{ href: '/events', label: 'Event Ledger', icon: 'fa-calendar-alt', badge: upcomingCount }] : [])
     ];
 
     return (
@@ -87,7 +87,7 @@ const Navbar = memo(function Navbar() {
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 md:h-2 md:w-2 bg-indigo-500"></span>
                             </span>
-                            <span className="text-[10px] md:text-xs font-bold text-indigo-600 dark:text-indigo-300">v6.7.1</span>
+                            <span className="text-[10px] md:text-xs font-bold text-indigo-600 dark:text-indigo-300">v6.9.8</span>
                         </div>
                     </div>
                 </Link>

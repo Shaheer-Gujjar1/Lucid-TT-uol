@@ -360,7 +360,7 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
                 <div>
                     <h2 className="text-4xl font-black text-slate-800 dark:text-white mb-2 tracking-tight flex items-center gap-3">
                         <i className={`fas ${view === 'datesheet' ? 'fa-calendar-alt text-indigo-500' : 'fa-chair text-purple-500'}`}></i>
-                        {view === 'datesheet' ? 'Exam Datesheet' : 'Seating Plan'}
+                        {view === 'datesheet' ? 'Crucible Timeline' : 'Crucible Allocation'}
                     </h2>
                     <p className="text-slate-500 dark:text-slate-400 font-bold text-sm ml-1 max-w-md">
                         {view === 'datesheet' ? 'Official Academic Examination Schedule' : 'Find your exam venue and seat allocation instantly'}
@@ -383,14 +383,14 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
                                 className={`py-3 px-6 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest transition-colors duration-300 flex items-center justify-center gap-2 transform active:scale-95 ${view === 'datesheet' ? 'text-white' : 'text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400'}`}
                             >
                                 <i className="fas fa-calendar-alt text-sm"></i>
-                                <span>Datesheet</span>
+                                <span>Timeline</span>
                             </button>
                             <button
                                 onClick={() => onViewChange('seating')}
                                 className={`py-3 px-6 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest transition-colors duration-300 flex items-center justify-center gap-2 transform active:scale-95 ${view === 'seating' ? 'text-white' : 'text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400'}`}
                             >
                                 <i className="fas fa-chair text-sm"></i>
-                                <span>Seating</span>
+                                <span>Allocation</span>
                             </button>
                         </div>
                     </div>

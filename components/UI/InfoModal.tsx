@@ -82,7 +82,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                         <div className="space-y-6 animate-fade-in">
                             <div className="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/30 text-center">
                                 <p className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    <span className="font-bold text-indigo-600 dark:text-indigo-400">Lucid Aura∞ v6.7.1</span> is the premier academic utility for UOL students. It redefines your university experience by seamlessly integrating dynamic timetables, intelligent exam planning, and performance tracking into one unified, high-performance interface.
+                                    <span className="font-bold text-indigo-600 dark:text-indigo-400">Lucid Aura∞ v6.9.8</span> is the premier academic utility for UOL students. It redefines your university experience by seamlessly integrating dynamic timetables, intelligent exam planning, and performance tracking into one unified, high-performance interface.
                                 </p>
                             </div>
 
