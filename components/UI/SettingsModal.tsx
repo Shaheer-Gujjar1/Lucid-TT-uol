@@ -1,6 +1,6 @@
 'use client';
 
-import { useSettings, resetSettings } from '@/lib/settings';
+import { useSettings, resetSettings, AUSTERE_CONFIG, HARMONIZED_CONFIG, OPULENT_CONFIG, AppSettings } from '@/lib/settings';
 
 interface SettingsModalProps {
     isOpen: boolean;
@@ -12,23 +12,32 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
     if (!isOpen || !mounted) return null;
 
-    const toggleSetting = (key: keyof typeof settings) => {
-        const newValue = !settings[key];
+    const toggleSetting = (key: keyof AppSettings) => {
+        const current = settings[key];
+        if (typeof current !== 'boolean') return;
+
+        const newValue = !current;
         let newSettings = { ...settings, [key]: newValue };
 
-        // Bug Fix & Strategy Alignment Logic
-        if (key === 'enableEvents' && newValue === false) {
-            // If turning OFF events, shift to a non-event dependent strategy
-            if (settings.notificationStrategy === 'events_only') {
-                newSettings.notificationStrategy = 'none';
-            } else if (settings.notificationStrategy === 'all_classes_and_events') {
-                newSettings.notificationStrategy = 'all_classes';
-            } else if (settings.notificationStrategy === 'after_free_and_events') {
-                newSettings.notificationStrategy = 'after_free';
+        // Notification strategy sync logic if events toggle is swapped
+        if (key === 'enableEvents') {
+            if (newValue === false) {
+                if (settings.notificationStrategy === 'events_only') newSettings.notificationStrategy = 'none';
+                else if (settings.notificationStrategy === 'all_classes_and_events') newSettings.notificationStrategy = 'all_classes';
+                else if (settings.notificationStrategy === 'after_free_and_events') newSettings.notificationStrategy = 'after_free';
+            } else {
+                if (settings.notificationStrategy === 'none') newSettings.notificationStrategy = 'events_only';
+                else if (settings.notificationStrategy === 'all_classes') newSettings.notificationStrategy = 'all_classes_and_events';
+                else if (settings.notificationStrategy === 'after_free') newSettings.notificationStrategy = 'after_free_and_events';
             }
         }
 
         saveSettings(newSettings);
+    };
+
+    const isConfigMatch = (preset: AppSettings) => {
+        const keys: (keyof AppSettings)[] = ['enableGPA', 'enableEvents', 'enableOnlineIndicator', 'enableAuraAI', 'enableAppInfo', 'enableCourseSearch', 'enableRoomMode', 'enableCrucible', 'enableWeekView', 'notificationStrategy'];
+        return keys.every(key => settings[key] === preset[key]);
     };
 
     const handleReset = () => {
@@ -61,90 +70,29 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     </button>
                 </div>
 
-                {/* Quick Settings Presets */}
-                <div className="p-6 pb-2 border-b border-slate-100 dark:border-white/5 bg-slate-50/30 dark:bg-slate-800/20">
+                <div className="p-6 pb-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/30 dark:bg-slate-800/20">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 px-1">Quick Config Protocols</p>
                     <div className="grid grid-cols-3 gap-3">
                         <button
-                            onClick={() => saveSettings({
-                                ...settings,
-                                enableGPA: false, enableEvents: false, enableOnlineIndicator: false, enableAuraAI: false, enableAppInfo: false,
-                                enableCourseSearch: false, enableRoomMode: false, enableCrucible: false, enableWeekView: false,
-                                notificationStrategy: 'none'
-                            })}
-                            className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 hover:border-indigo-500 transition-all group"
+                            onClick={() => saveSettings({ ...settings, ...AUSTERE_CONFIG })}
+                            className={`flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 transition-all duration-300 group ${isConfigMatch(AUSTERE_CONFIG) ? 'border-indigo-500 shadow-[0_8px_30px_rgba(79,70,229,0.15)] ring-4 ring-indigo-500/10' : 'border-slate-100 dark:border-slate-700 hover:border-indigo-500/50'}`}
                         >
-                            <i className="fas fa-leaf text-slate-400 group-hover:text-indigo-500"></i>
-                            <span className="text-[9px] font-black uppercase tracking-tighter">Austere</span>
+                            <i className={`fas fa-leaf ${isConfigMatch(AUSTERE_CONFIG) ? 'text-indigo-500' : 'text-slate-400 group-hover:text-indigo-500'}`}></i>
+                            <span className={`text-[9px] font-black uppercase tracking-tighter ${isConfigMatch(AUSTERE_CONFIG) ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500'}`}>Austere</span>
                         </button>
                         <button
-                            onClick={() => saveSettings({
-                                ...settings,
-                                enableGPA: true, enableOnlineIndicator: true, enableAppInfo: true, enableCourseSearch: true, enableRoomMode: true,
-                                enableCrucible: true, enableWeekView: true,
-                                enableEvents: false, enableAuraAI: false,
-                                notificationStrategy: 'after_free'
-                            })}
-                            className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 border-indigo-500 shadow-[0_8px_30px_rgba(79,70,229,0.15)] group"
+                            onClick={() => saveSettings({ ...settings, ...HARMONIZED_CONFIG })}
+                            className={`flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 transition-all duration-300 group ${isConfigMatch(HARMONIZED_CONFIG) ? 'border-indigo-500 shadow-[0_8px_30px_rgba(79,70,229,0.15)] ring-4 ring-indigo-500/10' : 'border-slate-100 dark:border-slate-700 hover:border-indigo-500/50'}`}
                         >
-                            <i className="fas fa-balance-scale text-indigo-500"></i>
-                            <span className="text-[9px] font-black uppercase tracking-tighter">Harmonized</span>
+                            <i className={`fas fa-balance-scale ${isConfigMatch(HARMONIZED_CONFIG) ? 'text-indigo-500' : 'text-slate-400 group-hover:text-indigo-500'}`}></i>
+                            <span className={`text-[9px] font-black uppercase tracking-tighter ${isConfigMatch(HARMONIZED_CONFIG) ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500'}`}>Harmonized</span>
                         </button>
                         <button
-                            onClick={() => saveSettings({
-                                ...settings,
-                                enableGPA: true, enableEvents: true, enableOnlineIndicator: true, enableAuraAI: true, enableAppInfo: true,
-                                enableCourseSearch: true, enableRoomMode: true, enableCrucible: true, enableWeekView: true,
-                                notificationStrategy: 'after_free_and_events'
-                            })}
-                            className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 hover:border-amber-500 transition-all group"
+                            onClick={() => saveSettings({ ...settings, ...OPULENT_CONFIG })}
+                            className={`flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 transition-all duration-300 group ${isConfigMatch(OPULENT_CONFIG) ? 'border-amber-500 shadow-[0_8px_30px_rgba(245,158,11,0.15)] ring-4 ring-amber-500/10' : 'border-slate-100 dark:border-slate-700 hover:border-amber-500/50'}`}
                         >
-                            <i className="fas fa-gem text-slate-400 group-hover:text-amber-500"></i>
-                            <span className="text-[9px] font-black uppercase tracking-tighter">Opulent</span>
-                        </button>
-                    </div>
-                </div>
-
-                {/* Quick Settings Presets */}
-                <div className="p-6 pb-2 border-b border-slate-100 dark:border-white/5 bg-slate-50/30 dark:bg-slate-800/20">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 px-1">Quick Config Protocols</p>
-                    <div className="grid grid-cols-3 gap-3">
-                        <button
-                            onClick={() => saveSettings({
-                                ...settings,
-                                enableGPA: false, enableEvents: false, enableOnlineIndicator: false, enableAuraAI: false, enableAppInfo: false,
-                                enableCourseSearch: false, enableRoomMode: false, enableCrucible: false, enableWeekView: false,
-                                notificationStrategy: 'none'
-                            })}
-                            className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 hover:border-indigo-500 transition-all group"
-                        >
-                            <i className="fas fa-leaf text-slate-400 group-hover:text-indigo-500"></i>
-                            <span className="text-[9px] font-black uppercase tracking-tighter">Austere</span>
-                        </button>
-                        <button
-                            onClick={() => saveSettings({
-                                ...settings,
-                                enableGPA: true, enableOnlineIndicator: true, enableAppInfo: true, enableCourseSearch: true, enableRoomMode: true,
-                                enableCrucible: true, enableWeekView: true,
-                                enableEvents: false, enableAuraAI: false,
-                                notificationStrategy: 'after_free'
-                            })}
-                            className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 border-indigo-500 shadow-[0_8px_30px_rgba(79,70,229,0.15)] group"
-                        >
-                            <i className="fas fa-balance-scale text-indigo-500"></i>
-                            <span className="text-[9px] font-black uppercase tracking-tighter">Harmonized</span>
-                        </button>
-                        <button
-                            onClick={() => saveSettings({
-                                ...settings,
-                                enableGPA: true, enableEvents: true, enableOnlineIndicator: true, enableAuraAI: true, enableAppInfo: true,
-                                enableCourseSearch: true, enableRoomMode: true, enableCrucible: true, enableWeekView: true,
-                                notificationStrategy: 'after_free_and_events'
-                            })}
-                            className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 hover:border-amber-500 transition-all group"
-                        >
-                            <i className="fas fa-gem text-slate-400 group-hover:text-amber-500"></i>
-                            <span className="text-[9px] font-black uppercase tracking-tighter">Opulent</span>
+                            <i className={`fas fa-gem ${isConfigMatch(OPULENT_CONFIG) ? 'text-amber-500' : 'text-slate-400 group-hover:text-amber-500'}`}></i>
+                            <span className={`text-[9px] font-black uppercase tracking-tighter ${isConfigMatch(OPULENT_CONFIG) ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500'}`}>Opulent</span>
                         </button>
                     </div>
                 </div>
@@ -152,7 +100,10 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 {/* Toggles */}
                 <div className="p-6 overflow-y-auto custom-scrollbar flex flex-col gap-6">
 
-                    <div className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                    <div
+                        onClick={() => toggleSetting('enableGPA')}
+                        className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                    >
                         <div>
                             <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
                                 <i className="fas fa-calculator text-indigo-500 w-5"></i> Academic GPA
@@ -160,14 +111,16 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Integrate the GPA analytic utility into your dashboard.</p>
                         </div>
                         <button
-                            onClick={() => toggleSetting('enableGPA')}
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableGPA ? 'bg-indigo-600 shadow-[0_0_15px_rgba(79,70,229,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
                         >
                             <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-500 ${settings.enableGPA ? 'translate-x-6' : 'translate-x-1'}`} />
                         </button>
                     </div>
 
-                    <div className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                    <div
+                        onClick={() => toggleSetting('enableEvents')}
+                        className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                    >
                         <div>
                             <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
                                 <i className="fas fa-calendar-alt text-amber-500 w-5"></i> Event Chronicle
@@ -175,29 +128,33 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Toggle access to the sophisticated event management suite.</p>
                         </div>
                         <button
-                            onClick={() => toggleSetting('enableEvents')}
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableEvents ? 'bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
                         >
                             <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-500 ${settings.enableEvents ? 'translate-x-6' : 'translate-x-1'}`} />
                         </button>
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    <div
+                        onClick={() => toggleSetting('enableOnlineIndicator')}
+                        className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                    >
                         <div>
-                            <h4 className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                                <i className="fas fa-wifi text-emerald-500 w-4"></i> Online Indicator
+                            <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
+                                <i className="fas fa-wifi text-emerald-500 w-5"></i> Online Indicator
                             </h4>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Display network status in the floating action menu.</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Display network status in the floating action menu.</p>
                         </div>
                         <button
-                            onClick={() => toggleSetting('enableOnlineIndicator')}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${settings.enableOnlineIndicator ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'}`}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableOnlineIndicator ? 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
                         >
-                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settings.enableOnlineIndicator ? 'translate-x-6' : 'translate-x-1'}`} />
+                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-500 ${settings.enableOnlineIndicator ? 'translate-x-6' : 'translate-x-1'}`} />
                         </button>
                     </div>
 
-                    <div className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                    <div
+                        onClick={() => toggleSetting('enableAuraAI')}
+                        className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                    >
                         <div>
                             <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
                                 <i className="fas fa-robot text-fuchsia-500 w-5"></i> Aura Intelligence
@@ -205,14 +162,16 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Enable high-performance AI-driven scheduling assistance.</p>
                         </div>
                         <button
-                            onClick={() => toggleSetting('enableAuraAI')}
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableAuraAI ? 'bg-fuchsia-500 shadow-[0_0_15px_rgba(217,70,239,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
                         >
                             <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-500 ${settings.enableAuraAI ? 'translate-x-6' : 'translate-x-1'}`} />
                         </button>
                     </div>
 
-                    <div className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                    <div
+                        onClick={() => toggleSetting('enableAppInfo')}
+                        className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                    >
                         <div>
                             <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
                                 <i className="fas fa-info-circle text-blue-500 w-5"></i> Knowledge Hub
@@ -220,7 +179,6 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Access detailed application insights and documentation.</p>
                         </div>
                         <button
-                            onClick={() => toggleSetting('enableAppInfo')}
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableAppInfo ? 'bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
                         >
                             <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-500 ${settings.enableAppInfo ? 'translate-x-6' : 'translate-x-1'}`} />
@@ -242,7 +200,10 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                         </select>
                     </div>
 
-                    <div className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                    <div
+                        onClick={() => toggleSetting('enableCourseSearch')}
+                        className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                    >
                         <div>
                             <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
                                 <i className="fas fa-search text-slate-400 w-5"></i> Course Discovery
@@ -250,29 +211,33 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Activate advanced subject lookup within the dashboard.</p>
                         </div>
                         <button
-                            onClick={() => toggleSetting('enableCourseSearch')}
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableCourseSearch ? 'bg-indigo-600 shadow-[0_0_15px_rgba(79,70,229,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
                         >
                             <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-500 ${settings.enableCourseSearch ? 'translate-x-6' : 'translate-x-1'}`} />
                         </button>
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    <div
+                        onClick={() => toggleSetting('enableRoomMode')}
+                        className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                    >
                         <div>
-                            <h4 className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
+                            <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
                                 <i className="fas fa-door-open text-orange-500 w-5"></i> Room Mode
                             </h4>
                             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Enable Room Timetable search mode.</p>
                         </div>
                         <button
-                            onClick={() => toggleSetting('enableRoomMode')}
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableRoomMode ? 'bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
                         >
                             <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-500 ${settings.enableRoomMode ? 'translate-x-6' : 'translate-x-1'}`} />
                         </button>
                     </div>
 
-                    <div className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                    <div
+                        onClick={() => toggleSetting('enableCrucible')}
+                        className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                    >
                         <div>
                             <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
                                 <i className="fas fa-chair text-purple-500 w-5"></i> Crucible Protocol
@@ -280,14 +245,16 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Toggle all examination and seating allocations.</p>
                         </div>
                         <button
-                            onClick={() => toggleSetting('enableCrucible')}
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableCrucible ? 'bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
                         >
                             <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-500 ${settings.enableCrucible ? 'translate-x-6' : 'translate-x-1'}`} />
                         </button>
                     </div>
 
-                    <div className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                    <div
+                        onClick={() => toggleSetting('enableWeekView')}
+                        className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                    >
                         <div>
                             <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
                                 <i className="fas fa-calendar-week text-indigo-400 w-5"></i> Week View Chronicle
@@ -295,7 +262,6 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Toggle the high-density weekly schedule outlook.</p>
                         </div>
                         <button
-                            onClick={() => toggleSetting('enableWeekView')}
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableWeekView ? 'bg-indigo-400 shadow-[0_0_15px_rgba(129,140,248,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
                         >
                             <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-500 ${settings.enableWeekView ? 'translate-x-6' : 'translate-x-1'}`} />

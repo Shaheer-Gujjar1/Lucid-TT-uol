@@ -43,38 +43,29 @@ export default function ModeToggle({ mode, setMode }: ModeToggleProps) {
                 className="grid gap-0 relative"
                 style={{ gridTemplateColumns: `repeat(${colCount}, minmax(0, 1fr))` }}
             >
-                <button onClick={() => setMode('student')} className={`flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 px-1 md:px-6 py-2.5 md:py-3.5 rounded-full font-black tracking-tighter uppercase transition-all duration-300 z-10 ${mode === 'student' ? 'text-white' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'}`}>
-                    <i className={`fas fa-user-graduate text-xs md:text-sm transition-transform duration-300 ${mode === 'student' ? 'scale-110' : 'group-hover:scale-110'}`}></i>
-                    <span className="text-[9px] md:text-sm opacity-90">
-                        <span className="hidden md:inline">Learner</span>
-                        <span className="md:hidden">Std</span>
-                    </span>
-                </button>
-                <button onClick={() => setMode('teacher')} className={`flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 px-1 md:px-6 py-2.5 md:py-3.5 rounded-full font-black tracking-tighter uppercase transition-all duration-300 z-10 ${mode === 'teacher' ? 'text-white' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'}`}>
-                    <i className={`fas fa-chalkboard-teacher text-xs md:text-sm transition-transform duration-300 ${mode === 'teacher' ? 'scale-110' : 'group-hover:scale-110'}`}></i>
-                    <span className="text-[9px] md:text-sm opacity-90">
-                        <span className="hidden md:inline">Lecturer</span>
-                        <span className="md:hidden">Lec</span>
-                    </span>
-                </button>
-                {settings.enableRoomMode && (
-                    <button onClick={() => setMode('room')} className={`flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 px-1 md:px-6 py-2.5 md:py-3.5 rounded-full font-black tracking-tighter uppercase transition-all duration-300 z-10 ${mode === 'room' ? 'text-white' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'}`}>
-                        <i className={`fas fa-door-open text-xs md:text-sm transition-transform duration-300 ${mode === 'room' ? 'scale-110' : 'group-hover:scale-110'}`}></i>
-                        <span className="text-[9px] md:text-sm opacity-90">
-                            <span className="hidden md:inline">Spatial</span>
-                            <span className="md:hidden">Room</span>
-                        </span>
-                    </button>
-                )}
-                {settings.enableCrucible && (
-                    <button onClick={() => setMode('exam')} className={`flex flex-col md:flex-row items-center justify-center gap-1 md:gap-3 px-1 md:px-6 py-2.5 md:py-3.5 rounded-full font-black tracking-tighter uppercase transition-all duration-300 z-10 ${mode === 'exam' ? 'text-white' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'}`}>
-                        <i className={`fas fa-file-invoice text-xs md:text-sm transition-transform duration-300 ${mode === 'exam' ? 'scale-110' : 'group-hover:scale-110'}`}></i>
-                        <span className="text-[9px] md:text-sm opacity-90">
-                            <span className="hidden md:inline">Crucible</span>
-                            <span className="md:hidden">Exam</span>
-                        </span>
-                    </button>
-                )}
+                {enabledModes.map((m) => {
+                    const isActive = mode === m;
+                    const config = {
+                        student: { icon: 'fa-user-graduate', label: 'Learner', short: 'Std', onClick: () => setMode('student') },
+                        teacher: { icon: 'fa-chalkboard-teacher', label: 'Lecturer', short: 'Lec', onClick: () => setMode('teacher') },
+                        room: { icon: 'fa-door-open', label: 'Spatial', short: 'Room', onClick: () => setMode('room') },
+                        exam: { icon: 'fa-file-invoice', label: 'Crucible', short: 'Exam', onClick: () => setMode('exam') }
+                    }[m];
+
+                    return (
+                        <button
+                            key={m}
+                            onClick={config.onClick}
+                            className={`flex ${colCount <= 3 ? 'flex-row' : 'flex-col md:flex-row'} items-center justify-center gap-1.5 md:gap-3 px-1 md:px-6 py-2.5 md:py-3.5 rounded-full font-black tracking-tighter uppercase transition-all duration-300 z-10 ${isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'}`}
+                        >
+                            <i className={`fas ${config.icon} text-xs md:text-sm transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}></i>
+                            <span className="text-[9px] md:text-sm opacity-90">
+                                <span className={`${colCount <= 3 ? 'inline' : 'hidden md:inline'}`}>{config.label}</span>
+                                <span className={`${colCount <= 3 ? 'hidden' : 'md:hidden'}`}>{config.short}</span>
+                            </span>
+                        </button>
+                    );
+                })}
             </div>
         </div>
     );

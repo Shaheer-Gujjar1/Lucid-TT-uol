@@ -16,19 +16,25 @@ export interface AppSettings {
     enableWeekView: boolean;
 }
 
-const defaultSettings: AppSettings = {
-    enableGPA: true,
-    enableEvents: false, // Harmonized: Events OFF
-    enableOnlineIndicator: true,
-    enableAuraAI: false, // Harmonized: Aura AI OFF
-    enableAppInfo: true,
-    defaultMode: 'student',
-    enableCourseSearch: true,
-    notificationStrategy: 'after_free', // Harmonized: Post-Resume Intelligence
-    enableRoomMode: true,
-    enableCrucible: true,
-    enableWeekView: true,
+export const AUSTERE_CONFIG: AppSettings = {
+    enableGPA: false, enableEvents: false, enableOnlineIndicator: false, enableAuraAI: false, enableAppInfo: false,
+    defaultMode: 'student', enableCourseSearch: false, notificationStrategy: 'none', enableRoomMode: false,
+    enableCrucible: false, enableWeekView: false,
 };
+
+export const HARMONIZED_CONFIG: AppSettings = {
+    enableGPA: true, enableEvents: false, enableOnlineIndicator: true, enableAuraAI: false, enableAppInfo: true,
+    defaultMode: 'student', enableCourseSearch: true, notificationStrategy: 'after_free', enableRoomMode: true,
+    enableCrucible: true, enableWeekView: true,
+};
+
+export const OPULENT_CONFIG: AppSettings = {
+    enableGPA: true, enableEvents: true, enableOnlineIndicator: true, enableAuraAI: true, enableAppInfo: true,
+    defaultMode: 'student', enableCourseSearch: true, notificationStrategy: 'after_free_and_events', enableRoomMode: true,
+    enableCrucible: true, enableWeekView: true,
+};
+
+const defaultSettings: AppSettings = HARMONIZED_CONFIG;
 
 export function getSettings(): AppSettings {
     if (typeof window === 'undefined') return defaultSettings;
