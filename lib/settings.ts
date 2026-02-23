@@ -23,9 +23,9 @@ export const AUSTERE_CONFIG: AppSettings = {
 };
 
 export const HARMONIZED_CONFIG: AppSettings = {
-    enableGPA: true, enableEvents: false, enableOnlineIndicator: true, enableAuraAI: false, enableAppInfo: true,
-    defaultMode: 'student', enableCourseSearch: true, notificationStrategy: 'after_free', enableRoomMode: true,
-    enableCrucible: true, enableWeekView: true,
+    enableGPA: false, enableEvents: false, enableOnlineIndicator: true, enableAuraAI: false, enableAppInfo: true,
+    defaultMode: 'student', enableCourseSearch: false, notificationStrategy: 'after_free', enableRoomMode: true,
+    enableCrucible: false, enableWeekView: true,
 };
 
 export const OPULENT_CONFIG: AppSettings = {
