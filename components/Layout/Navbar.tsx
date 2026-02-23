@@ -4,11 +4,13 @@
 import { useState, useEffect, memo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSettings } from '@/lib/settings';
 
 const Navbar = memo(function Navbar() {
     const [darkMode, setDarkMode] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const pathname = usePathname();
+    const { settings } = useSettings();
 
     useEffect(() => {
         const isDark = localStorage.getItem('darkMode') === 'true';
@@ -67,8 +69,8 @@ const Navbar = memo(function Navbar() {
 
     const navItems = [
         { href: '/', label: 'Timetable', icon: 'fa-table' },
-        { href: '/gpa', label: 'GPA', icon: 'fa-calculator' },
-        { href: '/events', label: 'Events', icon: 'fa-calendar-alt', badge: upcomingCount },
+        ...(settings.enableGPA ? [{ href: '/gpa', label: 'GPA', icon: 'fa-calculator' }] : []),
+        ...(settings.enableEvents ? [{ href: '/events', label: 'Events', icon: 'fa-calendar-alt', badge: upcomingCount }] : [])
     ];
 
     return (

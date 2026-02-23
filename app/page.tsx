@@ -16,11 +16,14 @@ import DatesheetDownloadModal from '@/components/Exam/DatesheetDownloadModal';
 import SeatingPlanDownloadModal from '@/components/Exam/SeatingPlanDownloadModal';
 import Toast from '@/components/UI/Toast';
 import InfoModal from '@/components/UI/InfoModal';
+import SettingsModal from '@/components/UI/SettingsModal';
+import { useSettings } from '@/lib/settings';
 import { ProcessedSlot, DAYS, processDayData } from '@/lib/parser';
 import { checkAndSync, detectSheetChanges } from '@/lib/sync_service';
 
 export default function Home() {
     const router = useRouter();
+    const { settings } = useSettings();
     const [mode, setMode] = useState<'student' | 'teacher' | 'room' | 'exam'>('student');
     const [examView, setExamView] = useState<'datesheet' | 'seating'>('datesheet');
     const [view, setView] = useState<'day' | 'week'>('day');
@@ -53,6 +56,7 @@ export default function Home() {
 
     const [isFabExpanded, setIsFabExpanded] = useState(false);
     const [showInfoModal, setShowInfoModal] = useState(false);
+    const [showSettingsModal, setShowSettingsModal] = useState(false);
     const [examRefreshTrigger, setExamRefreshTrigger] = useState(0);
 
     useEffect(() => {
@@ -741,10 +745,12 @@ export default function Home() {
                     <div className={`flex flex-col items-end gap-3 transition-all duration-300 origin-bottom ${isFabExpanded ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 translate-y-10 scale-90 pointer-events-none absolute bottom-16'}`}>
 
                         {/* Status Pill */}
-                        <div className="px-5 py-2.5 rounded-full font-bold text-xs shadow-lg shadow-black/5 dark:shadow-indigo-500/20 flex items-center gap-2 border border-slate-200 dark:border-slate-700 transition-all duration-300 bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 backdrop-blur-md">
-                            <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]'}`}></span>
-                            {isOnline ? 'Online' : 'Offline'}
-                        </div>
+                        {settings.enableOnlineIndicator && (
+                            <div className="px-5 py-2.5 rounded-full font-bold text-xs shadow-lg shadow-black/5 dark:shadow-indigo-500/20 flex items-center gap-2 border border-slate-200 dark:border-slate-700 transition-all duration-300 bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 backdrop-blur-md">
+                                <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]'}`}></span>
+                                {isOnline ? 'Online' : 'Offline'}
+                            </div>
+                        )}
 
                         {/* Refresh */}
                         <button
@@ -775,24 +781,26 @@ export default function Home() {
                         </button>
 
                         {/* AI Chat Bot (NEW) */}
-                        <button
-                            onClick={() => {
-                                // Robust activation using the global fallback
-                                if (typeof window !== 'undefined') {
-                                    if ((window as any).LucidChatToggle) {
-                                        (window as any).LucidChatToggle();
-                                    } else {
-                                        // Final fallback: Event
-                                        window.dispatchEvent(new CustomEvent('lucid-chat-toggle'));
+                        {settings.enableAuraAI && (
+                            <button
+                                onClick={() => {
+                                    // Robust activation using the global fallback
+                                    if (typeof window !== 'undefined') {
+                                        if ((window as any).LucidChatToggle) {
+                                            (window as any).LucidChatToggle();
+                                        } else {
+                                            // Final fallback: Event
+                                            window.dispatchEvent(new CustomEvent('lucid-chat-toggle'));
+                                        }
                                     }
-                                }
-                                setIsFabExpanded(false);
-                            }}
-                            className="w-12 h-12 bg-white dark:bg-slate-800 text-fuchsia-600 dark:text-fuchsia-400 rounded-full shadow-lg shadow-fuchsia-500/10 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-fuchsia-100 dark:border-slate-700"
-                            title="AI Assistant"
-                        >
-                            <i className="fas fa-robot"></i>
-                        </button>
+                                    setIsFabExpanded(false);
+                                }}
+                                className="w-12 h-12 bg-white dark:bg-slate-800 text-fuchsia-600 dark:text-fuchsia-400 rounded-full shadow-lg shadow-fuchsia-500/10 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-fuchsia-100 dark:border-slate-700"
+                                title="AI Assistant"
+                            >
+                                <i className="fas fa-robot"></i>
+                            </button>
+                        )}
 
                         {/* Download */}
                         <button
@@ -811,12 +819,23 @@ export default function Home() {
                         </button>
 
                         {/* Info Button (NEW) */}
+                        {settings.enableAppInfo && (
+                            <button
+                                onClick={() => { setShowInfoModal(true); setIsFabExpanded(false); }}
+                                className="w-12 h-12 bg-white dark:bg-slate-800 text-blue-500 dark:text-blue-400 rounded-full shadow-lg shadow-blue-500/20 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-blue-100 dark:border-slate-700"
+                                title="App Info"
+                            >
+                                <i className="fas fa-info"></i>
+                            </button>
+                        )}
+
+                        {/* Settings Button */}
                         <button
-                            onClick={() => { setShowInfoModal(true); setIsFabExpanded(false); }}
-                            className="w-12 h-12 bg-white dark:bg-slate-800 text-blue-500 dark:text-blue-400 rounded-full shadow-lg shadow-blue-500/20 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-blue-100 dark:border-slate-700"
-                            title="App Info"
+                            onClick={() => { setShowSettingsModal(true); setIsFabExpanded(false); }}
+                            className="w-12 h-12 bg-white dark:bg-slate-800 text-teal-600 dark:text-teal-400 rounded-full shadow-lg shadow-teal-500/20 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-teal-100 dark:border-slate-700"
+                            title="Settings"
                         >
-                            <i className="fas fa-info"></i>
+                            <i className="fas fa-cog"></i>
                         </button>
 
                     </div>
@@ -831,6 +850,7 @@ export default function Home() {
                 </div>
 
                 <InfoModal isOpen={showInfoModal} onClose={() => setShowInfoModal(false)} />
+                <SettingsModal isOpen={showSettingsModal} onClose={() => setShowSettingsModal(false)} />
 
                 <DatesheetDownloadModal
                     isOpen={showDatesheetDownloadModal}

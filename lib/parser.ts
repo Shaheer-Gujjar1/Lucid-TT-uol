@@ -439,7 +439,7 @@ function parseAllClasses(cell: string): ClassMatch[] {
     // Pattern 1: BSMDS / Data Science long form
     // Pattern 2: BS Math / Maths / Mathematics
     // Pattern 3: Standard codes (BSCS etc)
-    const regex = /(?:(BSMDS|BS\s*Mathematics\s*for\s*Data\s*Science)|(BS\s*Math(?:s|ematics)?|Math(?:s|ematics)?)|(BSCS|BSSE|BSAI|BBA(?:\s*\(?\s*2Y\s*\)?)?|BSAF(?:\s*\(?\s*2Y\s*\)?)?|BSDM|BS\w+|BS\s\w+|BS\s\d+|BBA\s\w+|BSAF\s\w+|BSDM\s\w+|\bPharmD\b|\bDPT\b|\bMLT\b|\bHND\b|\bRIT\b|\bNursing\b|BS\sUrdu|BS\sBiotech|BS\sZoology|BS\sChemistry|BS\sPhysics|BS\sEnglish|BS\sPsychology|BS\sCriminology|BS\sIR|BS\sNursing|Post\s*RN\s*Nursing|BS\sSISS|BS\sEducation|BS\sIslamic\sStudies|BS\sNutrition|BS\sMedical\sPhysics))[-\s]*(?:Sem(?:ester)?\.?\s*)?(\d+(?:rd|th|st|nd)?(?:\+\d+)?|[IVX]+)(?:[-\s]*([ABC]))?/gi;
+    const regex = /(?:(BSMDS|BS\s*Mathematics\s*for\s*Data\s*Science)|(BS\s*Math(?:s|ematics)?|Math(?:s|ematics)?)|(BSCS|BSSE|BSAI|BBA(?:\s*\(?\s*2Y\s*\)?)?|BSAF(?:\s*\(?\s*2Y\s*\)?)?|BSDM|BS\w+|BS\s\w+|BS\s\d+|BBA\s\w+|BSAF\s\w+|BSDM\s\w+|\bPharmD\b|\bDPT\b|\bMLT\b|\bHND\b|(?:^|[\s/])RIT\b|\bNursing\b|BS\sUrdu|BS\sBiotech|BS\sZoology|BS\sChemistry|BS\sPhysics|BS\sEnglish|BS\sPsychology|BS\sCriminology|BS\sIR|BS\sNursing|Post\s*RN\s*Nursing|BS\sSISS|BS\sEducation|BS\sIslamic\sStudies|BS\sNutrition|BS\sMedical\sPhysics))[-\s]*(?:Sem(?:ester)?\.?\s*)?(\d+(?:rd|th|st|nd)?(?:\+\d+)?|[IVX]+)(?:[-\s]*([ABC]))?/gi;
 
     let m;
     while ((m = regex.exec(cell)) !== null) {

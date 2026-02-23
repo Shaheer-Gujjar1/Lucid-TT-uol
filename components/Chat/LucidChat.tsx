@@ -4,6 +4,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { processQuery, ParsedResult } from '@/lib/lucid-chat/engine';
 import { useRouter, usePathname } from 'next/navigation';
+import { useSettings } from '@/lib/settings';
 
 interface Message {
     id: number;
@@ -59,6 +60,7 @@ export default function LucidChat({ onAction }: LucidChatProps) {
 
     // Smart Memory
     const [memory, setMemory] = useState<string[]>([]);
+    const { settings, mounted } = useSettings();
 
     // Context State for Multi-turn conversation
     const [context, setContext] = useState<{
@@ -696,6 +698,8 @@ export default function LucidChat({ onAction }: LucidChatProps) {
             handleSend();
         }
     };
+
+    if (mounted && !settings.enableAuraAI) return null;
 
     // ... (Render Logic same as before) ...
     return (
