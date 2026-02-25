@@ -23,6 +23,7 @@ import { useSettings } from '@/lib/settings';
 import { ProcessedSlot, DAYS, processDayData } from '@/lib/parser';
 import { checkAndSync, detectSheetChanges } from '@/lib/sync_service';
 import CondensedWeekViewExport from '@/components/Timetable/CondensedWeekViewExport';
+import WeekViewDownloadModal from '@/components/Timetable/WeekViewDownloadModal';
 
 
 
@@ -67,6 +68,7 @@ export default function Home() {
     const [showSettingsModal, setShowSettingsModal] = useState(false);
     const [showDeveloperDownloadModal, setShowDeveloperDownloadModal] = useState(false);
     const [showChronicleExportModal, setShowChronicleExportModal] = useState(false);
+    const [showWeekViewDownloadModal, setShowWeekViewDownloadModal] = useState(false);
     const [examRefreshTrigger, setExamRefreshTrigger] = useState(0);
     const [syncVersion, setSyncVersion] = useState(0);
 
@@ -814,9 +816,18 @@ export default function Home() {
                         onClose={() => setShowChronicleExportModal(false)}
                         onExport={() => {
                             setShowChronicleExportModal(false);
-                            handleDownload(true, true);
+                            setShowWeekViewDownloadModal(true);
                         }}
                         dayCount={view === 'week' ? slots.filter((d: any) => d.slots && d.slots.some((s: any) => s.entries && s.entries.length > 0)).length : 0}
+                    />
+
+                    <WeekViewDownloadModal
+                        isOpen={showWeekViewDownloadModal}
+                        onClose={() => setShowWeekViewDownloadModal(false)}
+                        data={slots}
+                        mode={mode === 'exam' ? 'student' : mode as 'student' | 'teacher' | 'room'}
+                        filters={filters}
+                        onToast={setToastMsg}
                     />
 
                     {/* Hidden Export Component */}

@@ -24,7 +24,7 @@ export default function TimetablePrintView({ slots, day, room, mode, date, filte
     }
 
     const getAccent = (isLab: boolean, isFree: boolean) => {
-        if (isFree) return { color: '#f59e0b', thin: 'rgba(245, 158, 11, 0.15)', bg: 'linear-gradient(135deg, #fffbeb 0%, #fef9c3 50%, #ffffff 100%)', badgeColor: '', badgeBorder: '' };
+        if (isFree) return { color: '#10b981', thin: 'rgba(16, 185, 129, 0.15)', bg: 'linear-gradient(135deg, #ecfdf5 0%, rgba(236,253,245,0.5) 50%, #ffffff 100%)', badgeColor: '', badgeBorder: '' };
         if (isLab) return { color: '#f59e0b', thin: 'rgba(245, 158, 11, 0.15)', bg: 'linear-gradient(135deg, #fffbeb 0%, rgba(255,251,235,0.5) 50%, #ffffff 100%)', badgeColor: '#92400e', badgeBorder: '#fcd34d' };
         return { color: '#6366f1', thin: 'rgba(99, 102, 241, 0.12)', bg: 'linear-gradient(135deg, #eef2ff 0%, rgba(238,242,255,0.5) 50%, #ffffff 100%)', badgeColor: '#4338ca', badgeBorder: '#c7d2fe' };
     };
