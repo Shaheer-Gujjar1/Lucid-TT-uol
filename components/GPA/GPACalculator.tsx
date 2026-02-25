@@ -8,8 +8,11 @@ import GPAStats from './GPAStats';
 import InfoModal from '@/components/UI/InfoModal';
 import Toast from '@/components/UI/Toast';
 import GPAReportDownloadModal from './GPAReportDownloadModal';
+import { useSettings } from '@/lib/settings';
 
 const GPACalculator = () => {
+    const { settings, mounted } = useSettings();
+    const isClassic = mounted && settings.wordingPreference === 'classic';
     const [state, setState] = useState<GPAState>({
         previousCGPA: 0,
         previousCredits: 0,
@@ -164,8 +167,8 @@ const GPACalculator = () => {
                     <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
                         {/* Welcome / Intro Section */}
                         <div className="flex-1 text-center md:text-left">
-                            <h1 className="text-3xl md:text-5xl font-black mb-2 tracking-tight">GPA Calculator</h1>
-                            <p className="text-indigo-200 font-medium max-w-md">Track your academic progress with precision. Add semesters below to get started.</p>
+                            <h1 className="text-3xl md:text-5xl font-black mb-2 tracking-tight">{isClassic ? 'GPA Calculator' : 'Performance Dashboard'}</h1>
+                            <p className="text-indigo-200 font-medium max-w-md">{isClassic ? 'Track your grades and credit hours with ease.' : 'Track your academic progress with precision. Add semesters below to get started.'}</p>
                         </div>
 
                         {/* Previous/History Section */}

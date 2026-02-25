@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AgendaEvent } from './types';
 
 interface EventListProps {
@@ -14,8 +14,11 @@ interface EventListProps {
 export default function EventList({ events, onDelete, onToggleComplete, onEdit }: EventListProps) {
     const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'overdue'>('today');
     const [priorityFilter, setPriorityFilter] = useState<'all' | 'High' | 'Medium' | 'Low'>('all');
+    const [todayStr, setTodayStr] = useState<string>('');
 
-    const todayStr = new Date().toISOString().split('T')[0];
+    useEffect(() => {
+        setTodayStr(new Date().toISOString().split('T')[0]);
+    }, []);
 
     const filteredEvents = events.filter(e => {
         // 1. Date Check

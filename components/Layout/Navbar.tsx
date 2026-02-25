@@ -10,7 +10,7 @@ const Navbar = memo(function Navbar() {
     const [darkMode, setDarkMode] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const pathname = usePathname();
-    const { settings } = useSettings();
+    const { settings, mounted } = useSettings();
 
     useEffect(() => {
         const isDark = localStorage.getItem('darkMode') === 'true';
@@ -67,10 +67,12 @@ const Navbar = memo(function Navbar() {
         }
     };
 
+    const isClassic = mounted && settings.wordingPreference === 'classic';
+
     const navItems = [
-        { href: '/', label: 'Chronicle', icon: 'fa-table' },
-        ...(settings.enableGPA ? [{ href: '/gpa', label: 'Performance', icon: 'fa-calculator' }] : []),
-        ...(settings.enableEvents ? [{ href: '/events', label: 'Event Ledger', icon: 'fa-calendar-alt', badge: upcomingCount }] : [])
+        { href: '/', label: isClassic ? 'Timetable' : 'Chronicle', icon: 'fa-table' },
+        ...(settings.enableGPA ? [{ href: '/gpa', label: isClassic ? 'GPA' : 'Performance', icon: 'fa-calculator' }] : []),
+        ...(settings.enableEvents ? [{ href: '/events', label: isClassic ? 'Events' : 'Event Ledger', icon: 'fa-calendar-alt', badge: upcomingCount }] : [])
     ];
 
     return (
@@ -81,13 +83,13 @@ const Navbar = memo(function Navbar() {
                 <Link href="/" className="flex items-center gap-2 md:gap-4 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800 dark:to-slate-900 py-2 px-3 md:py-3 md:px-8 rounded-full border border-slate-200/50 dark:border-slate-700/50 shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] transform hover:scale-105 active:scale-95 transition-all duration-300 min-w-0 flex-shrink group/logo">
                     <img src="/logo-primary.png" className="w-6 h-6 md:w-8 md:h-8 object-contain flex-shrink-0 group-hover/logo:rotate-12 transition-transform" alt="Logo" />
                     <div className="flex items-baseline gap-2 min-w-0">
-                        <span className="text-sm md:text-lg font-black text-slate-700 dark:text-slate-200 tracking-tighter whitespace-normal leading-none text-left">Lucid <span className="bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent">Aura</span><span className="bg-gradient-to-r from-indigo-500 via-pink-500 to-purple-600 bg-clip-text text-transparent animate-gradient-flow animate-breathing inline-block ml-1 text-lg md:text-2xl align-middle -mb-1">∞</span></span>
+                        <span className="text-sm md:text-lg font-black text-slate-700 dark:text-slate-200 tracking-tighter whitespace-normal leading-none text-left">Lucid <span className="bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent">{isClassic ? 'Timetable' : 'Aura'}</span>{!isClassic && <span className="bg-gradient-to-r from-indigo-500 via-pink-500 to-purple-600 bg-clip-text text-transparent animate-gradient-flow animate-breathing inline-block ml-1 text-lg md:text-2xl align-middle -mb-1">∞</span>}</span>
                         <div className="flex items-center gap-2 px-2 py-0.5 md:px-3 md:py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 scale-[0.8] md:scale-100 origin-left flex-shrink-0">
                             <span className="relative flex h-1.5 w-1.5 md:h-2 md:w-2">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 md:h-2 md:w-2 bg-indigo-500"></span>
                             </span>
-                            <span className="text-[10px] md:text-xs font-bold text-indigo-600 dark:text-indigo-300">v6.9.8</span>
+                            <span className="text-[10px] md:text-xs font-bold text-indigo-600 dark:text-indigo-300">v6.11.3</span>
                         </div>
                     </div>
                 </Link>
@@ -148,7 +150,7 @@ const Navbar = memo(function Navbar() {
                         className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xl px-5 py-3 rounded-full font-bold text-sm flex items-center gap-3 hover:scale-105 active:scale-95 transition-all text-slate-600 dark:text-slate-300"
                         style={{ transitionDelay: `${navItems.length * 50}ms` }}
                     >
-                        <span>{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
+                        <span>{darkMode ? (isClassic ? 'Light Mode' : 'Radiant Shift') : (isClassic ? 'Dark Mode' : 'Obscura Shift')}</span>
                         <div className="w-8 h-8 rounded-full flex items-center justify-center bg-amber-100 dark:bg-amber-900/30 text-amber-500">
                             <i className={`fas ${darkMode ? 'fa-sun' : 'fa-moon'} text-xs`}></i>
                         </div>

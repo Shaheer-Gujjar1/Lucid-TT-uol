@@ -14,24 +14,25 @@ export interface AppSettings {
     enableRoomMode: boolean;
     enableCrucible: boolean;
     enableWeekView: boolean;
+    wordingPreference: 'premium' | 'classic';
 }
 
 export const AUSTERE_CONFIG: AppSettings = {
     enableGPA: false, enableEvents: false, enableOnlineIndicator: false, enableAuraAI: false, enableAppInfo: false,
     defaultMode: 'student', enableCourseSearch: false, notificationStrategy: 'none', enableRoomMode: false,
-    enableCrucible: false, enableWeekView: false,
+    enableCrucible: false, enableWeekView: false, wordingPreference: 'classic',
 };
 
 export const HARMONIZED_CONFIG: AppSettings = {
     enableGPA: false, enableEvents: false, enableOnlineIndicator: true, enableAuraAI: false, enableAppInfo: true,
     defaultMode: 'student', enableCourseSearch: false, notificationStrategy: 'after_free', enableRoomMode: true,
-    enableCrucible: false, enableWeekView: true,
+    enableCrucible: false, enableWeekView: true, wordingPreference: 'premium',
 };
 
 export const OPULENT_CONFIG: AppSettings = {
     enableGPA: true, enableEvents: true, enableOnlineIndicator: true, enableAuraAI: true, enableAppInfo: true,
     defaultMode: 'student', enableCourseSearch: true, notificationStrategy: 'after_free_and_events', enableRoomMode: true,
-    enableCrucible: true, enableWeekView: true,
+    enableCrucible: true, enableWeekView: true, wordingPreference: 'premium',
 };
 
 const defaultSettings: AppSettings = HARMONIZED_CONFIG;

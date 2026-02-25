@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { SeatingPlanEntry } from '@/lib/exam_utils';
 import { toPng } from 'html-to-image';
+import { useSettings } from '@/lib/settings';
 
 interface SeatingPlanDownloadModalProps {
     isOpen: boolean;
@@ -118,7 +119,7 @@ function InlineSeatingPrintView({ data, filters, generatedAt }: { data: SeatingP
                     <h1 style={styles.title}>
                         Lucid <span style={{ color: '#7c3aed' }}>Seating Plan</span>
                     </h1>
-                    <p style={styles.subtitle}>Generated via Lucid Aura∞ v6.7.3</p>
+                    <p style={styles.subtitle}>Generated via Lucid Aura∞ v6.11.3</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '16px', fontWeight: 800, color: '#1e293b' }}>
@@ -184,7 +185,16 @@ function InlineSeatingPrintView({ data, filters, generatedAt }: { data: SeatingP
 
 export default function SeatingPlanDownloadModal({ isOpen, onClose, data, filters, onToast }: SeatingPlanDownloadModalProps) {
     const [isGenerating, setIsGenerating] = useState(false);
+    const [clientGeneratedAt, setClientGeneratedAt] = useState('');
     const printRef = useRef<HTMLDivElement>(null);
+    const { settings, mounted } = useSettings();
+    const isClassic = mounted && settings.wordingPreference === 'classic';
+
+    useEffect(() => {
+        if (isOpen) {
+            setClientGeneratedAt(new Date().toLocaleString());
+        }
+    }, [isOpen]);
 
     const handleDownload = async () => {
         if (!printRef.current) return;
@@ -205,11 +215,11 @@ export default function SeatingPlanDownloadModal({ isOpen, onClose, data, filter
             link.href = dataUrl;
             link.click();
 
-            onToast('Seating Plan Downloaded!');
+            onToast(isClassic ? 'Seating Plan Downloaded!' : 'Seating Plan Chronicle Exported!');
             onClose();
         } catch (e) {
             console.error("Download failed", e);
-            onToast("Failed to generate image.");
+            onToast(isClassic ? 'Download failed.' : 'Failed to generate image.');
             onClose();
         } finally {
             setIsGenerating(false);
@@ -230,7 +240,7 @@ export default function SeatingPlanDownloadModal({ isOpen, onClose, data, filter
                 <InlineSeatingPrintView
                     data={data}
                     filters={filters}
-                    generatedAt={new Date().toLocaleString()}
+                    generatedAt={clientGeneratedAt}
                 />
             </div>
         </div>

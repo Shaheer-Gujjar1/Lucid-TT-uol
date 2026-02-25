@@ -1,6 +1,7 @@
 
 import { SeatingPlanEntry } from '@/lib/exam_utils';
 import { useState, useEffect } from 'react';
+import { useSettings } from '@/lib/settings';
 
 interface SeatingPlanProps {
     data: SeatingPlanEntry[];
@@ -9,6 +10,8 @@ interface SeatingPlanProps {
 
 export default function SeatingPlan({ data, loading }: SeatingPlanProps) {
     const [visibleLimit, setVisibleLimit] = useState(20);
+    const { settings, mounted } = useSettings();
+    const isClassic = mounted && settings.wordingPreference === 'classic';
 
     // Reset pagination when data changes
     useEffect(() => {
@@ -23,7 +26,7 @@ export default function SeatingPlan({ data, loading }: SeatingPlanProps) {
         return (
             <div className="flex flex-col items-center justify-center py-20 animate-pulse">
                 <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-                <p className="mt-4 text-indigo-600 font-bold tracking-widest text-xs uppercase">Loading Seating...</p>
+                <p className="mt-4 text-indigo-600 font-bold tracking-widest text-xs uppercase">{isClassic ? 'Loading Seats...' : 'Loading Seating...'}</p>
             </div>
         );
     }
@@ -34,8 +37,8 @@ export default function SeatingPlan({ data, loading }: SeatingPlanProps) {
                 <div className="inline-block animate-bounce duration-[2000ms]">
                     <i className="fas fa-chair text-6xl text-slate-300 dark:text-slate-600 mb-6"></i>
                 </div>
-                <h3 className="text-xl font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">No Seats Found</h3>
-                <p className="text-slate-400 dark:text-slate-500 text-sm mt-2">Try searching by Name or Room Number.</p>
+                <h3 className="text-xl font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{isClassic ? 'No Seats Found' : 'No Allocations Located'}</h3>
+                <p className="text-slate-400 dark:text-slate-500 text-sm mt-2">{isClassic ? 'Try searching by Name or Room Number.' : 'Refine your search parameters.'}</p>
             </div>
         );
     }
@@ -130,7 +133,7 @@ export default function SeatingPlan({ data, loading }: SeatingPlanProps) {
                         onClick={handleLoadMore}
                         className="bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold px-8 py-3 rounded-full hover:bg-indigo-50 dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shadow-sm border border-slate-200 dark:border-slate-700 flex items-center gap-2 group"
                     >
-                        <span>Show More Seats</span>
+                        <span>{isClassic ? 'Show More Seats' : 'Load More Allocations'}</span>
                         <i className="fas fa-arrow-down transform group-hover:translate-y-1 transition-transform"></i>
                     </button>
                     <p className="mt-3 text-center text-xs font-bold text-slate-400 block w-full">

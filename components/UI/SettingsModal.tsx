@@ -9,6 +9,7 @@ interface SettingsModalProps {
 
 export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     const { settings, saveSettings, mounted } = useSettings();
+    const isClassic = settings?.wordingPreference === 'classic';
 
     if (!isOpen || !mounted) return null;
 
@@ -36,12 +37,15 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     };
 
     const isConfigMatch = (preset: AppSettings) => {
-        const keys: (keyof AppSettings)[] = ['enableGPA', 'enableEvents', 'enableOnlineIndicator', 'enableAuraAI', 'enableAppInfo', 'enableCourseSearch', 'enableRoomMode', 'enableCrucible', 'enableWeekView', 'notificationStrategy'];
+        const keys: (keyof AppSettings)[] = ['enableGPA', 'enableEvents', 'enableOnlineIndicator', 'enableAuraAI', 'enableAppInfo', 'enableCourseSearch', 'enableRoomMode', 'enableCrucible', 'enableWeekView', 'notificationStrategy', 'wordingPreference'];
         return keys.every(key => settings[key] === preset[key]);
     };
 
     const handleReset = () => {
-        if (confirm('Are you certain you wish to restore all configurations to their original state? This action cannot be undone.')) {
+        const msg = isClassic
+            ? 'Are you sure you want to reset all settings? This will clear your preferences.'
+            : 'Are you certain you wish to restore all configurations to their original state? This action cannot be undone.';
+        if (confirm(msg)) {
             resetSettings();
         }
     };
@@ -58,8 +62,8 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                             <i className="fas fa-sliders-h text-xl"></i>
                         </div>
                         <div>
-                            <h3 className="text-xl font-black text-slate-800 dark:text-white tracking-tight italic">Preferences</h3>
-                            <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Personalize your experience</p>
+                            <h3 className="text-xl font-black text-slate-800 dark:text-white tracking-tight italic">{isClassic ? 'Settings' : 'Preferences'}</h3>
+                            <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">{isClassic ? 'Configure your application' : 'Personalize your experience'}</p>
                         </div>
                     </div>
                     <button
@@ -71,7 +75,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                 </div>
 
                 <div className="p-6 pb-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/30 dark:bg-slate-800/20">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 px-1">Quick Config Protocols</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 px-1">{isClassic ? 'Quick Presets' : 'Quick Config Protocols'}</p>
                     <div className="grid grid-cols-3 gap-3">
                         <button
                             onClick={() => saveSettings({ ...settings, ...AUSTERE_CONFIG })}
@@ -106,9 +110,9 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     >
                         <div>
                             <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
-                                <i className="fas fa-calculator text-indigo-500 w-5"></i> Academic GPA
+                                <i className="fas fa-calculator text-indigo-500 w-5"></i> {isClassic ? 'GPA Calculator' : 'Academic GPA'}
                             </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Integrate the GPA analytic utility into your dashboard.</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Enable the grade tracking module.' : 'Integrate the GPA analytic utility into your dashboard.'}</p>
                         </div>
                         <button
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableGPA ? 'bg-indigo-600 shadow-[0_0_15px_rgba(79,70,229,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
@@ -123,9 +127,9 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     >
                         <div>
                             <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
-                                <i className="fas fa-calendar-alt text-amber-500 w-5"></i> Event Chronicle
+                                <i className="fas fa-calendar-alt text-amber-500 w-5"></i> {isClassic ? 'Events' : 'Event Chronicle'}
                             </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Toggle access to the sophisticated event management suite.</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Enable the event and task manager.' : 'Toggle access to the sophisticated event management suite.'}</p>
                         </div>
                         <button
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableEvents ? 'bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
@@ -140,9 +144,9 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     >
                         <div>
                             <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
-                                <i className="fas fa-wifi text-emerald-500 w-5"></i> Online Indicator
+                                <i className="fas fa-wifi text-emerald-500 w-5"></i> {isClassic ? 'Network Status' : 'Presence Indicator'}
                             </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Display network status in the floating action menu.</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Show online status in the menu.' : 'Display active synchronization status in the floating interface.'}</p>
                         </div>
                         <button
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableOnlineIndicator ? 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
@@ -157,9 +161,9 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     >
                         <div>
                             <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
-                                <i className="fas fa-robot text-fuchsia-500 w-5"></i> Aura Intelligence
+                                <i className="fas fa-robot text-fuchsia-500 w-5"></i> {isClassic ? 'AI Scheduler' : 'Aura Intelligence'}
                             </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Enable high-performance AI-driven scheduling assistance.</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Enable AI assistance for scheduling.' : 'Enable high-performance AI-driven scheduling assistance.'}</p>
                         </div>
                         <button
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableAuraAI ? 'bg-fuchsia-500 shadow-[0_0_15px_rgba(217,70,239,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
@@ -174,9 +178,9 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     >
                         <div>
                             <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
-                                <i className="fas fa-info-circle text-blue-500 w-5"></i> Knowledge Hub
+                                <i className="fas fa-info-circle text-blue-500 w-5"></i> {isClassic ? 'About App' : 'Knowledge Hub'}
                             </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Access detailed application insights and documentation.</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'View application information and help.' : 'Access detailed application insights and documentation.'}</p>
                         </div>
                         <button
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableAppInfo ? 'bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
@@ -187,8 +191,8 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
                     <div className="flex items-center justify-between border-t border-slate-100 dark:border-white/5 pt-6 px-2">
                         <div>
-                            <h4 className="font-black text-slate-800 dark:text-slate-200 tracking-tight italic">Global Persona</h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Switch your primary academic lens.</p>
+                            <h4 className="font-black text-slate-800 dark:text-slate-200 tracking-tight italic">{isClassic ? 'Default Mode' : 'Global Persona'}</h4>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Set your primary application view.' : 'Switch your primary academic lens.'}</p>
                         </div>
                         <select
                             value={settings.defaultMode}
@@ -200,15 +204,30 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                         </select>
                     </div>
 
+                    <div className="flex items-center justify-between border-t border-slate-100 dark:border-white/5 pt-6 px-2">
+                        <div>
+                            <h4 className="font-black text-slate-800 dark:text-slate-200 tracking-tight italic">{isClassic ? 'Vocabulary Tone' : 'Linguistic Tone'}</h4>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Change wording across the site.' : 'Toggle between Premium and Classic wording.'}</p>
+                        </div>
+                        <select
+                            value={settings.wordingPreference}
+                            onChange={(e) => saveSettings({ ...settings, wordingPreference: e.target.value as any })}
+                            className="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-black rounded-xl px-4 py-2 border border-slate-200 dark:border-white/5 shadow-sm outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer"
+                        >
+                            <option value="premium">PREMIUM (Aura)</option>
+                            <option value="classic">CLASSIC (Standard)</option>
+                        </select>
+                    </div>
+
                     <div
                         onClick={() => toggleSetting('enableCourseSearch')}
                         className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
                     >
                         <div>
                             <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
-                                <i className="fas fa-search text-slate-400 w-5"></i> Course Discovery
+                                <i className="fas fa-search text-slate-400 w-5"></i> {isClassic ? 'Course Search' : 'Course Discovery'}
                             </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Activate advanced subject lookup within the dashboard.</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Enable subject searching in the dashboard.' : 'Activate advanced subject lookup within the dashboard.'}</p>
                         </div>
                         <button
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableCourseSearch ? 'bg-indigo-600 shadow-[0_0_15px_rgba(79,70,229,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
@@ -223,9 +242,9 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     >
                         <div>
                             <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
-                                <i className="fas fa-door-open text-orange-500 w-5"></i> Room Mode
+                                <i className="fas fa-door-open text-orange-500 w-5"></i> {isClassic ? 'Room Mode' : 'Spatial Mode'}
                             </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Enable Room Timetable search mode.</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Enable room occupancy search.' : 'Enable Room Timetable search mode.'}</p>
                         </div>
                         <button
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableRoomMode ? 'bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
@@ -240,9 +259,9 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     >
                         <div>
                             <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
-                                <i className="fas fa-chair text-purple-500 w-5"></i> Crucible Protocol
+                                <i className="fas fa-chair text-purple-500 w-5"></i> {isClassic ? 'Exams & Seating' : 'Crucible Protocol'}
                             </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Toggle all examination and seating allocations.</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Toggle examination and seating plans.' : 'Toggle all examination and seating allocations.'}</p>
                         </div>
                         <button
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableCrucible ? 'bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
@@ -257,9 +276,9 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     >
                         <div>
                             <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
-                                <i className="fas fa-calendar-week text-indigo-400 w-5"></i> Week View Chronicle
+                                <i className="fas fa-calendar-week text-indigo-400 w-5"></i> {isClassic ? 'Week View' : 'Week View Chronicle'}
                             </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Toggle the high-density weekly schedule outlook.</p>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Toggle the weekly schedule view.' : 'Toggle the high-density weekly schedule outlook.'}</p>
                         </div>
                         <button
                             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableWeekView ? 'bg-indigo-400 shadow-[0_0_15px_rgba(129,140,248,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
@@ -270,8 +289,8 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
                     <div className="flex flex-col gap-3 border-t border-slate-100 dark:border-white/5 pt-6 px-2">
                         <div>
-                            <h4 className="font-black text-slate-800 dark:text-slate-200 tracking-tight italic">Intelligence Alerts</h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">Configure high-priority notification protocols.</p>
+                            <h4 className="font-black text-slate-800 dark:text-slate-200 tracking-tight italic">{isClassic ? 'Notifications' : 'Intelligence Alerts'}</h4>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Configure your notification preferences.' : 'Configure high-priority notification protocols.'}</p>
                         </div>
                         <select
                             value={settings.notificationStrategy}
@@ -280,14 +299,14 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                         >
                             {settings.enableEvents && (
                                 <>
-                                    <option value="after_free_and_events">POST-RESUME INTELLIGENCE & EVENT CHRONICLE</option>
-                                    <option value="all_classes_and_events">COMPREHENSIVE CLASS ALERTS & EVENT CHRONICLE</option>
-                                    <option value="events_only">CHRONICLE EVENTS EXCLUSIVE</option>
+                                    <option value="after_free_and_events">{isClassic ? 'CLASSES & EVENTS' : 'POST-RESUME INTELLIGENCE & EVENT CHRONICLE'}</option>
+                                    <option value="all_classes_and_events">{isClassic ? 'EVERYTHING' : 'COMPREHENSIVE CLASS ALERTS & EVENT CHRONICLE'}</option>
+                                    <option value="events_only">{isClassic ? 'EVENTS ONLY' : 'CHRONICLE EVENTS EXCLUSIVE'}</option>
                                 </>
                             )}
-                            <option value="after_free">POST-RESUME INTELLIGENCE</option>
-                            <option value="all_classes">COMPREHENSIVE CLASS ALERTS</option>
-                            <option value="none">SILENT MODE</option>
+                            <option value="after_free">{isClassic ? 'CLASSES ONLY' : 'POST-RESUME INTELLIGENCE'}</option>
+                            <option value="all_classes">{isClassic ? 'ALL CLASSES' : 'COMPREHENSIVE CLASS ALERTS'}</option>
+                            <option value="none">{isClassic ? 'OFF' : 'SILENT MODE'}</option>
                         </select>
                         {settings.notificationStrategy !== 'none' && (
                             <div className="bg-indigo-50/50 dark:bg-indigo-500/5 border border-indigo-100/50 dark:border-indigo-500/10 rounded-2xl p-4 flex items-start gap-3 mt-1">
@@ -303,7 +322,8 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
                 <div className="p-5 flex justify-center border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/20">
                     <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 text-center leading-relaxed">
-                        Configurations are persisted locally.<br />Presets override current selections.
+                        {isClassic ? 'Settings are saved on this device.' : 'Configurations are persisted locally.'}<br />
+                        {isClassic ? 'Presets will overwrite current settings.' : 'Presets override current selections.'}
                     </p>
                 </div>
             </div>

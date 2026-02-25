@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import Datesheet from './Datesheet';
 import SeatingPlan from './SeatingPlan';
 import { DatesheetEntry, SeatingPlanEntry } from '@/lib/exam_utils';
+import { useSettings } from '@/lib/settings';
 
 interface ExamViewProps {
     view: 'datesheet' | 'seating';
@@ -31,6 +32,8 @@ interface ExamFile {
 export default function ExamView({ view, onViewChange, filters, onDatesAvailable, onDatesheetLoaded, onSeatingLoaded, refreshTrigger = 0 }: ExamViewProps) {
     const [datesheetData, setDatesheetData] = useState<DatesheetEntry[]>([]);
     const [seatingData, setSeatingData] = useState<SeatingPlanEntry[]>([]);
+    const { settings, mounted } = useSettings();
+    const isClassic = mounted && settings.wordingPreference === 'classic';
 
     // Store full data for client-side filtering
     const [allSeating, setAllSeating] = useState<SeatingPlanEntry[]>([]);
@@ -349,7 +352,7 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
                 <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-r shadow-sm flex items-center gap-4 animate-shake">
                     <div className="text-2xl"><i className="fas fa-file-excel"></i></div>
                     <div>
-                        <h3 className="font-bold">Cannot Load Seating Plan</h3>
+                        <h3 className="font-bold">{isClassic ? 'Cannot Load Seating Plan' : 'Seating Plan Unavailable'}</h3>
                         <p className="text-sm">{error}</p>
                     </div>
                 </div>
@@ -360,10 +363,14 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
                 <div>
                     <h2 className="text-4xl font-black text-slate-800 dark:text-white mb-2 tracking-tight flex items-center gap-3">
                         <i className={`fas ${view === 'datesheet' ? 'fa-calendar-alt text-indigo-500' : 'fa-chair text-purple-500'}`}></i>
-                        {view === 'datesheet' ? 'Crucible Timeline' : 'Crucible Allocation'}
+                        {view === 'datesheet'
+                            ? (isClassic ? 'Exam Schedule' : 'Crucible Timeline')
+                            : (isClassic ? 'Seat Allocation' : 'Crucible Allocation')}
                     </h2>
                     <p className="text-slate-500 dark:text-slate-400 font-bold text-sm ml-1 max-w-md">
-                        {view === 'datesheet' ? 'Official Academic Examination Schedule' : 'Find your exam venue and seat allocation instantly'}
+                        {view === 'datesheet'
+                            ? (isClassic ? 'View your upcoming exam dates and times.' : 'Official Academic Examination Schedule')
+                            : (isClassic ? 'Find your exam room and seat number.' : 'Find your exam venue and seat allocation instantly')}
                     </p>
                 </div>
 
@@ -383,14 +390,14 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
                                 className={`py-3 px-6 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest transition-colors duration-300 flex items-center justify-center gap-2 transform active:scale-95 ${view === 'datesheet' ? 'text-white' : 'text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400'}`}
                             >
                                 <i className="fas fa-calendar-alt text-sm"></i>
-                                <span>Timeline</span>
+                                <span>{isClassic ? 'Schedule' : 'Timeline'}</span>
                             </button>
                             <button
                                 onClick={() => onViewChange('seating')}
                                 className={`py-3 px-6 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest transition-colors duration-300 flex items-center justify-center gap-2 transform active:scale-95 ${view === 'seating' ? 'text-white' : 'text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400'}`}
                             >
                                 <i className="fas fa-chair text-sm"></i>
-                                <span>Allocation</span>
+                                <span>{isClassic ? 'Seats' : 'Allocation'}</span>
                             </button>
                         </div>
                     </div>

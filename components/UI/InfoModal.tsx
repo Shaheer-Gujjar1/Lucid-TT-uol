@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSettings } from '@/lib/settings';
 
 interface InfoModalProps {
     isOpen: boolean;
@@ -8,7 +9,9 @@ interface InfoModalProps {
 }
 
 export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
+    const { settings, mounted } = useSettings();
     const [activeTab, setActiveTab] = useState<'about' | 'features' | 'aura' | 'credits'>('about');
+    const isClassic = mounted && settings.wordingPreference === 'classic';
 
     if (!isOpen) return null;
 
@@ -58,14 +61,14 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                     <TabButton
                         active={activeTab === 'features'}
                         onClick={() => setActiveTab('features')}
-                        icon="fa-bolt"
-                        label="Features"
+                        icon="fa-compass"
+                        label={isClassic ? "Guide" : "Intelligence Hub"}
                     />
                     <TabButton
                         active={activeTab === 'aura'}
                         onClick={() => setActiveTab('aura')}
-                        icon="fa-robot"
-                        label="Aura AI"
+                        icon="fa-sync"
+                        label={isClassic ? "Sync" : "Protocols"}
                     />
                     <TabButton
                         active={activeTab === 'credits'}
@@ -82,13 +85,13 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                         <div className="space-y-6 animate-fade-in">
                             <div className="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/30 text-center">
                                 <p className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    <span className="font-bold text-indigo-600 dark:text-indigo-400">Lucid Aura∞ v6.9.8</span> is the premier academic utility for UOL students. It redefines your university experience by seamlessly integrating dynamic timetables, intelligent exam planning, and performance tracking into one unified, high-performance interface.
+                                    <span className="font-bold text-indigo-600 dark:text-indigo-400">Lucid Aura∞ v6.11.3</span> is the premier academic utility for UOL. It integrates dynamic timetables, intelligent planning, and performance analytics into one high-performance interface.
                                 </p>
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
-                                <StatCard label="Version" value="6.7.0" icon="fa-code-branch" />
-                                <StatCard label="Release" value="Feb 2026" icon="fa-calendar-check" />
+                                <StatCard label="Version" value="6.11.3" icon="fa-code-branch" />
+                                <StatCard label="Release" value="SEPT 2025" icon="fa-calendar-check" />
                             </div>
 
                             <div className="text-center pt-2">
@@ -110,130 +113,90 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
 
                     {activeTab === 'features' && (
                         <div className="space-y-4 animate-fade-in">
+                            <div className="p-1 mb-2">
+                                <h4 className="text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-1 italic">Operational Guide</h4>
+                                <p className="text-[10px] text-slate-400 font-bold uppercase">Master the workflow in seconds</p>
+                            </div>
+
                             <FeatureRow
                                 icon="fa-user-graduate"
                                 color="text-indigo-500"
                                 bg="bg-indigo-50 dark:bg-indigo-900/20"
-                                title="Student Mode"
-                                desc="Find your personal class schedule by Program, Semester & Section. Save 'Preferences' to load your timetable instantly."
+                                title={isClassic ? "Student Mode" : "Learner Perspective"}
+                                desc="Search Class → Refine Filters → Save as Preference."
                             />
                             <FeatureRow
                                 icon="fa-chalkboard-teacher"
                                 color="text-purple-500"
                                 bg="bg-purple-50 dark:bg-purple-900/20"
-                                title="Teacher Mode"
-                                desc="Search for any instructor to view their complete weekly teaching schedule across all departments."
-                            />
-                            <FeatureRow
-                                icon="fa-file-signature"
-                                color="text-sky-500"
-                                bg="bg-sky-50 dark:bg-sky-900/20"
-                                title="Exam Suite"
-                                desc="Access the official Datesheet & Seating Plan. Search by Name/ID or course to find your venue and time."
+                                title={isClassic ? "Teacher Mode" : "Lecturer Rotations"}
+                                desc="Search Faculty Name → View Weekly Schedule instantly."
                             />
                             <FeatureRow
                                 icon="fa-door-open"
                                 color="text-pink-500"
                                 bg="bg-pink-50 dark:bg-pink-900/20"
-                                title="Room Mode"
-                                desc="Check the availability of any room on campus to find a free slot for self-study or meetings."
+                                title={isClassic ? "Room Mode" : "Spatial Occupancy"}
+                                desc="Enter Room Number → Determine current availability."
                             />
                             <FeatureRow
-                                icon="fa-arrows-alt-h"
-                                color="text-orange-500"
-                                bg="bg-orange-50 dark:bg-orange-900/20"
-                                title="Smart Gestures"
-                                desc="Swipe left or right on the Timetable to instantly switch between days."
+                                icon="fa-file-signature"
+                                color="text-sky-500"
+                                bg="bg-sky-50 dark:bg-sky-900/20"
+                                title={isClassic ? "Exam Mode" : "Crucible Protocol"}
+                                desc="Search ID/Name → Locate Seat Allocation & Venue."
                             />
                             <FeatureRow
                                 icon="fa-chart-pie"
                                 color="text-emerald-500"
                                 bg="bg-emerald-50 dark:bg-emerald-900/20"
-                                title="GPA Calculator"
-                                desc="Track your academic progress with trends. Now featuring Undo/Redo to fix mistakes instantly."
-                            />
-                            <FeatureRow
-                                icon="fa-cloud-download-alt"
-                                color="text-amber-500"
-                                bg="bg-amber-50 dark:bg-amber-900/20"
-                                title="Universal Export"
-                                desc="Download high-quality images of your Timetable, Datesheet, and Seating Plan with a single tap."
-                            />
-                            <FeatureRow
-                                icon="fa-calendar-check"
-                                color="text-rose-500"
-                                bg="bg-rose-50 dark:bg-rose-900/20"
-                                title="Events Hub"
-                                desc="Manage your personal assignments, quizzes, and campus events with built-in reminders."
-                            />
-                            <FeatureRow
-                                icon="fa-calendar-week"
-                                color="text-teal-500"
-                                bg="bg-teal-50 dark:bg-teal-900/20"
-                                title="Week View"
-                                desc="Visualize your entire week at a glance. Identify free slots and clashes instantly."
-                            />
-                            <FeatureRow
-                                icon="fa-moon"
-                                color="text-slate-600 dark:text-slate-300"
-                                bg="bg-slate-100 dark:bg-slate-800"
-                                title="Dark Mode"
-                                desc="A complete dark theme redesign that is easy on the eyes and perfect for night owls."
+                                title={isClassic ? "GPA Calculator" : "Performance Analytics"}
+                                desc="Input Grades → Analyze Trends → Track GPA Progress."
                             />
                         </div>
                     )}
 
                     {activeTab === 'aura' && (
                         <div className="space-y-5 animate-fade-in">
-                            <div className="p-4 rounded-2xl bg-fuchsia-50 dark:bg-fuchsia-900/10 border border-fuchsia-100 dark:border-fuchsia-800/30">
-                                <h4 className="text-sm font-bold text-fuchsia-600 dark:text-fuchsia-400 mb-1 flex items-center gap-2">
-                                    <i className="fas fa-sparkles text-xs"></i>
-                                    Meet Aura AI
+                            <div className="p-5 rounded-[2rem] bg-indigo-600 text-white shadow-xl shadow-indigo-500/20 overflow-hidden relative">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                                <h4 className="text-sm font-black uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                                    <i className="fas fa-satellite-dish animate-pulse"></i>
+                                    {isClassic ? "Seamless Connectivity" : "Adaptive Protocols"}
                                 </h4>
-                                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    Your intelligent academic companion. Aura isn't just a chatbot; it's a context-aware engine that understands your schedule and automates your tasks.
-                                </p>
+                                <div className="space-y-4">
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center shrink-0 mt-0.5">
+                                            <i className="fas fa-check text-[10px]"></i>
+                                        </div>
+                                        <p className="text-[11px] font-bold leading-relaxed opacity-90 italic">
+                                            {isClassic ? "Real-time Refresh: The app checks for changes automatically to keep you updated." : "Autonomous Sync: Adaptive checks maintain data integrity with zero manual effort."}
+                                        </p>
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                        <div className="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center shrink-0 mt-0.5">
+                                            <i className="fas fa-check text-[10px]"></i>
+                                        </div>
+                                        <p className="text-[11px] font-bold leading-relaxed opacity-90 italic">
+                                            {isClassic ? "Offline Capability: Continue viewing your schedule even without an active internet connection." : "Spatial Persistent: Full dashboard availability during network absence."}
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div className="space-y-3">
-                                <p className="text-[10px] uppercase tracking-widest font-bold text-slate-400 pl-1">Try Asking</p>
-                                <FeatureRow
-                                    icon="fa-search"
-                                    color="text-indigo-500"
-                                    bg="bg-indigo-50 dark:bg-indigo-900/20"
-                                    title="Teacher & Room Lookup"
-                                    desc="'Where is Sir Asif right now?' or 'Find a free slot in Room 102'"
-                                />
-                                <FeatureRow
-                                    icon="fa-calendar-plus"
-                                    color="text-fuchsia-500"
-                                    bg="bg-fuchsia-50 dark:bg-fuchsia-900/20"
-                                    title="Instant Event Creation"
-                                    desc="'Add a Quiz for DAAA after 2 hours' or 'Remind me about Assignment'"
-                                />
-                                <FeatureRow
-                                    icon="fa-filter"
-                                    color="text-emerald-500"
-                                    bg="bg-emerald-50 dark:bg-emerald-900/20"
-                                    title="Dynamic Navigation"
-                                    desc="'Show me tomorrow's timetable' or 'Go to Seating Plan'"
-                                />
-                            </div>
-
-                            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                                <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-tighter mb-2">Power User Tips</h4>
+                            <div className="p-4 rounded-2xl bg-fuchsia-50 dark:bg-fuchsia-900/10 border border-fuchsia-100 dark:border-fuchsia-800/30">
+                                <h4 className="text-[10px] uppercase font-black text-fuchsia-600 dark:text-fuchsia-400 mb-2 flex items-center gap-2">
+                                    <i className="fas fa-sparkles"></i>
+                                    Aura Context Intelligence
+                                </h4>
                                 <ul className="space-y-2">
-                                    <li className="flex items-start gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-medium lowercase leading-tight">
-                                        <i className="fas fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Aura learns your name and class automatically when you search.</span>
+                                    <li className="flex items-start gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-bold lowercase leading-tight">
+                                        <i className="fas fa-caret-right text-indigo-500 mt-1"></i>
+                                        <span>Aura remembers your identity & class context automatically.</span>
                                     </li>
-                                    <li className="flex items-start gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-medium lowercase leading-tight">
-                                        <i className="fas fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Use relative time like "after 30 mins" for quick reminders.</span>
-                                    </li>
-                                    <li className="flex items-start gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-medium lowercase leading-tight">
-                                        <i className="fas fa-check-circle text-indigo-500 mt-0.5"></i>
-                                        <span>Type "cancel" at any time to exit the event creation wizard.</span>
+                                    <li className="flex items-start gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-bold lowercase leading-tight">
+                                        <i className="fas fa-caret-right text-indigo-500 mt-1"></i>
+                                        <span>Swipe Gesture: Instantly switch between dates on mobile.</span>
                                     </li>
                                 </ul>
                             </div>
@@ -266,7 +229,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                 {/* Footer */}
                 <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-center shrink-0">
                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                        © 2026 Lucid Dynamics • All Rights Reserved
+                        © 2025 Lucid Dynamics • All Rights Reserved
                     </p>
                 </div>
             </div>

@@ -1,5 +1,6 @@
 
 import { DatesheetEntry } from '@/lib/exam_utils';
+import { useSettings } from '@/lib/settings';
 
 interface DatesheetProps {
     data: DatesheetEntry[];
@@ -7,10 +8,13 @@ interface DatesheetProps {
 }
 
 export default function Datesheet({ data, loading }: DatesheetProps) {
+    const { settings, mounted } = useSettings();
+    const isClassic = mounted && settings.wordingPreference === 'classic';
+
     if (loading) return (
         <div className="flex flex-col items-center justify-center py-20 animate-pulse">
             <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-            <p className="mt-4 text-indigo-600 font-bold tracking-widest text-xs uppercase">Loading Datesheet...</p>
+            <p className="mt-4 text-indigo-600 font-bold tracking-widest text-xs uppercase">{isClassic ? 'Loading Exams...' : 'Loading Datesheet...'}</p>
         </div>
     );
 
@@ -20,8 +24,8 @@ export default function Datesheet({ data, loading }: DatesheetProps) {
                 <div className="inline-block animate-bounce duration-[2000ms]">
                     <i className="fas fa-calendar-times text-6xl text-slate-300 dark:text-slate-600 mb-6"></i>
                 </div>
-                <h3 className="text-xl font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">No Exams Found</h3>
-                <p className="text-slate-400 dark:text-slate-500 text-sm mt-2">Adjust your filters or check back later.</p>
+                <h3 className="text-xl font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{isClassic ? 'No Exams Found' : 'No Examinations Located'}</h3>
+                <p className="text-slate-400 dark:text-slate-500 text-sm mt-2">{isClassic ? 'Adjust your filters or check back later.' : 'Modify your search filters or return later.'}</p>
             </div>
         );
     }
@@ -53,7 +57,7 @@ export default function Datesheet({ data, loading }: DatesheetProps) {
                                         <h3 className="text-lg font-black text-slate-800 dark:text-white leading-none tracking-tight">{date}</h3>
                                         {day && <span className="text-sm font-bold text-indigo-500 uppercase tracking-wider border-l-2 border-slate-200 pl-2 dark:border-slate-700">{day}</span>}
                                     </div>
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{exams.length} Exams Scheduled</p>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{exams.length} {isClassic ? 'Exams' : 'Examinations'}</p>
                                 </div>
                             </div>
                         </div>

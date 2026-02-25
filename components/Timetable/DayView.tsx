@@ -5,6 +5,7 @@ import { ProcessedSlot } from '@/lib/parser';
 import { isSlotActive } from '@/lib/time_utils';
 import ProcessSlotCard from './ProcessSlotCard';
 import { useState, useEffect } from 'react';
+import { useSettings } from '@/lib/settings';
 
 interface DayViewProps {
     slots: ProcessedSlot[];
@@ -14,18 +15,14 @@ interface DayViewProps {
 }
 
 export default function DayView({ slots, loading, error, day }: DayViewProps) {
-    // Force re-render every minute to update "Active" status
-    const [, setTick] = useState(0);
-    useEffect(() => {
-        const interval = setInterval(() => setTick(t => t + 1), 60000);
-        return () => clearInterval(interval);
-    }, []);
+    const { settings, mounted } = useSettings();
+    const isClassic = mounted && settings.wordingPreference === 'classic';
 
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-20 animate-pulse">
                 <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-                <p className="mt-4 text-indigo-600 font-bold tracking-widest text-xs uppercase">Updating Schedule...</p>
+                <p className="mt-4 text-indigo-600 font-bold tracking-widest text-xs uppercase">{isClassic ? 'Loading...' : 'Updating Schedule...'}</p>
             </div>
         );
     }

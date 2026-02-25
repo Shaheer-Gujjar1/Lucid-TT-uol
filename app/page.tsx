@@ -29,6 +29,7 @@ import CondensedWeekViewExport from '@/components/Timetable/CondensedWeekViewExp
 export default function Home() {
     const router = useRouter();
     const { settings, mounted } = useSettings();
+    const isClassic = mounted && settings.wordingPreference === 'classic';
     const [mode, setMode] = useState<'student' | 'teacher' | 'room' | 'exam'>('student');
     const [isInitialLoad, setIsInitialLoad] = useState(true);
 
@@ -248,7 +249,7 @@ export default function Home() {
             const peakEnd = 16 * 60;
 
             if (currentTime >= peakStart && currentTime <= peakEnd) {
-                return 10000; // 10 seconds (Peak)
+                return 5000; // 5 seconds (Peak)
             }
             return 60000; // 60 seconds (Off-Peak)
         };
@@ -257,7 +258,7 @@ export default function Home() {
             console.log(`[Heartbeat] Checking updates. Interval: ${getSyncInterval() / 1000}s`);
             const changed = await detectSheetChanges();
             if (changed) {
-                setToastMsg('Schedule updated! Refreshing...');
+                setToastMsg(isClassic ? 'Schedule updated! Refreshing...' : 'Data integrity restored. Refreshing...');
                 const updatedData = await checkAndSync(true); // Force sync
                 responseCache.current['full_data'] = updatedData;
                 setSyncVersion(v => v + 1);
@@ -277,11 +278,11 @@ export default function Home() {
     useEffect(() => {
         if (!settings.enableCrucible && mode === 'exam') {
             setMode('student');
-            setToastMsg('Crucible access is currently restricted.');
+            setToastMsg(isClassic ? 'Exam mode is restricted.' : 'Crucible access is currently restricted.');
         }
         if (!settings.enableWeekView && view === 'week') {
             setView('day');
-            setToastMsg('Week View is currently restricted.');
+            setToastMsg(isClassic ? 'Week view is disabled.' : 'Week View is currently restricted.');
         }
     }, [settings.enableCrucible, settings.enableWeekView, mode, view]);
 
@@ -389,12 +390,12 @@ export default function Home() {
                 semester: filters.semester,
                 section: filters.section
             }));
-            setToastMsg('Student preferences saved!');
+            setToastMsg(isClassic ? 'Student settings saved!' : 'Student preferences saved!');
         } else if (mode === 'teacher') {
             localStorage.setItem('lucid_teacher_prefs', JSON.stringify({
                 teacherName: filters.teacherName
             }));
-            setToastMsg('Teacher preferences saved!');
+            setToastMsg(isClassic ? 'Teacher settings saved!' : 'Teacher preferences saved!');
         } else if (mode === 'exam' && examView === 'datesheet') {
             // ... (exam prefs)
             localStorage.setItem('lucid_exam_datesheet_prefs', JSON.stringify({
@@ -402,12 +403,12 @@ export default function Home() {
                 semester: filters.semester,
                 section: filters.section
             }));
-            setToastMsg('Datesheet preferences saved!');
+            setToastMsg(isClassic ? 'Datesheet settings saved!' : 'Datesheet preferences saved!');
         } else if (mode === 'exam' && examView === 'seating') {
             localStorage.setItem('lucid_exam_seating_prefs', JSON.stringify({
                 studentSearch: filters.studentSearch
             }));
-            setToastMsg('Seating search preference saved!');
+            setToastMsg(isClassic ? 'Seating search saved!' : 'Seating search preference saved!');
         }
     };
 
@@ -416,20 +417,20 @@ export default function Home() {
             localStorage.removeItem('lucid_student_prefs');
             localStorage.removeItem('lucid_timetable_preferences');
             setFilters(prev => ({ ...prev, program: '', semester: '', section: '' }));
-            setToastMsg('Student preferences cleared!');
+            setToastMsg(isClassic ? 'Student settings cleared!' : 'Student preferences cleared!');
         } else if (mode === 'teacher') {
             localStorage.removeItem('lucid_teacher_prefs');
             setFilters(prev => ({ ...prev, teacherName: '' }));
-            setToastMsg('Teacher preferences cleared!');
+            setToastMsg(isClassic ? 'Teacher settings cleared!' : 'Teacher preferences cleared!');
         } else if (mode === 'exam' && examView === 'datesheet') {
             // ... (exam clear)
             localStorage.removeItem('lucid_exam_datesheet_prefs');
             setFilters(prev => ({ ...prev, program: '', semester: '', section: '' }));
-            setToastMsg('Chronicle configuration cleared!');
+            setToastMsg(isClassic ? 'Datesheet settings cleared!' : 'Chronicle configuration cleared!');
         } else if (mode === 'exam' && examView === 'seating') {
             localStorage.removeItem('lucid_exam_seating_prefs');
             setFilters(prev => ({ ...prev, studentSearch: '' }));
-            setToastMsg('Seating criteria cleared!');
+            setToastMsg(isClassic ? 'Seating search cleared!' : 'Seating criteria cleared!');
         }
     };
 
@@ -450,14 +451,14 @@ export default function Home() {
             }
         }
 
-        setToastMsg('Initiating Chronicle Export...');
+        setToastMsg(isClassic ? 'Downloading...' : 'Initiating Chronicle Export...');
 
         try {
             const { toPng } = await import('html-to-image');
             const element = document.getElementById('timetable-print-view');
 
             if (!element) {
-                setToastMsg('Could not find printable view');
+                setToastMsg(isClassic ? 'Download view not found.' : 'Could not find printable view');
                 return;
             }
 
@@ -499,10 +500,10 @@ export default function Home() {
             link.href = dataUrl;
             link.click();
 
-            setToastMsg('Chronicle Export Completed!');
+            setToastMsg(isClassic ? 'Download Complete!' : 'Chronicle Export Completed!');
         } catch (error) {
             console.error('Download failed:', error);
-            setToastMsg('Export process encountered an interference.');
+            setToastMsg(isClassic ? 'Download failed. Please try again.' : 'Export process encountered an interference.');
         } finally {
             setLoading(false);
         }
@@ -820,22 +821,24 @@ export default function Home() {
 
                     {/* Hidden Export Component */}
                     <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
-                        {view === 'week' ? (
-                            <CondensedWeekViewExport
-                                data={slots}
-                                mode={mode === 'exam' ? 'student' : mode as 'student' | 'teacher' | 'room'}
-                                filters={filters}
-                                generatedAt={new Date().toLocaleString()}
-                            />
-                        ) : (
-                            <TimetablePrintView
-                                slots={slots}
-                                day={filters.day}
-                                room={filters.roomNumber}
-                                mode={mode === 'exam' ? 'student' : mode as 'student' | 'teacher' | 'room'}
-                                filters={filters}
-                                generatedAt={new Date().toLocaleString()}
-                            />
+                        {mounted && (
+                            view === 'week' ? (
+                                <CondensedWeekViewExport
+                                    data={slots}
+                                    mode={mode === 'exam' ? 'student' : mode as 'student' | 'teacher' | 'room'}
+                                    filters={filters}
+                                    generatedAt={new Date().toLocaleString()}
+                                />
+                            ) : (
+                                <TimetablePrintView
+                                    slots={slots}
+                                    day={filters.day}
+                                    room={filters.roomNumber}
+                                    mode={mode === 'exam' ? 'student' : mode as 'student' | 'teacher' | 'room'}
+                                    filters={filters}
+                                    generatedAt={new Date().toLocaleString()}
+                                />
+                            )
                         )}
                     </div>
                 </div>
@@ -862,17 +865,17 @@ export default function Home() {
                                 try {
                                     if (mode === 'exam') {
                                         setExamRefreshTrigger(prev => prev + 1);
-                                        setToastMsg('Exam data refreshing...');
+                                        setToastMsg(isClassic ? 'Refreshing exam data...' : 'Exam data refreshing...');
                                     } else {
                                         setLoading(true);
                                         // Timetable Refresh
                                         const updated = await checkAndSync(true);
                                         responseCache.current['full_data'] = updated;
                                         fetchData();
-                                        setToastMsg('Schedule updated manually!');
+                                        setToastMsg(isClassic ? 'Schedule refreshed!' : 'Schedule updated manually!');
                                     }
                                 } catch (e) {
-                                    setToastMsg('Manual update failed');
+                                    setToastMsg(isClassic ? 'Refresh failed.' : 'Manual update failed');
                                 } finally {
                                     setLoading(false);
                                 }

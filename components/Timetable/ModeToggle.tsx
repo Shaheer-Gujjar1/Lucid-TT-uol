@@ -45,11 +45,12 @@ export default function ModeToggle({ mode, setMode }: ModeToggleProps) {
             >
                 {enabledModes.map((m) => {
                     const isActive = mode === m;
+                    const isClassic = mounted && settings.wordingPreference === 'classic';
                     const config = {
-                        student: { icon: 'fa-user-graduate', label: 'Learner', short: 'Std', onClick: () => setMode('student') },
-                        teacher: { icon: 'fa-chalkboard-teacher', label: 'Lecturer', short: 'Lec', onClick: () => setMode('teacher') },
-                        room: { icon: 'fa-door-open', label: 'Spatial', short: 'Room', onClick: () => setMode('room') },
-                        exam: { icon: 'fa-file-invoice', label: 'Crucible', short: 'Exam', onClick: () => setMode('exam') }
+                        student: { icon: 'fa-user-graduate', label: isClassic ? 'Student' : 'Learner', short: isClassic ? 'Std' : 'Lrn', onClick: () => setMode('student') },
+                        teacher: { icon: 'fa-chalkboard-teacher', label: isClassic ? 'Teacher' : 'Lecturer', short: isClassic ? 'Tch' : 'Lec', onClick: () => setMode('teacher') },
+                        room: { icon: 'fa-door-open', label: isClassic ? 'Room' : 'Spatial', short: 'Room', onClick: () => setMode('room') },
+                        exam: { icon: 'fa-file-invoice', label: isClassic ? 'Exams' : 'Crucible', short: isClassic ? 'Exam' : 'Crbl', onClick: () => setMode('exam') }
                     }[m];
 
                     return (

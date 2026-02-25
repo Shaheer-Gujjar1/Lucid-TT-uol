@@ -33,7 +33,8 @@ interface FilterBarProps {
 
 
 export default function FilterBar({ mode, examView, filters, setFilter, onSave, onClear, availableDates }: FilterBarProps) {
-    const { settings } = useSettings();
+    const { settings, mounted } = useSettings();
+    const isClassic = mounted && settings.wordingPreference === 'classic';
     const [isExpanded, setIsExpanded] = useState(false);
     const [allowOverflow, setAllowOverflow] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -56,15 +57,15 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
             {/* Header - Always Visible */}
             <div className="flex justify-between items-center cursor-pointer group" onClick={() => setIsExpanded(!isExpanded)}>
                 <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 transition-transform duration-500 ${isExpanded ? 'rotate-180 scale-110' : 'group-hover:scale-105'}`}>
-                        <i className={`fas ${isExpanded ? 'fa-times' : 'fa-sliders-h'} text-xl`}></i>
+                    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 transition-transform duration-500 ${isExpanded ? 'scale-110' : 'group-hover:scale-105'}`}>
+                        <i className={`fas fa-filter text-xl transition-transform duration-500 ${isExpanded ? 'rotate-180' : ''}`}></i>
                     </div>
                     <div>
                         <h2 className="text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight">
-                            {isExpanded ? 'Condense Selection' : 'Refine Selection'}
+                            {isExpanded ? (isClassic ? 'Condense Filter' : 'Condense Selection') : (isClassic ? 'Filter Selection' : 'Refine Selection')}
                         </h2>
                         <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest group-hover:text-indigo-500 transition-colors">
-                            {mode === 'student' ? 'Learner Perspective' : mode === 'teacher' ? 'Lecturer Perspective' : mode === 'room' ? 'Spatial Dashboard' : 'Crucible'}
+                            {mode === 'student' ? (isClassic ? 'Student Mode' : 'Learner Perspective') : mode === 'teacher' ? (isClassic ? 'Teacher Mode' : 'Lecturer Perspective') : mode === 'room' ? (isClassic ? 'Room Mode' : 'Spatial Dashboard') : (isClassic ? 'Exam Mode' : 'Crucible')}
                         </p>
                     </div>
                 </div>
@@ -82,22 +83,22 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                             <div className="flex flex-col gap-4 mb-6 relative z-[105]">
                                 {/* Row 1: Dropdowns */}
                                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
-                                    <Dropdown label="Faculty Discipline" value={filters.program} options={PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" isOpen={activeDropdown === 'program'} onToggle={(v) => setActiveDropdown(v ? 'program' : null)} />
-                                    <Dropdown label="Academic Term" value={filters.semester} options={SEMESTERS} onChange={(v) => setFilter('semester', v)} icon="fa-layer-group" isOpen={activeDropdown === 'semester'} onToggle={(v) => setActiveDropdown(v ? 'semester' : null)} />
-                                    <Dropdown label="Cohort" value={filters.section} options={SECTIONS} onChange={(v) => setFilter('section', v)} icon="fa-users" isOpen={activeDropdown === 'section'} onToggle={(v) => setActiveDropdown(v ? 'section' : null)} />
-                                    <Dropdown label="Temporal Frame" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
+                                    <Dropdown label={isClassic ? "Program" : "Faculty Discipline"} value={filters.program} options={PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" isOpen={activeDropdown === 'program'} onToggle={(v) => setActiveDropdown(v ? 'program' : null)} />
+                                    <Dropdown label={isClassic ? "Semester" : "Academic Term"} value={filters.semester} options={SEMESTERS} onChange={(v) => setFilter('semester', v)} icon="fa-layer-group" isOpen={activeDropdown === 'semester'} onToggle={(v) => setActiveDropdown(v ? 'semester' : null)} />
+                                    <Dropdown label={isClassic ? "Section" : "Cohort"} value={filters.section} options={SECTIONS} onChange={(v) => setFilter('section', v)} icon="fa-users" isOpen={activeDropdown === 'section'} onToggle={(v) => setActiveDropdown(v ? 'section' : null)} />
+                                    <Dropdown label={isClassic ? "Day" : "Temporal Frame"} value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
                                 </div>
                                 {/* Row 2: Subject Search (Optional) */}
                                 {settings.enableCourseSearch && (
                                     <div className="flex flex-col gap-2 relative">
-                                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Subject Discovery (Optional)</label>
+                                        <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">{isClassic ? 'Subject Search (Optional)' : 'Subject Discovery (Optional)'}</label>
                                         <div className="relative">
                                             <i className="fas fa-book-open absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
                                             <input
                                                 type="text"
                                                 value={filters.course || ''}
                                                 onChange={(e) => setFilter('course', e.target.value)}
-                                                placeholder="Strict Search (e.g. 'Calculus')"
+                                                placeholder={isClassic ? "Search Course..." : "Strict Search (e.g. 'Calculus')"}
                                                 className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner placeholder:font-medium"
                                             />
                                         </div>
@@ -110,54 +111,54 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                         {mode === 'teacher' && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 relative z-[105]">
                                 <div className="flex flex-col gap-2 relative">
-                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Lecturer Identity</label>
+                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">{isClassic ? 'Teacher Name' : 'Lecturer Identity'}</label>
                                     <div className="relative">
                                         <i className="fas fa-chalkboard-teacher absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
                                         <input
                                             type="text"
                                             value={filters.teacherName}
                                             onChange={(e) => setFilter('teacherName', e.target.value)}
-                                            placeholder="e.g. Prof. Alexander"
+                                            placeholder={isClassic ? "e.g. Mr. Smith" : "e.g. Prof. Alexander"}
                                             className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner"
                                         />
                                     </div>
                                     {settings.enableCourseSearch && (
-                                        <div className="flex flex-col gap-2 relative">
-                                            <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Subject / Course (Optional)</label>
+                                        <div className="flex flex-col gap-2 relative mt-2">
+                                            <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">{isClassic ? 'Course (Optional)' : 'Subject / Course (Optional)'}</label>
                                             <div className="relative">
                                                 <i className="fas fa-book-open absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
                                                 <input
                                                     type="text"
                                                     value={filters.course || ''}
                                                     onChange={(e) => setFilter('course', e.target.value)}
-                                                    placeholder="Strict Search (e.g. 'Calculus')"
+                                                    placeholder={isClassic ? "Search subject..." : "Strict Search (e.g. 'Calculus')"}
                                                     className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner placeholder:font-medium"
                                                 />
                                             </div>
                                         </div>
                                     )}
                                 </div>
-                                <Dropdown label="Temporal Frame" value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
+                                <Dropdown label={isClassic ? "Day" : "Temporal Frame"} value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
                             </div>
                         )}
                         {/* Room Mode */}
                         {mode === 'room' && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 relative z-[105]">
                                 <div className="flex flex-col gap-2 relative">
-                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">Spatial Designation</label>
+                                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest pl-1">{isClassic ? 'Room Number' : 'Spatial Designation'}</label>
                                     <div className="relative">
                                         <i className="fas fa-door-open absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"></i>
                                         <input
                                             type="text"
                                             value={filters.roomNumber}
                                             onChange={(e) => setFilter('roomNumber', e.target.value)}
-                                            placeholder="e.g. 107"
+                                            placeholder={isClassic ? "e.g. 107" : "Discovery Spatial..."}
                                             className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner"
                                         />
                                     </div>
                                 </div>
                                 <Dropdown
-                                    label="Temporal Frame"
+                                    label={isClassic ? "Day" : "Temporal Frame"}
                                     value={filters.day}
                                     options={DAYS_OPTIONS}
                                     onChange={(v) => setFilter('day', v)}
@@ -232,18 +233,18 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
 
                                         {/* Class Filters (Program, Semester, Section) */}
                                         <div className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            <Dropdown label="Program" value={filters.program} options={EXAM_PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" isOpen={activeDropdown === 'program'} onToggle={(v) => setActiveDropdown(v ? 'program' : null)} />
-                                            <Dropdown label="Semester" value={filters.semester} options={SEMESTERS} onChange={(v) => setFilter('semester', v)} icon="fa-layer-group" isOpen={activeDropdown === 'semester'} onToggle={(v) => setActiveDropdown(v ? 'semester' : null)} />
-                                            <Dropdown label="Section" value={filters.section} options={SECTIONS} onChange={(v) => setFilter('section', v)} icon="fa-users" isOpen={activeDropdown === 'section'} onToggle={(v) => setActiveDropdown(v ? 'section' : null)} />
+                                            <Dropdown label={isClassic ? "Program" : "Faculty Discipline"} value={filters.program} options={EXAM_PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" isOpen={activeDropdown === 'program'} onToggle={(v) => setActiveDropdown(v ? 'program' : null)} />
+                                            <Dropdown label={isClassic ? "Semester" : "Academic Term"} value={filters.semester} options={SEMESTERS} onChange={(v) => setFilter('semester', v)} icon="fa-layer-group" isOpen={activeDropdown === 'semester'} onToggle={(v) => setActiveDropdown(v ? 'semester' : null)} />
+                                            <Dropdown label={isClassic ? "Section" : "Cohort"} value={filters.section} options={SECTIONS} onChange={(v) => setFilter('section', v)} icon="fa-users" isOpen={activeDropdown === 'section'} onToggle={(v) => setActiveDropdown(v ? 'section' : null)} />
                                         </div>
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                                         <Dropdown
-                                            label="Date"
+                                            label={isClassic ? "Date" : "Temporal Index"}
                                             value={filters.date || ''}
                                             options={[
-                                                { label: 'All Dates', value: '' },
+                                                { label: isClassic ? 'All Dates' : 'Complete Index', value: '' },
                                                 ...(availableDates || []).map(d => ({ label: d, value: d }))
                                             ]}
                                             onChange={(v) => setFilter('date', v)}
@@ -251,9 +252,9 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                                             isOpen={activeDropdown === 'date'}
                                             onToggle={(v) => setActiveDropdown(v ? 'date' : null)}
                                         />
-                                        <Dropdown label="Program" value={filters.program} options={EXAM_PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" isOpen={activeDropdown === 'program'} onToggle={(v) => setActiveDropdown(v ? 'program' : null)} />
-                                        <Dropdown label="Semester" value={filters.semester} options={SEMESTERS} onChange={(v) => setFilter('semester', v)} icon="fa-layer-group" isOpen={activeDropdown === 'semester'} onToggle={(v) => setActiveDropdown(v ? 'semester' : null)} />
-                                        <Dropdown label="Section" value={filters.section} options={SECTIONS} onChange={(v) => setFilter('section', v)} icon="fa-users" isOpen={activeDropdown === 'section'} onToggle={(v) => setActiveDropdown(v ? 'section' : null)} />
+                                        <Dropdown label={isClassic ? "Program" : "Faculty Discipline"} value={filters.program} options={EXAM_PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" isOpen={activeDropdown === 'program'} onToggle={(v) => setActiveDropdown(v ? 'program' : null)} />
+                                        <Dropdown label={isClassic ? "Semester" : "Academic Term"} value={filters.semester} options={SEMESTERS} onChange={(v) => setFilter('semester', v)} icon="fa-layer-group" isOpen={activeDropdown === 'semester'} onToggle={(v) => setActiveDropdown(v ? 'semester' : null)} />
+                                        <Dropdown label={isClassic ? "Section" : "Cohort"} value={filters.section} options={SECTIONS} onChange={(v) => setFilter('section', v)} icon="fa-users" isOpen={activeDropdown === 'section'} onToggle={(v) => setActiveDropdown(v ? 'section' : null)} />
                                     </div>
                                 )}
                             </div>
@@ -286,10 +287,10 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                             {mode !== 'room' && (
                                 <div className="flex flex-col md:flex-row gap-3 md:gap-4">
                                     <button onClick={onSave} className="flex-1 md:flex-none flex items-center justify-center gap-3 px-6 md:px-8 py-3 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black hover:shadow-xl hover:shadow-indigo-500/30 hover:scale-[1.02] active:scale-95 transition-all text-sm shadow-md group border border-indigo-400/30">
-                                        <i className="fas fa-save opacity-80 group-hover:animate-pulse"></i> Save as Preferences
+                                        <i className="fas fa-save opacity-80 group-hover:animate-pulse"></i> {isClassic ? 'Save Settings' : 'Save as Preferences'}
                                     </button>
                                     <button onClick={onClear} className="flex-1 md:flex-none flex items-center justify-center gap-3 px-6 md:px-8 py-3 rounded-full border-2 border-red-500/30 text-red-500 font-black hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-500 hover:scale-[1.02] active:scale-95 transition-all text-sm shadow-sm group">
-                                        <i className="fas fa-trash-alt opacity-70 group-hover:animate-bounce"></i> Clear All
+                                        <i className="fas fa-trash-alt opacity-70 group-hover:animate-bounce"></i> {isClassic ? 'Reset All' : 'Clear All'}
                                     </button>
                                 </div>
                             )}

@@ -12,7 +12,6 @@ interface TimetablePrintViewProps {
 }
 
 export default function TimetablePrintView({ slots, day, room, mode, date, filters, generatedAt }: TimetablePrintViewProps) {
-    // Determine selection criteria text
     let selectionInfo = "";
     if (mode === 'student') {
         selectionInfo = `${filters.program || ''} ${filters.semester || ''} ${filters.section || ''}`.trim();
@@ -24,259 +23,128 @@ export default function TimetablePrintView({ slots, day, room, mode, date, filte
         selectionInfo = filters.roomNumber || "";
     }
 
-    const styles = {
-        container: {
-            width: '1220px',
-            background: '#ffffff', // Clean white for print
-            padding: '40px',
-            fontFamily: 'Inter, system-ui, sans-serif',
-            color: '#1e293b',
-        },
-        headerBlock: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '30px',
-            paddingBottom: '20px',
-            borderBottom: '2px solid #e2e8f0',
-        },
-        headerTitle: {
-            fontSize: '28px',
-            fontWeight: 900,
-            color: '#334155',
-            letterSpacing: '-1px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0px', // No gap needed if no logo
-        },
-        headerGradientText: {
-            color: '#7c3aed', // Purple-600 to match theme without gradient text clip issues
-            display: 'inline-block',
-        },
-        metaInfo: {
-            display: 'flex',
-            gap: '8px',
-            justifyContent: 'flex-end',
-        },
-        pill: {
-            background: '#f1f5f9',
-            color: '#475569',
-            fontWeight: 700,
-            fontSize: '12px',
-            padding: '6px 16px',
-            borderRadius: '9999px',
-            border: '1px solid #e2e8f0',
-        },
-        selectionLabel: {
-            fontSize: '16px',
-            fontWeight: 800,
-            color: '#334155',
-            textAlign: 'right' as const,
-            marginTop: '8px',
-            textTransform: 'uppercase' as const,
-            letterSpacing: '0.5px',
-        },
-        slotCard: (isLab: boolean, isFree: boolean, noBorderLeft: boolean = false) => {
-            // Precise Tailwind-match gradients
-            // Lecture (Blue): from-blue-50 via-blue-50/60 to-white
-            const bgBlue = 'linear-gradient(135deg, #eff6ff 0%, rgba(239, 246, 255, 0.6) 50%, #ffffff 100%)';
-            // Lab (Amber): from-amber-50 via-amber-50/60 to-white
-            const bgAmber = 'linear-gradient(135deg, #fffbeb 0%, rgba(255, 251, 235, 0.6) 50%, #ffffff 100%)';
-            // Free (Emerald): from-emerald-50 via-emerald-50/60 to-white
-            const bgEmerald = 'linear-gradient(135deg, #ecfdf5 0%, rgba(236, 253, 245, 0.6) 50%, #ffffff 100%)';
-
-            const bg = isLab ? bgAmber : isFree ? bgEmerald : bgBlue;
-            const borderColor = isLab ? 'rgba(245, 158, 11, 0.3)' : isFree ? 'rgba(16, 185, 129, 0.3)' : 'rgba(59, 130, 246, 0.3)';
-            const borderLeftColor = isLab ? '#f59e0b' : isFree ? '#10b981' : '#3b82f6';
-
-            return {
-                position: 'relative' as const,
-                background: bg,
-                borderRadius: '16px',
-                padding: '20px',
-                marginBottom: '16px',
-                borderTop: `1px solid ${borderColor}`,
-                borderRight: `1px solid ${borderColor}`,
-                borderBottom: `1px solid ${borderColor}`,
-                borderLeft: noBorderLeft ? 'none' : `6px solid ${borderLeftColor}`,
-                boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
-                minHeight: isFree ? '80px' : 'auto',
-            };
-        },
-        timeLabel: {
-            fontSize: '11px',
-            fontWeight: 900,
-            color: '#94a3b8',
-            textTransform: 'uppercase' as const,
-            letterSpacing: '1px',
-            marginBottom: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-        },
-        clashBadge: {
-            position: 'absolute' as const,
-            top: '0',
-            right: '0',
-            background: 'linear-gradient(to right, #ef4444, #dc2626)',
-            color: 'white',
-            fontSize: '10px',
-            fontWeight: 800,
-            padding: '4px 12px',
-            borderRadius: '0 16px 0 12px',
-            letterSpacing: '1px',
-        },
-        typeBadge: (isLab: boolean) => ({
-            background: isLab ? 'linear-gradient(to right, #fef3c7, #fffbeb)' : 'linear-gradient(to right, #dbeafe, #eff6ff)',
-            color: isLab ? '#92400e' : '#1e40af',
-            fontSize: '9px',
-            fontWeight: 900,
-            padding: '4px 12px',
-            borderRadius: '9999px',
-            display: 'inline-block',
-            marginBottom: '8px',
-            border: `1px solid ${isLab ? '#fcd34d' : '#93c5fd'}`,
-            letterSpacing: '0.5px',
-        }),
-        courseTitle: {
-            fontSize: '16px',
-            fontWeight: 900,
-            color: '#1e293b', // slate-800
-            marginBottom: '4px',
-            lineHeight: '1.2',
-            letterSpacing: '-0.02em',
-        },
-        instructorLabel: {
-            fontSize: '13px',
-            fontWeight: 600,
-            color: '#64748b', // slate-500
-            marginBottom: '12px',
-            display: 'block',
-        },
-        bottomRow: {
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-end',
-            marginTop: '8px',
-        },
-        roomBox: {
-            textAlign: 'right' as const,
-        },
-        roomLabel: {
-            fontSize: '12px',
-            color: '#94a3b8',
-            fontWeight: 700,
-        },
-        roomValue: {
-            color: '#334155',
-            fontWeight: 900,
-            fontSize: '13px',
-        },
-        classLabel: {
-            fontSize: '11px',
-            fontWeight: 900,
-            textTransform: 'uppercase' as const,
-            color: '#64748b',
-            letterSpacing: '0.5px',
-        },
-        freeText: {
-            color: '#10b981',
-            fontSize: '20px',
-            fontWeight: 900,
-            letterSpacing: '4px',
-            textTransform: 'uppercase' as const,
-            textAlign: 'center' as const,
-            width: '100%',
-            marginTop: '4px',
-        },
-        footer: {
-            marginTop: '40px',
-            borderTop: '1px solid #e2e8f0',
-            paddingTop: '16px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            fontSize: '11px',
-            color: '#94a3b8',
-            fontWeight: 500,
-        }
+    const getAccent = (isLab: boolean, isFree: boolean) => {
+        if (isFree) return { color: '#f59e0b', thin: 'rgba(245, 158, 11, 0.15)', bg: 'linear-gradient(135deg, #fffbeb 0%, #fef9c3 50%, #ffffff 100%)', badgeColor: '', badgeBorder: '' };
+        if (isLab) return { color: '#f59e0b', thin: 'rgba(245, 158, 11, 0.15)', bg: 'linear-gradient(135deg, #fffbeb 0%, rgba(255,251,235,0.5) 50%, #ffffff 100%)', badgeColor: '#92400e', badgeBorder: '#fcd34d' };
+        return { color: '#6366f1', thin: 'rgba(99, 102, 241, 0.12)', bg: 'linear-gradient(135deg, #eef2ff 0%, rgba(238,242,255,0.5) 50%, #ffffff 100%)', badgeColor: '#4338ca', badgeBorder: '#c7d2fe' };
     };
 
+    // Shared card wrapper with floating accent bar
+    const SlotCard = ({ accent, children, minH }: { accent: ReturnType<typeof getAccent>, children: React.ReactNode, minH?: string }) => (
+        <div style={{
+            position: 'relative',
+            background: accent.bg,
+            borderRadius: '14px',
+            padding: '18px 24px 18px 32px',
+            borderTop: `1px solid ${accent.thin}`,
+            borderRight: `1px solid ${accent.thin}`,
+            borderBottom: `1px solid ${accent.thin}`,
+            borderLeft: `1px solid ${accent.thin}`,
+            minHeight: minH || 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+        }}>
+            {/* Floating Accent Bar */}
+            <div style={{
+                position: 'absolute',
+                left: '10px',
+                top: '14px',
+                bottom: '14px',
+                width: '5px',
+                borderRadius: '9999px',
+                background: accent.color,
+            }} />
+            {children}
+        </div>
+    );
+
     return (
-        <div id="timetable-print-view" style={styles.container} >
-            <div style={styles.headerBlock}>
+        <div id="timetable-print-view" style={{ width: '1220px', background: '#ffffff', padding: '40px', fontFamily: 'Inter, system-ui, sans-serif', color: '#1e293b' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', paddingBottom: '20px', borderBottom: '2px solid #e2e8f0' }}>
                 <div>
-                    <div style={styles.headerTitle}>
-                        <span>Lucid <span style={styles.headerGradientText}>Timetable</span></span>
+                    <div style={{ fontSize: '28px', fontWeight: 900, color: '#334155', letterSpacing: '-1px' }}>
+                        Lucid <span style={{ color: '#7c3aed' }}>Timetable</span>
                     </div>
                     <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600, marginTop: '2px' }}>
-                        Generated by Lucid Aura∞ v6.9.8
+                        Generated by Lucid Aura∞ v6.11.3
                     </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                    <div style={styles.metaInfo}>
-                        <span style={styles.pill}>{day}</span>
-                        <span style={styles.pill}>{mode.toUpperCase()} MODE</span>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                        <span style={{ background: '#f1f5f9', color: '#475569', fontWeight: 700, fontSize: '12px', padding: '6px 16px', borderRadius: '9999px', borderTop: '1px solid #e2e8f0', borderRight: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', borderLeft: '1px solid #e2e8f0' }}>{day}</span>
+                        <span style={{ background: '#f1f5f9', color: '#475569', fontWeight: 700, fontSize: '12px', padding: '6px 16px', borderRadius: '9999px', borderTop: '1px solid #e2e8f0', borderRight: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', borderLeft: '1px solid #e2e8f0' }}>{mode.toUpperCase()} MODE</span>
                     </div>
-                    <div style={styles.selectionLabel}>{selectionInfo || 'ALL CLASSES'}</div>
+                    <div style={{ fontSize: '16px', fontWeight: 800, color: '#334155', textAlign: 'right', marginTop: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{selectionInfo || 'ALL CLASSES'}</div>
                 </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+            {/* Slots */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {slots.map((slot, idx) => {
                     const isFree = !slot.entries || slot.entries.length === 0;
+                    const isLab = !isFree && slot.entries[0]?.isLab;
+                    const accent = getAccent(isLab, isFree);
 
                     if (isFree) {
                         return (
-                            <div key={idx} style={styles.slotCard(false, true, true)}>
-                                <div style={styles.timeLabel}>{slot.time}</div>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                                    <div style={styles.freeText}>FREE</div>
-                                </div>
-                            </div>
+                            <SlotCard key={idx} accent={accent} minH="90px">
+                                <div style={{ fontSize: '11px', fontWeight: 700, color: '#b0b0b0', marginBottom: '6px' }}>{slot.time}</div>
+                                <div style={{ color: '#10b981', fontSize: '22px', fontWeight: 900, letterSpacing: '0.25em', textTransform: 'uppercase', textAlign: 'center', width: '100%' }}>FREE</div>
+                            </SlotCard>
                         );
                     }
 
-                    const isClash = slot.entries.length > 1;
-                    const isLab = slot.entries[0]?.isLab;
-                    const accentColor = isLab ? '#f59e0b' : '#3b82f6';
-
                     return (
-                        <div key={idx} style={styles.slotCard(isLab, false, true)}>
-
-                            {isClash && <div style={styles.clashBadge}>CLASH</div>}
-
-                            {slot.entries.map((entry, entryIdx) => (
-                                <div key={entryIdx}>
-                                    {entryIdx > 0 && <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '16px 0' }} />}
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '24px' }}>
-                                        <div style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={styles.timeLabel}>
-                                                <span>TIME:</span> {slot.time}
+                        <SlotCard key={idx} accent={accent}>
+                            {slot.entries.map((entry, ei) => (
+                                <div key={ei}>
+                                    {ei > 0 && <hr style={{ borderTop: '1px solid rgba(0,0,0,0.06)', borderRight: 'none', borderBottom: 'none', borderLeft: 'none', margin: '14px 0' }} />}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '6px' }}>
+                                                <span style={{ color: '#a78bfa' }}>TIME:</span>{'  '}
+                                                <span style={{ color: '#64748b', fontWeight: 700 }}>{slot.time}</span>
                                             </div>
-                                            <div style={styles.courseTitle}>{entry.course}</div>
-                                            <div style={styles.instructorLabel}>{entry.instructor}</div>
+                                            <div style={{ fontSize: '17px', fontWeight: 900, color: '#1e293b', marginBottom: '3px', lineHeight: '1.25', letterSpacing: '-0.01em' }}>{entry.course || 'Untitled'}</div>
+                                            <div style={{ fontSize: '13px', fontWeight: 600, color: '#94a3b8' }}>{entry.instructor || 'Staff'}</div>
                                         </div>
-                                        <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flexShrink: 0 }}>
-                                            <div style={styles.typeBadge(entry.isLab)}>
+                                        <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                                            <div style={{
+                                                background: '#fff',
+                                                color: accent.badgeColor,
+                                                fontSize: '9px',
+                                                fontWeight: 900,
+                                                padding: '4px 14px',
+                                                borderRadius: '9999px',
+                                                borderTop: `1.5px solid ${accent.badgeBorder}`,
+                                                borderRight: `1.5px solid ${accent.badgeBorder}`,
+                                                borderBottom: `1.5px solid ${accent.badgeBorder}`,
+                                                borderLeft: `1.5px solid ${accent.badgeBorder}`,
+                                                letterSpacing: '0.06em',
+                                                textTransform: 'uppercase',
+                                            }}>
                                                 {entry.isLab ? 'LABORATORY' : 'LECTURE'}
                                             </div>
-                                            <div style={{ ...styles.roomLabel, marginBottom: '2px' }}>
-                                                Room <span style={styles.roomValue}>{entry.room}</span>
+                                            <div style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 700 }}>
+                                                Room <span style={{ color: '#1e293b', fontWeight: 900 }}>{entry.room}</span>
                                             </div>
-                                            <div style={{ ...styles.classLabel, marginTop: '2px' }}>{entry.class}</div>
+                                            <div style={{ fontSize: '11px', fontWeight: 800, color: '#64748b', letterSpacing: '0.02em', textTransform: 'uppercase' }}>{entry.class}</div>
                                         </div>
                                     </div>
                                 </div>
                             ))}
-                        </div>
+                        </SlotCard>
                     );
                 })}
             </div>
 
-            <div style={styles.footer}>
+            {/* Footer */}
+            <div style={{ marginTop: '40px', borderTop: '1px solid #f1f5f9', paddingTop: '16px', display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#c0c0c0', fontWeight: 600 }}>
                 <div>https://luciduol.netlify.app</div>
                 <div>{generatedAt}</div>
             </div>
-        </div >
+        </div>
     );
 }

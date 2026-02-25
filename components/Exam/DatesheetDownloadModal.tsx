@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { DatesheetEntry } from '@/lib/exam_utils';
 import { toPng } from 'html-to-image';
+import { useSettings } from '@/lib/settings';
 
 interface DatesheetDownloadModalProps {
     isOpen: boolean;
@@ -134,7 +135,7 @@ function InlineDatesheetPrintView({ data, filters, generatedAt }: { data: Datesh
                     <h1 style={styles.title}>
                         Lucid <span style={{ color: '#7c3aed' }}>Datesheet</span>
                     </h1>
-                    <p style={styles.subtitle}>Generated via Lucid Aura∞ v6.7.2</p>
+                    <p style={styles.subtitle}>Generated via Lucid Aura∞ v6.11.3</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                     <div style={styles.dateText}>{generatedAt.split(',')[0]}</div>
@@ -216,7 +217,16 @@ function InlineDatesheetPrintView({ data, filters, generatedAt }: { data: Datesh
 
 export default function DatesheetDownloadModal({ isOpen, onClose, data, filters, onToast }: DatesheetDownloadModalProps) {
     const [isGenerating, setIsGenerating] = useState(false);
+    const [clientGeneratedAt, setClientGeneratedAt] = useState('');
     const printRef = useRef<HTMLDivElement>(null);
+    const { settings, mounted } = useSettings();
+    const isClassic = mounted && settings.wordingPreference === 'classic';
+
+    useEffect(() => {
+        if (isOpen) {
+            setClientGeneratedAt(new Date().toLocaleString());
+        }
+    }, [isOpen]);
 
     const handleDownload = async () => {
         if (!printRef.current) return;
@@ -239,11 +249,11 @@ export default function DatesheetDownloadModal({ isOpen, onClose, data, filters,
             link.href = dataUrl;
             link.click();
 
-            onToast('Datesheet Downloaded!');
+            onToast(isClassic ? 'Datesheet Downloaded!' : 'Datesheet Chronicle Exported!');
             onClose();
         } catch (e) {
             console.error("Download failed", e);
-            onToast("Failed to generate image. Please try again.");
+            onToast(isClassic ? 'Download failed. Try again.' : 'Failed to generate image. Please try again.');
             onClose(); // Close on error too
         } finally {
             setIsGenerating(false);
@@ -266,7 +276,7 @@ export default function DatesheetDownloadModal({ isOpen, onClose, data, filters,
                 <InlineDatesheetPrintView
                     data={data}
                     filters={filters}
-                    generatedAt={new Date().toLocaleString()}
+                    generatedAt={clientGeneratedAt}
                 />
             </div>
         </div>
