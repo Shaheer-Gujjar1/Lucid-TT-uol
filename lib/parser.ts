@@ -142,6 +142,12 @@ function calculateSimilarity(str1: string, str2: string): number {
 }
 
 function areDuplicateEntries(entry1: SlotEntry, entry2: SlotEntry): boolean {
+    if (entry1.isLab !== entry2.isLab) return false;
+
+    if ((entry1.room === "TBD" || entry2.room === "TBD") && entry1.cell !== entry2.cell) {
+        return false;
+    }
+
     const normalized1 = normalizeCourseName(entry1.course);
     const normalized2 = normalizeCourseName(entry2.course);
 
