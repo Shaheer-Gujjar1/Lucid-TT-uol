@@ -241,14 +241,15 @@ function cleanInstructorString(inst: string): string {
     let cleaned = inst.replace(/\b(room|lab|class).*/i, '').trim();
     cleaned = cleaned.split(/\s*[-–(]\s*/)[0].trim();
     cleaned = cleaned.replace(/\b\d{1,2}[:.]\d{2}.*/, '').trim();
-    cleaned = cleaned.replace(/\s{2,}.*/, '').trim();
+    // Normalize multi-spaces instead of truncating, to prevent dropping names like "Mr  ANWAR"
+    cleaned = cleaned.replace(/\s{2,}/g, ' ').trim();
     cleaned = cleaned.replace(/[,;]\s*.*/, '').trim();
     return cleaned || "Not Listed";
 }
 
 function extractInstructor(text: string): string {
     const lines = text.split("\n");
-    const pattern = /\b(Mr\.?|Ms\.?|Mrs\.?|Mister|Miss|Doctor|Dr\.?|Muhammad|Mufti|Hafiz|Prof\.?|New\s+Faculty|New\s+Faulty)\b/i;
+    const pattern = /\b(Mr|Ms|Mrs|Mister|Miss|Doctor|Dr|Muhammad|Mufti|Hafiz|Prof|Engr|Lec|Sir|Madam|Maam|Ar|New\s+Faculty|New\s+Faulty)(\.?)(?:\s+|$|[A-Za-z])/i;
 
     let fallbackInst: string | null = null;
 
@@ -436,16 +437,16 @@ function parseAllClasses(cell: string): ClassMatch[] {
     const matches: ClassMatch[] = [];
     // Enhanced Regex to capture:
     // 1. Standard Programs: BSCS, BSSE, etc.
-    // 2. BS Math variants: BS Math, BS Maths, BS-Math, Math-III, Maths-III (case insensitive via flag)
+    // 2. BS Math variants: BS Math, BS Maths, BS-Math, Math-III, Maths-III, BSMTS, MTS, BS-MTS, BSMATS (case insensitive)
     // 3. BSMDS variants: BSMDS, BS Mathematics for Data Science
     // 4. Semesters: Roman (I-X), Decimal (1-10), "3rd+0" combo
     // 5. Section: Optional [A-C]
 
     // Main patterns joined by |
     // Pattern 1: BSMDS / Data Science long form
-    // Pattern 2: BS Math / Maths / Mathematics
+    // Pattern 2: BS Math / Maths / Mathematics / MTS / BSMTS / BSMATS
     // Pattern 3: Standard codes (BSCS etc)
-    const regex = /(?:(BSMDS|BS\s*Mathematics\s*for\s*Data\s*Science)|(BS\s*Math(?:s|ematics)?|Math(?:s|ematics)?)|(BSCS|BSSE|BSAI|BBA(?:\s*\(?\s*2Y\s*\)?)?|BSAF(?:\s*\(?\s*2Y\s*\)?)?|BSDM|BS\w+|BS\s\w+|BS\s\d+|BBA\s\w+|BSAF\s\w+|BSDM\s\w+|\bPharmD\b|\bDPT\b|\bMLT\b|\bHND\b|(?:^|[\s/])RIT\b|\bNursing\b|BS\sUrdu|BS\sBiotech|BS\sZoology|BS\sChemistry|BS\sPhysics|BS\sEnglish|BS\sPsychology|BS\sCriminology|BS\sIR|BS\sNursing|Post\s*RN\s*Nursing|BS\sSISS|BS\sEducation|BS\sIslamic\sStudies|BS\sNutrition|BS\sMedical\sPhysics))[-\s]*(?:Sem(?:ester)?\.?\s*)?(\d+(?:rd|th|st|nd)?(?:\+\d+)?|[IVX]+)(?:[-\s]*([ABC]))?/gi;
+    const regex = /(?:(BSMDS|BS\s*Mathematics\s*for\s*Data\s*Science)|(BS(?:\s*|-)MTS|MTS|BSMATS|BS\s*Math(?:s|ematics)?|Math(?:s|ematics)?)|(BSCS|BSSE|BSAI|BBA(?:\s*\(?\s*2Y\s*\)?)?|BSAF(?:\s*\(?\s*2Y\s*\)?)?|BSDM|BS\w+|BS\s\w+|BS\s\d+|BBA\s\w+|BSAF\s\w+|BSDM\s\w+|\bPharmD\b|\bDPT\b|\bMLT\b|\bHND\b|(?:^|[\s/])RIT\b|\bNursing\b|BS\sUrdu|BS\sBiotech|BS\sZoology|BS\sChemistry|BS\sPhysics|BS\sEnglish|BS\sPsychology|BS\sCriminology|BS\sIR|BS\sNursing|Post\s*RN\s*Nursing|BS\sSISS|BS\sEducation|BS\sIslamic\sStudies|BS\sNutrition|BS\sMedical\sPhysics))[-\s]*(?:Sem(?:ester)?\.?\s*)?(\d+(?:rd|th|st|nd)?(?:\+\d+)?|[IVX]+)(?:[-\s]*([ABC]))?/gi;
 
     let m;
     while ((m = regex.exec(cell)) !== null) {
@@ -456,8 +457,10 @@ function parseAllClasses(cell: string): ClassMatch[] {
         // Normalization
         let program = rawProgram.replace(/\s+/g, ''); // Default strip spaces
 
-        // BS Math Normalization
-        if (/Math/i.test(rawProgram)) {
+        // BS Math & BSMTS Normalization
+        if (/BSMATS/i.test(rawProgram) || /MTS/i.test(rawProgram)) {
+            program = "BSMTS";
+        } else if (/Math/i.test(rawProgram)) {
             program = "BS Math";
         }
 
@@ -577,8 +580,14 @@ export function processDayData(dayData: string[][], mode: 'student' | 'teacher' 
                 };
 
                 matches = allMatches.filter(c => {
-                    const filterProg = (program || '').replace(/\s+/g, '').toUpperCase();
-                    const matchProg = (c.program || '').replace(/\s+/g, '').toUpperCase();
+                    let filterProg = (program || '').replace(/[\s-]/g, '').toUpperCase();
+                    let matchProg = (c.program || '').replace(/[\s-]/g, '').toUpperCase();
+
+                    // Cross-compatibility fix: BSMATH vs BSMTS vs MATH
+                    const mathVariants = ['BSMATH', 'BSMTS', 'BSMATS', 'MATH', 'MATHS'];
+                    if (mathVariants.includes(filterProg) && mathVariants.includes(matchProg)) {
+                        matchProg = filterProg; // Force match if they both belong to math variants
+                    }
 
                     const filterSec = (section || '').toUpperCase();
                     const matchSec = (c.section || '').toUpperCase();
@@ -634,7 +643,7 @@ export function processDayData(dayData: string[][], mode: 'student' | 'teacher' 
                 if (mode === 'student' && !match.program) continue;
 
                 let courseTitle = cell.split("\n")[0].replace(/^\d+\.\s*/, "").trim();
-                const instructorPattern = /\b(Mr\.?|Ms\.?|Mrs\.?|Mister|Miss|Doctor|Dr\.?|Muhammad|Mufti|Hafiz|Prof\.?|New\s+Faculty|New\s+Faulty)\b/i;
+                const instructorPattern = /\b(Mr|Ms|Mrs|Mister|Miss|Doctor|Dr|Muhammad|Mufti|Hafiz|Prof|Engr|Lec|Sir|Madam|Maam|Ar|New\s+Faculty|New\s+Faulty)(\.?)(?:\s+|$|[A-Za-z])/i;
                 const matchPos = courseTitle.search(instructorPattern);
                 if (matchPos > 0) {
                     const instNameFull = extractInstructor(courseTitle);
@@ -668,7 +677,7 @@ export function processDayData(dayData: string[][], mode: 'student' | 'teacher' 
                     classStr = `${match.program}-${match.semester}${match.section || ''}`;
                 } else {
                     // Fallback for teacher/room/subject mode if no strict parse
-                    const classMatch = cell.match(/(BSCS|BSSE|BSAI|BS\w+|BBA\w*|BSAF\w*|BSDM\w*|BS\w*|PharmD|DPT|MLT|HND|RIT|Nursing|BS\s\w+|BS\s\d+|BBA\s\w+|BSAF\s\w+|BSDM\s\w+)[-\s]*(\d+|[IVX]+)([ABC])?/gi);
+                    const classMatch = cell.match(/(BSMDS|BS\s*Maths?|Maths?|BSMATS|BSMTS|MTS|BSCS|BSSE|BSAI|BS\w+|BBA\w*|BSAF\w*|BSDM\w*|BS\w*|PharmD|DPT|MLT|HND|RIT|Nursing|BS\s\w+|BS\s\d+|BBA\s\w+|BSAF\s\w+|BSDM\s\w+)[-\s]*(\d+|[IVX]+)([ABC])?/gi);
                     if (classMatch) classStr = classMatch[0];
                 }
 

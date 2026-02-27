@@ -91,7 +91,7 @@ function InlineWeekPrintView({ data, mode, filters, generatedAt }: { data: { day
             <div style={s.headerBlock}>
                 <div>
                     <h1 style={s.title}>Lucid <span style={{ color: '#7c3aed' }}>Chronicle</span></h1>
-                    <p style={s.subtitle}>Generated via Lucid Aura∞ v6.11.4</p>
+                    <p style={s.subtitle}>Generated via Lucid Aura∞ v6.11.5</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '16px', fontWeight: 800, color: '#1e293b' }}>{selectionInfo || 'FULL SCHEDULE'}</div>
