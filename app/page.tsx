@@ -467,9 +467,13 @@ export default function Home() {
             // Small delay to ensure render
             await new Promise(r => setTimeout(r, 100));
 
+            // Determine if dark mode is active to set the correct background
+            const isDark = document.documentElement.classList.contains('dark');
+            const bgColor = isDark ? '#0f172a' : '#ffffff'; // slate-900 or white
+
             // Generate Image using html-to-image
             const dataUrl = await toPng(element, {
-                backgroundColor: '#ffffff',
+                backgroundColor: bgColor,
                 cacheBust: true,
                 pixelRatio: 2,
                 skipFonts: true, // Prevent CORS errors from external stylesheets
