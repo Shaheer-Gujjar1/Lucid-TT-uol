@@ -11,6 +11,8 @@ import Link from 'next/link';
 import Toast from '@/components/UI/Toast';
 import { requestNotificationPermission } from '@/lib/notification_service';
 import InfoModal from '@/components/UI/InfoModal';
+import SettingsModal from '@/components/UI/SettingsModal';
+import { useSettings } from '@/lib/settings';
 
 import ConfirmationModal from '@/components/UI/ConfirmationModal';
 
@@ -30,7 +32,9 @@ export default function EventsPage() {
     // FAB & Info Modal States
     const [isFabExpanded, setIsFabExpanded] = useState(false);
     const [showInfoModal, setShowInfoModal] = useState(false);
+    const [showSettingsModal, setShowSettingsModal] = useState(false);
     const [isOnline, setIsOnline] = useState(true);
+    const { settings } = useSettings();
 
     // Online status detection
     useEffect(() => {
@@ -247,24 +251,26 @@ export default function EventsPage() {
                     </div>
 
                     {/* AI Chat Bot (NEW) */}
-                    <button
-                        onClick={() => {
-                            // Robust activation using the global fallback
-                            if (typeof window !== 'undefined') {
-                                if ((window as any).LucidChatToggle) {
-                                    (window as any).LucidChatToggle();
-                                } else {
-                                    // Final fallback: Event
-                                    window.dispatchEvent(new CustomEvent('lucid-chat-toggle'));
+                    {settings.enableAuraAI && (
+                        <button
+                            onClick={() => {
+                                // Robust activation using the global fallback
+                                if (typeof window !== 'undefined') {
+                                    if ((window as any).LucidChatToggle) {
+                                        (window as any).LucidChatToggle();
+                                    } else {
+                                        // Final fallback: Event
+                                        window.dispatchEvent(new CustomEvent('lucid-chat-toggle'));
+                                    }
                                 }
-                            }
-                            setIsFabExpanded(false);
-                        }}
-                        className="w-12 h-12 bg-white dark:bg-slate-800 text-fuchsia-600 dark:text-fuchsia-400 rounded-full shadow-lg shadow-fuchsia-500/10 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-fuchsia-100 dark:border-slate-700"
-                        title="AI Assistant"
-                    >
-                        <i className="fas fa-robot"></i>
-                    </button>
+                                setIsFabExpanded(false);
+                            }}
+                            className="w-12 h-12 bg-white dark:bg-slate-800 text-fuchsia-600 dark:text-fuchsia-400 rounded-full shadow-lg shadow-fuchsia-500/10 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-fuchsia-100 dark:border-slate-700"
+                            title="AI Assistant"
+                        >
+                            <i className="fas fa-robot"></i>
+                        </button>
+                    )}
 
                     {/* Add Event Button */}
                     <button
@@ -283,12 +289,23 @@ export default function EventsPage() {
                     </button>
 
                     {/* Info Button */}
+                    {settings.enableAppInfo && (
+                        <button
+                            onClick={() => { setShowInfoModal(true); setIsFabExpanded(false); }}
+                            className="w-12 h-12 bg-white dark:bg-slate-800 text-blue-500 dark:text-blue-400 rounded-full shadow-lg shadow-blue-500/20 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-blue-100 dark:border-slate-700"
+                            title="App Info"
+                        >
+                            <i className="fas fa-info"></i>
+                        </button>
+                    )}
+
+                    {/* Settings Button */}
                     <button
-                        onClick={() => { setShowInfoModal(true); setIsFabExpanded(false); }}
-                        className="w-12 h-12 bg-white dark:bg-slate-800 text-blue-500 dark:text-blue-400 rounded-full shadow-lg shadow-blue-500/20 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-blue-100 dark:border-slate-700"
-                        title="App Info"
+                        onClick={() => { setShowSettingsModal(true); setIsFabExpanded(false); }}
+                        className="w-12 h-12 bg-white dark:bg-slate-800 text-teal-600 dark:text-teal-400 rounded-full shadow-lg shadow-teal-500/20 flex items-center justify-center hover:scale-110 active:scale-95 transition-all border border-teal-100 dark:border-slate-700"
+                        title="Settings"
                     >
-                        <i className="fas fa-info"></i>
+                        <i className="fas fa-cog"></i>
                     </button>
 
                 </div>
@@ -317,6 +334,7 @@ export default function EventsPage() {
             />
 
             <InfoModal isOpen={showInfoModal} onClose={() => setShowInfoModal(false)} />
+            <SettingsModal isOpen={showSettingsModal} onClose={() => setShowSettingsModal(false)} />
             {toastMsg && <Toast message={toastMsg} onClose={() => setToastMsg(null)} />}
         </div>
     );
