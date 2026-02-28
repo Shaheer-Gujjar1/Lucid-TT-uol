@@ -3,34 +3,30 @@ import { ProcessedSlot } from '@/lib/parser';
 import { toPng } from 'html-to-image';
 import { useSettings } from '@/lib/settings';
 
-interface WeekViewDownloadModalProps {
+interface DayViewDownloadModalProps {
     isOpen: boolean;
     onClose: () => void;
-    data: { day: string; slots: ProcessedSlot[] }[];
+    day: string;
+    slots: ProcessedSlot[];
     mode: 'student' | 'teacher' | 'room';
     filters: any;
     onToast: (msg: string) => void;
 }
 
-// Inline Print View — Sleek, High-End Card-Based Layout
-function InlineWeekPrintView({ data, mode, filters, generatedAt }: { data: { day: string; slots: ProcessedSlot[] }[], mode: string, filters: any, generatedAt: string }) {
-    // Flatten all entries
-    const rows: { day: string; time: string; course: string; instructor: string; room: string; classInfo: string; isLab: boolean; entriesMatched: number }[] = [];
-    data.forEach(dayData => {
-        if (!dayData.slots) return;
-        dayData.slots.forEach(slot => {
-            if (!slot.entries || slot.entries.length === 0) return;
-            slot.entries.forEach(entry => {
-                rows.push({
-                    day: dayData.day,
-                    time: slot.time,
-                    course: entry.course || 'Untitled',
-                    instructor: entry.instructor || 'Staff',
-                    room: entry.room || '-',
-                    classInfo: entry.class || '-',
-                    isLab: entry.isLab,
-                    entriesMatched: slot.entries.length // Used for clash indication if needed
-                });
+// Inline Print View — Sleek, High-End Card-Based Layout for Single Day
+function InlineDayPrintView({ day, slots, mode, filters, generatedAt }: { day: string; slots: ProcessedSlot[], mode: string, filters: any, generatedAt: string }) {
+    // Flatten all entries for the single day
+    const rows: { time: string; course: string; instructor: string; room: string; classInfo: string; isLab: boolean }[] = [];
+    slots.forEach(slot => {
+        if (!slot.entries || slot.entries.length === 0) return;
+        slot.entries.forEach(entry => {
+            rows.push({
+                time: slot.time,
+                course: entry.course || 'Untitled',
+                instructor: entry.instructor || 'Staff',
+                room: entry.room || '-',
+                classInfo: entry.class || '-',
+                isLab: entry.isLab,
             });
         });
     });
@@ -45,27 +41,24 @@ function InlineWeekPrintView({ data, mode, filters, generatedAt }: { data: { day
         selectionInfo = filters.roomNumber || "";
     }
 
-    const daySummary = data
-        .filter(d => d.slots && d.slots.some(s => s.entries && s.entries.length > 0))
-        .map(d => ({ day: d.day, count: d.slots.reduce((acc, s) => acc + (s.entries?.length || 0), 0) }));
-
     const totalClasses = rows.length;
-    const activeDays = daySummary.length;
+    const labClasses = rows.filter(r => r.isLab).length;
+    const lectureClasses = totalClasses - labClasses;
 
     const s = {
         container: { width: '1280px', background: '#f8fafc', padding: '50px', fontFamily: 'Inter, system-ui, sans-serif', color: '#0f172a' } as React.CSSProperties,
         headerBlock: { background: '#ffffff', borderRadius: '24px', padding: '32px 40px', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', border: '1px solid rgba(226, 232, 240, 0.8)' } as React.CSSProperties,
         titleBox: { display: 'flex', flexDirection: 'column' as const, gap: '4px' },
         title: { fontSize: '38px', fontWeight: 900, color: '#1e293b', letterSpacing: '-1px', margin: 0, lineHeight: 1, whiteSpace: 'nowrap' as const } as React.CSSProperties,
-        titleHighlight: { background: 'linear-gradient(135deg, #6366f1, #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', paddingRight: '4px' },
+        titleHighlight: { background: 'linear-gradient(135deg, #10b981, #0ea5e9)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', paddingRight: '4px' },
         subtitle: { fontSize: '13px', color: '#64748b', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' as const } as React.CSSProperties,
         infoBox: { textAlign: 'right' as const, display: 'flex', flexDirection: 'column' as const, alignItems: 'flex-end', gap: '8px' },
         selectionBig: { fontSize: '20px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase' as const, letterSpacing: '0.02em' } as React.CSSProperties,
         badgesRow: { display: 'flex', gap: '8px' },
         modeBadge: { background: 'linear-gradient(to right, #f1f5f9, #ffffff)', color: '#475569', fontWeight: 800, fontSize: '11px', padding: '6px 16px', borderRadius: '9999px', border: '1px solid #e2e8f0', letterSpacing: '0.05em' } as React.CSSProperties,
 
-        statsGrid: { display: 'grid', gridTemplateColumns: `repeat(${daySummary.length + 2}, 1fr)`, gap: '16px', marginBottom: '40px' } as React.CSSProperties,
-        statCardMain: { background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)', color: 'white', borderRadius: '20px', padding: '20px 24px', boxShadow: '0 10px 25px -5px rgba(99, 102, 241, 0.4)', position: 'relative' as const, overflow: 'hidden' as const } as React.CSSProperties,
+        statsGrid: { display: 'grid', gridTemplateColumns: `repeat(3, 1fr)`, gap: '16px', marginBottom: '40px' } as React.CSSProperties,
+        statCardMain: { background: 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%)', color: 'white', borderRadius: '20px', padding: '20px 24px', boxShadow: '0 10px 25px -5px rgba(14, 165, 233, 0.4)', position: 'relative' as const, overflow: 'hidden' as const } as React.CSSProperties,
         statCard: { background: '#ffffff', borderRadius: '20px', padding: '20px 24px', boxShadow: '0 4px 20px -5px rgba(0,0,0,0.03)', border: '1px solid rgba(226, 232, 240, 0.8)', display: 'flex', flexDirection: 'column' as const, justifyContent: 'center' } as React.CSSProperties,
         statLabelMain: { fontSize: '11px', fontWeight: 800, color: 'rgba(255,255,255,0.8)', textTransform: 'uppercase' as const, letterSpacing: '0.05em', marginBottom: '8px' } as React.CSSProperties,
         statValueMain: { fontSize: '32px', fontWeight: 900, color: '#ffffff', lineHeight: 1 } as React.CSSProperties,
@@ -106,11 +99,8 @@ function InlineWeekPrintView({ data, mode, filters, generatedAt }: { data: { day
         footerBrand: { fontSize: '14px', fontWeight: 800, color: '#cbd5e1' } as React.CSSProperties,
     };
 
-    // Group rows by day for the new layout
-    const daysArr = Array.from(new Set(rows.map(r => r.day)));
-
     return (
-        <div id="week-print-view" style={s.container}>
+        <div id="day-print-view" style={s.container}>
             {/* Header Block */}
             <div style={s.headerBlock}>
                 <div style={s.titleBox}>
@@ -121,7 +111,7 @@ function InlineWeekPrintView({ data, mode, filters, generatedAt }: { data: { day
                     <div style={s.selectionBig}>{selectionInfo || 'FULL SCHEDULE'}</div>
                     <div style={s.badgesRow}>
                         <div style={s.modeBadge}>{mode.toUpperCase()} MODE</div>
-                        <div style={{ ...s.modeBadge, background: '#f8fafc' }}>WEEK VIEW</div>
+                        <div style={{ ...s.modeBadge, background: '#f8fafc' }}>DAY VIEW</div>
                     </div>
                 </div>
             </div>
@@ -135,72 +125,64 @@ function InlineWeekPrintView({ data, mode, filters, generatedAt }: { data: { day
                     <div style={s.statValueMain}>{totalClasses}</div>
                 </div>
                 <div style={s.statCard}>
-                    <div style={s.statLabel}>Active Days</div>
-                    <div style={s.statValue}>{activeDays}</div>
+                    <div style={s.statLabel}>Lectures</div>
+                    <div style={s.statValue}>{lectureClasses}</div>
                 </div>
-                {daySummary.map((ds, i) => (
-                    <div key={i} style={s.statCard}>
-                        <div style={s.statLabel}>{ds.day.slice(0, 3)}</div>
-                        <div style={s.statValue}>{ds.count}</div>
-                    </div>
-                ))}
+                <div style={s.statCard}>
+                    <div style={s.statLabel}>Laboratories</div>
+                    <div style={s.statValue}>{labClasses}</div>
+                </div>
             </div>
 
             {/* List Layout */}
             <div style={s.listContainer}>
-                {daysArr.map(dayText => {
-                    const dayRows = rows.filter(r => r.day === dayText);
-                    return (
-                        <div key={dayText} style={s.dayGroup}>
-                            <div style={s.dayHeader}>
-                                <div style={s.dayTitle}>{dayText}</div>
-                                <div style={s.dayBadge}>{dayRows.length} Classes</div>
-                            </div>
-
-                            <div>
-                                {dayRows.map((row, i) => (
-                                    <div key={i} style={s.rowCard}>
-                                        {/* Status Line Indicator */}
-                                        <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: row.isLab ? '#f59e0b' : '#6366f1' }}></div>
-
-                                        <div style={s.timeCol}>
-                                            <div style={s.timeLabel}>Time</div>
-                                            <div style={s.timeValue}>{row.time}</div>
-                                        </div>
-
-                                        <div style={s.courseCol}>
-                                            <div style={s.courseName}>{row.course}</div>
-                                            <div style={row.isLab ? s.courseTypeBadgeLab : s.courseTypeBadgeLec}>
-                                                {row.isLab ? 'Laboratory' : 'Lecture'}
-                                            </div>
-                                        </div>
-
-                                        <div style={s.instructorCol}>
-                                            <div style={s.instructorLabel}>Instructor</div>
-                                            <div style={s.instructorValue}>{row.instructor}</div>
-                                        </div>
-
-                                        <div style={s.roomCol}>
-                                            <div style={s.roomLabel}>Room</div>
-                                            <div style={s.roomValue}>{row.room}</div>
-                                        </div>
-
-                                        <div style={s.classCol}>
-                                            <div style={s.classLabel}>Class</div>
-                                            <div style={s.classValue}>{row.classInfo}</div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    );
-                })}
-
-                {rows.length === 0 && (
-                    <div style={{ padding: '60px', textAlign: 'center', background: '#ffffff', borderRadius: '24px', border: '2px dashed #e2e8f0' }}>
-                        <div style={{ fontSize: '20px', fontWeight: 800, color: '#94a3b8' }}>No classes scheduled for this selection.</div>
+                <div style={s.dayGroup}>
+                    <div style={s.dayHeader}>
+                        <div style={s.dayTitle}>{day}</div>
+                        <div style={s.dayBadge}>{totalClasses} Classes</div>
                     </div>
-                )}
+
+                    <div>
+                        {rows.map((row, i) => (
+                            <div key={i} style={s.rowCard}>
+                                {/* Status Line Indicator */}
+                                <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: row.isLab ? '#f59e0b' : '#6366f1' }}></div>
+
+                                <div style={s.timeCol}>
+                                    <div style={s.timeLabel}>Time</div>
+                                    <div style={s.timeValue}>{row.time}</div>
+                                </div>
+
+                                <div style={s.courseCol}>
+                                    <div style={s.courseName}>{row.course}</div>
+                                    <div style={row.isLab ? s.courseTypeBadgeLab : s.courseTypeBadgeLec}>
+                                        {row.isLab ? 'Laboratory' : 'Lecture'}
+                                    </div>
+                                </div>
+
+                                <div style={s.instructorCol}>
+                                    <div style={s.instructorLabel}>Instructor</div>
+                                    <div style={s.instructorValue}>{row.instructor}</div>
+                                </div>
+
+                                <div style={s.roomCol}>
+                                    <div style={s.roomLabel}>Room</div>
+                                    <div style={s.roomValue}>{row.room}</div>
+                                </div>
+
+                                <div style={s.classCol}>
+                                    <div style={s.classLabel}>Class</div>
+                                    <div style={s.classValue}>{row.classInfo}</div>
+                                </div>
+                            </div>
+                        ))}
+                        {rows.length === 0 && (
+                            <div style={{ padding: '60px', textAlign: 'center', background: '#ffffff', borderRadius: '24px', border: '2px dashed #e2e8f0' }}>
+                                <div style={{ fontSize: '20px', fontWeight: 800, color: '#94a3b8' }}>No classes scheduled for this selection.</div>
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
 
             <div style={s.footer}>
@@ -212,7 +194,7 @@ function InlineWeekPrintView({ data, mode, filters, generatedAt }: { data: { day
     );
 }
 
-export default function WeekViewDownloadModal({ isOpen, onClose, data, mode, filters, onToast }: WeekViewDownloadModalProps) {
+export default function DayViewDownloadModal({ isOpen, onClose, day, slots, mode, filters, onToast }: DayViewDownloadModalProps) {
     const [isGenerating, setIsGenerating] = useState(false);
     const [clientGeneratedAt, setClientGeneratedAt] = useState('');
     const printRef = useRef<HTMLDivElement>(null);
@@ -240,13 +222,13 @@ export default function WeekViewDownloadModal({ isOpen, onClose, data, mode, fil
             });
 
             const dateStr = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
-            let filename = `Chronicle-WeekView`;
+            let filename = `Chronicle-DayView`;
             if (mode === 'student') {
-                filename = `Chronicle-${filters.program || 'Schedule'}-${filters.semester || ''}${filters.section || ''}-Week-${dateStr}`;
+                filename = `Chronicle-${filters.program || 'Schedule'}-${filters.semester || ''}${filters.section || ''}-${day}-${dateStr}`;
             } else if (mode === 'teacher') {
-                filename = `Chronicle-${filters.teacherName || 'Teacher'}-Week-${dateStr}`;
+                filename = `Chronicle-${filters.teacherName || 'Teacher'}-${day}-${dateStr}`;
             } else if (mode === 'room') {
-                filename = `Chronicle-${filters.roomNumber || 'Room'}-Week-${dateStr}`;
+                filename = `Chronicle-${filters.roomNumber || 'Room'}-${day}-${dateStr}`;
             }
             filename = filename.replace(/--+/g, '-').replace(/-$/, '');
 
@@ -255,10 +237,10 @@ export default function WeekViewDownloadModal({ isOpen, onClose, data, mode, fil
             link.href = dataUrl;
             link.click();
 
-            onToast(isClassic ? 'Week view downloaded!' : 'Chronicle Export Completed!');
+            onToast(isClassic ? 'Day view downloaded!' : 'Chronicle Export Completed!');
             onClose();
         } catch (e) {
-            console.error("Week view download failed", e);
+            console.error("Day view download failed", e);
             onToast(isClassic ? 'Download failed. Try again.' : 'Export process encountered an interference.');
             onClose();
         } finally {
@@ -277,8 +259,9 @@ export default function WeekViewDownloadModal({ isOpen, onClose, data, mode, fil
     return (
         <div style={{ position: 'fixed', left: '-9999px', top: 0, opacity: 0, pointerEvents: 'none' }}>
             <div ref={printRef}>
-                <InlineWeekPrintView
-                    data={data}
+                <InlineDayPrintView
+                    day={day}
+                    slots={slots}
                     mode={mode}
                     filters={filters}
                     generatedAt={clientGeneratedAt}

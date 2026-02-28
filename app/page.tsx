@@ -24,6 +24,7 @@ import { ProcessedSlot, DAYS, processDayData } from '@/lib/parser';
 import { checkAndSync, detectSheetChanges } from '@/lib/sync_service';
 import CondensedWeekViewExport from '@/components/Timetable/CondensedWeekViewExport';
 import WeekViewDownloadModal from '@/components/Timetable/WeekViewDownloadModal';
+import DayViewDownloadModal from '@/components/Timetable/DayViewDownloadModal';
 
 
 
@@ -69,6 +70,7 @@ export default function Home() {
     const [showDeveloperDownloadModal, setShowDeveloperDownloadModal] = useState(false);
     const [showChronicleExportModal, setShowChronicleExportModal] = useState(false);
     const [showWeekViewDownloadModal, setShowWeekViewDownloadModal] = useState(false);
+    const [showDayViewDownloadModal, setShowDayViewDownloadModal] = useState(false);
     const [examRefreshTrigger, setExamRefreshTrigger] = useState(0);
     const [syncVersion, setSyncVersion] = useState(0);
 
@@ -440,6 +442,13 @@ export default function Home() {
         if (mode === 'exam' && examView === 'datesheet') {
             setShowDatesheetDownloadModal(true);
             return;
+        }
+
+        if (view === 'day' && mode !== 'exam') {
+            if (settings.exportDayStyle === 'normal') {
+                setShowDayViewDownloadModal(true);
+                return;
+            }
         }
 
         if (view === 'week') {
@@ -986,6 +995,16 @@ export default function Home() {
                     isOpen={showSeatingPlanDownloadModal}
                     onClose={() => setShowSeatingPlanDownloadModal(false)}
                     data={seatingData}
+                    filters={filters}
+                    onToast={setToastMsg}
+                />
+
+                <DayViewDownloadModal
+                    isOpen={showDayViewDownloadModal}
+                    onClose={() => setShowDayViewDownloadModal(false)}
+                    day={filters.day || DAYS[(new Date().getDay() + 6) % 7]}
+                    slots={slots as ProcessedSlot[]}
+                    mode={mode as 'student' | 'teacher' | 'room'}
                     filters={filters}
                     onToast={setToastMsg}
                 />

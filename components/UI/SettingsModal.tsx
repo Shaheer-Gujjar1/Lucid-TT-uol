@@ -219,6 +219,21 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                         </select>
                     </div>
 
+                    <div className="flex items-center justify-between border-t border-slate-100 dark:border-white/5 pt-6 px-2">
+                        <div>
+                            <h4 className="font-black text-slate-800 dark:text-slate-200 tracking-tight italic">{isClassic ? 'Day View Export' : 'Chronicle Export Style'}</h4>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Choose the visual style for downloaded images.' : 'Toggle between UI Replica and Document Layout.'}</p>
+                        </div>
+                        <select
+                            value={settings.exportDayStyle || 'fancy'}
+                            onChange={(e) => saveSettings({ ...settings, exportDayStyle: e.target.value as any })}
+                            className="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-black rounded-xl px-4 py-2 border border-slate-200 dark:border-white/5 shadow-sm outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer"
+                        >
+                            <option value="fancy">FANCY (App Replica)</option>
+                            <option value="normal">NORMAL (Document)</option>
+                        </select>
+                    </div>
+
                     <div
                         onClick={() => toggleSetting('enableCourseSearch')}
                         className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
