@@ -307,6 +307,20 @@ export default function Home() {
         // DEBUG LOGGING
         console.log(`FetchData PROCEEDING. Day: ${activeDay}`);
 
+        // EARLY RETURNS to prevent massive processing lag when filters are empty (e.g. during mode switch)
+        if (mode === 'student' && !filters.program && !filters.semester && !filters.section && !filters.course) {
+            setSlots([]);
+            return;
+        }
+        if (mode === 'teacher' && !filters.teacherName && !filters.course) {
+            setSlots([]);
+            return;
+        }
+        if (mode === 'room' && !filters.roomNumber) {
+            setSlots([]);
+            return;
+        }
+
         // TRY LOCAL FILTERING WITH PERFECT PARITY (Using processDayData)
         const localRawData = responseCache.current['full_data'];
 
@@ -339,14 +353,6 @@ export default function Home() {
             console.log("No local raw data found. Falling back or waiting for sync.");
         }
 
-        // FALLBACK TO API (Only if local data is missing - unlikely with sync)
-        if (mode === 'student' && !filters.program && !filters.semester && !filters.section && !filters.course) {
-            if (!localRawData) setSlots([]);
-            return;
-        }
-        if (mode === 'teacher' && !filters.teacherName) return;
-        if (mode === 'room' && !filters.roomNumber) return;
-
         // API Params construction (Fallback)
         const params = new URLSearchParams({
             day: activeDay,
@@ -363,7 +369,7 @@ export default function Home() {
         setLoading(true);
         setError(null);
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        const timeoutId = setTimeout(() => controller.abort("Timeout"), 10000);
 
         try {
             const res = await fetch(`/api/timetable?${params}`, { signal: controller.signal });
@@ -380,7 +386,11 @@ export default function Home() {
     }, [mode, filters, view, syncVersion]); // Added syncVersion to avoid stale closure
 
     useEffect(() => {
-        fetchData();
+        const timer = setTimeout(() => {
+            fetchData();
+        }, 150); // Debounce to prevent lag during rapid typing in search fields
+
+        return () => clearTimeout(timer);
     }, [fetchData]);
 
     const handleSetFilter = (key: keyof typeof filters, value: string) => {

@@ -21,7 +21,7 @@ export interface AppSettings {
 export const AUSTERE_CONFIG: AppSettings = {
     enableGPA: false, enableEvents: false, enableOnlineIndicator: false, enableAuraAI: false, enableAppInfo: false,
     defaultMode: 'student', enableCourseSearch: false, notificationStrategy: 'none', enableRoomMode: false,
-    enableCrucible: false, enableWeekView: false, wordingPreference: 'classic', exportDayStyle: 'normal',
+    enableCrucible: false, enableWeekView: false, wordingPreference: 'classic', exportDayStyle: 'fancy',
 };
 
 export const HARMONIZED_CONFIG: AppSettings = {

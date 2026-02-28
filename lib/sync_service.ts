@@ -9,7 +9,7 @@ export interface SyncMetadata {
 
 export async function fetchAllTimetableData() {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+    const timeoutId = setTimeout(() => controller.abort("Timeout"), 10000); // 10s timeout
     try {
         const res = await fetch('/api/timetable?day=all&mode=student&raw=true', { signal: controller.signal });
         if (!res.ok) throw new Error('Failed to fetch from server');
@@ -61,7 +61,7 @@ export async function detectSheetChanges() {
     if (typeof window === 'undefined') return false;
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+    const timeoutId = setTimeout(() => controller.abort("Timeout"), 5000); // 5s timeout
 
     try {
         const res = await fetch('/api/timetable?meta=true', { signal: controller.signal });

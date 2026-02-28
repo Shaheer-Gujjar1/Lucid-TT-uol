@@ -50,7 +50,7 @@ function InlineDayPrintView({ day, slots, mode, filters, generatedAt }: { day: s
         headerBlock: { background: '#ffffff', borderRadius: '24px', padding: '32px 40px', boxShadow: '0 10px 40px -10px rgba(0,0,0,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', border: '1px solid rgba(226, 232, 240, 0.8)' } as React.CSSProperties,
         titleBox: { display: 'flex', flexDirection: 'column' as const, gap: '4px' },
         title: { fontSize: '38px', fontWeight: 900, color: '#1e293b', letterSpacing: '-1px', margin: 0, lineHeight: 1, whiteSpace: 'nowrap' as const } as React.CSSProperties,
-        titleHighlight: { background: 'linear-gradient(135deg, #10b981, #0ea5e9)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', paddingRight: '4px' },
+        titleHighlight: { background: 'linear-gradient(135deg, #6366f1, #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', paddingRight: '4px' },
         subtitle: { fontSize: '13px', color: '#64748b', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' as const } as React.CSSProperties,
         infoBox: { textAlign: 'right' as const, display: 'flex', flexDirection: 'column' as const, alignItems: 'flex-end', gap: '8px' },
         selectionBig: { fontSize: '20px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase' as const, letterSpacing: '0.02em' } as React.CSSProperties,
@@ -58,7 +58,7 @@ function InlineDayPrintView({ day, slots, mode, filters, generatedAt }: { day: s
         modeBadge: { background: 'linear-gradient(to right, #f1f5f9, #ffffff)', color: '#475569', fontWeight: 800, fontSize: '11px', padding: '6px 16px', borderRadius: '9999px', border: '1px solid #e2e8f0', letterSpacing: '0.05em' } as React.CSSProperties,
 
         statsGrid: { display: 'grid', gridTemplateColumns: `repeat(3, 1fr)`, gap: '16px', marginBottom: '40px' } as React.CSSProperties,
-        statCardMain: { background: 'linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%)', color: 'white', borderRadius: '20px', padding: '20px 24px', boxShadow: '0 10px 25px -5px rgba(14, 165, 233, 0.4)', position: 'relative' as const, overflow: 'hidden' as const } as React.CSSProperties,
+        statCardMain: { background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)', color: 'white', borderRadius: '20px', padding: '20px 24px', boxShadow: '0 10px 25px -5px rgba(99, 102, 241, 0.4)', position: 'relative' as const, overflow: 'hidden' as const } as React.CSSProperties,
         statCard: { background: '#ffffff', borderRadius: '20px', padding: '20px 24px', boxShadow: '0 4px 20px -5px rgba(0,0,0,0.03)', border: '1px solid rgba(226, 232, 240, 0.8)', display: 'flex', flexDirection: 'column' as const, justifyContent: 'center' } as React.CSSProperties,
         statLabelMain: { fontSize: '11px', fontWeight: 800, color: 'rgba(255,255,255,0.8)', textTransform: 'uppercase' as const, letterSpacing: '0.05em', marginBottom: '8px' } as React.CSSProperties,
         statValueMain: { fontSize: '32px', fontWeight: 900, color: '#ffffff', lineHeight: 1 } as React.CSSProperties,
@@ -71,7 +71,7 @@ function InlineDayPrintView({ day, slots, mode, filters, generatedAt }: { day: s
         dayTitle: { fontSize: '24px', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.5px' } as React.CSSProperties,
         dayBadge: { background: '#f8fafc', color: '#64748b', fontSize: '12px', fontWeight: 800, padding: '4px 12px', borderRadius: '8px', border: '1px solid #e2e8f0' },
 
-        rowCard: { display: 'grid', gridTemplateColumns: '120px 1fr 200px 140px 100px', gap: '20px', alignItems: 'center', padding: '20px', borderRadius: '16px', background: '#f8fafc', marginBottom: '12px', border: '1px solid #f1f5f9', position: 'relative' as const, overflow: 'hidden' as const } as React.CSSProperties,
+        rowCard: { display: 'grid', gridTemplateColumns: '120px 1fr 200px 140px', gap: '20px', alignItems: 'center', padding: '20px', borderRadius: '16px', background: '#f8fafc', marginBottom: '12px', border: '1px solid #f1f5f9', position: 'relative' as const, overflow: 'hidden' as const } as React.CSSProperties,
 
         timeCol: { display: 'flex', flexDirection: 'column' as const, gap: '4px' },
         timeLabel: { fontSize: '10px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' as const, letterSpacing: '0.05em' } as React.CSSProperties,
@@ -90,10 +90,6 @@ function InlineDayPrintView({ day, slots, mode, filters, generatedAt }: { day: s
         roomLabel: { fontSize: '10px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' as const, letterSpacing: '0.05em' } as React.CSSProperties,
         roomValue: { fontSize: '16px', fontWeight: 900, color: '#1e293b' } as React.CSSProperties,
 
-        classCol: { display: 'flex', flexDirection: 'column' as const, gap: '4px', alignItems: 'flex-end' as const },
-        classLabel: { fontSize: '10px', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase' as const, letterSpacing: '0.05em' } as React.CSSProperties,
-        classValue: { background: '#ffffff', color: '#334155', fontSize: '12px', fontWeight: 800, padding: '6px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' } as React.CSSProperties,
-
         footer: { marginTop: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 20px' },
         footerText: { fontSize: '12px', color: '#94a3b8', fontWeight: 600, letterSpacing: '0.02em' } as React.CSSProperties,
         footerBrand: { fontSize: '14px', fontWeight: 800, color: '#cbd5e1' } as React.CSSProperties,
@@ -105,7 +101,7 @@ function InlineDayPrintView({ day, slots, mode, filters, generatedAt }: { day: s
             <div style={s.headerBlock}>
                 <div style={s.titleBox}>
                     <h1 style={s.title}>Lucid <span style={s.titleHighlight}>Chronicle</span></h1>
-                    <div style={s.subtitle}>Generated via Lucid Aura∞ v6.11.5</div>
+                    <div style={s.subtitle}>Generated via Lucid Aura∞ v6.12.2</div>
                 </div>
                 <div style={s.infoBox}>
                     <div style={s.selectionBig}>{selectionInfo || 'FULL SCHEDULE'}</div>
@@ -168,11 +164,6 @@ function InlineDayPrintView({ day, slots, mode, filters, generatedAt }: { day: s
                                 <div style={s.roomCol}>
                                     <div style={s.roomLabel}>Room</div>
                                     <div style={s.roomValue}>{row.room}</div>
-                                </div>
-
-                                <div style={s.classCol}>
-                                    <div style={s.classLabel}>Class</div>
-                                    <div style={s.classValue}>{row.classInfo}</div>
                                 </div>
                             </div>
                         ))}

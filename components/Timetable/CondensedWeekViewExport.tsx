@@ -206,7 +206,7 @@ export default function CondensedWeekViewExport({ data, mode, filters, generated
                     <h1 style={s.title}>
                         Lucid <span style={{ color: '#7c3aed' }}>Chronicle</span>
                     </h1>
-                    <p style={s.subtitle}>Generated via Lucid Aura∞ v6.11.5</p>
+                    <p style={s.subtitle}>Generated via Lucid Aura∞ v6.12.2</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '16px', fontWeight: 800, color: '#1e293b' }}>
