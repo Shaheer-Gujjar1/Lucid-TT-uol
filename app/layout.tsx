@@ -16,9 +16,46 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-    title: "Lucid Aura∞ v6.12.5",
+    title: "Lucid Aura∞ | UOL Timetable, exams & Academic Suite",
+    description: "Lucid Aura is the premier academic utility for UOL. Access dynamic timetables, intelligent exam planning, and performance analytics in one high-performance interface. No data collection, 100% frontend privacy.",
+    keywords: ["Lucid Aura", "UOL Timetable", "University of Lahore", "UOL Exam Seating Plan", "GPA Calculator", "Academic Suite", "Student Timetable"],
+    authors: [{ name: "Shaheer Ahmed" }],
+    creator: "Shaheer Ahmed",
+    publisher: "Lucid Dynamics",
+    formatDetection: {
+        email: false,
+        address: false,
+        telephone: false,
+    },
+    metadataBase: new URL("https://luciduol.netlify.app"),
+    alternates: {
+        canonical: "/",
+    },
+    openGraph: {
+        title: "Lucid Aura∞ - UOL Timetable & Academic Suite",
+        description: "The ultimate student companion for UOL. Timetables, exams, and GPA tracking with a magical interface.",
+        url: "https://luciduol.netlify.app",
+        siteName: "Lucid Aura",
+        images: [
+            {
+                url: "/logo-primary.png",
+                width: 800,
+                height: 600,
+                alt: "Lucid Aura Logo",
+            },
+        ],
+        locale: "en_US",
+        type: "website",
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Lucid Aura∞ - UOL Academic Utility",
+        description: "Intelligent timetable & academic tools for University of Lahore students.",
+        images: ["/logo-primary.png"],
+    },
     icons: {
         icon: "/favicon.ico",
+        apple: "/logo-primary.png",
     },
 };
 

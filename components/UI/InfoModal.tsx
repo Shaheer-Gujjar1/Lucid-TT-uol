@@ -10,7 +10,7 @@ interface InfoModalProps {
 
 export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
     const { settings, mounted } = useSettings();
-    const [activeTab, setActiveTab] = useState<'about' | 'features' | 'aura' | 'credits'>('about');
+    const [activeTab, setActiveTab] = useState<'about' | 'features' | 'aura' | 'legal'>('about');
     const isClassic = mounted && settings.wordingPreference === 'classic';
 
     if (!isOpen) return null;
@@ -51,7 +51,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                 </div>
 
                 {/* Navigation Tabs */}
-                <div className="flex p-2 gap-2 bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-200/50 dark:border-slate-700/50">
+                <div className="flex p-2 gap-2 bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-200/50 dark:border-slate-700/50 overflow-x-auto no-scrollbar">
                     <TabButton
                         active={activeTab === 'about'}
                         onClick={() => setActiveTab('about')}
@@ -71,10 +71,10 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                         label={isClassic ? "Sync" : "Protocols"}
                     />
                     <TabButton
-                        active={activeTab === 'credits'}
-                        onClick={() => setActiveTab('credits')}
-                        icon="fa-code"
-                        label="Credits"
+                        active={activeTab === 'legal'}
+                        onClick={() => setActiveTab('legal')}
+                        icon="fa-balance-scale"
+                        label="Legal"
                     />
                 </div>
 
@@ -85,17 +85,16 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                         <div className="space-y-6 animate-fade-in">
                             <div className="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/30 text-center">
                                 <p className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    <span className="font-bold text-indigo-600 dark:text-indigo-400">Lucid Aura∞ v6.12.5</span> is the premier academic utility for UOL. It integrates dynamic timetables, intelligent planning, and performance analytics into one high-performance interface.
+                                    <span className="font-bold text-indigo-600 dark:text-indigo-400">Lucid Aura∞ v6.12.6</span> is the premier academic utility for UOL. It integrates dynamic timetables, intelligent planning, and performance analytics into one high-performance interface.
                                 </p>
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
-                                <StatCard label="Version" value="6.12.5" icon="fa-code-branch" />
+                                <StatCard label="Version" value="6.12.6" icon="fa-code-branch" />
                                 <StatCard label="Release" value="SEPT 2025" icon="fa-calendar-check" />
                             </div>
 
                             <div className="text-center pt-2">
-                                <p className="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-2">Developer Portfolio</p>
                                 <div className="flex justify-center">
                                     <a
                                         href="https://quantam-bio.netlify.app"
@@ -106,6 +105,19 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                                         <i className="fas fa-globe"></i>
                                         quantam-bio.netlify.app
                                     </a>
+                                </div>
+                            </div>
+
+                            <div className="pt-4 border-t border-slate-100 dark:border-slate-800/50">
+                                <div className="flex flex-col items-center text-center p-6 rounded-3xl bg-slate-50/50 dark:bg-slate-800/20 border border-slate-100 dark:border-slate-800/50">
+                                    <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 p-[2px] mb-3 shadow-lg">
+                                        <div className="w-full h-full rounded-full bg-white dark:bg-slate-900 flex items-center justify-center">
+                                            <span className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">SA</span>
+                                        </div>
+                                    </div>
+                                    <h3 className="text-lg font-bold text-slate-800 dark:text-white">Shaheer Ahmed</h3>
+                                    <p className="text-xs font-medium text-indigo-500 dark:text-indigo-400">Sole Developer & Designer</p>
+                                    <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-bold">BSCS • University of Lahore</p>
                                 </div>
                             </div>
                         </div>
@@ -192,7 +204,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                                 <ul className="space-y-2">
                                     <li className="flex items-start gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-bold lowercase leading-tight">
                                         <i className="fas fa-caret-right text-indigo-500 mt-1"></i>
-                                        <span>Aura remembers your identity & class context automatically.</span>
+                                        <span>Unified Search: instantly locate classrooms, faculty, or subjects.</span>
                                     </li>
                                     <li className="flex items-start gap-2 text-[11px] text-slate-500 dark:text-slate-400 font-bold lowercase leading-tight">
                                         <i className="fas fa-caret-right text-indigo-500 mt-1"></i>
@@ -203,22 +215,76 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                         </div>
                     )}
 
-                    {activeTab === 'credits' && (
+
+                    {activeTab === 'legal' && (
                         <div className="space-y-6 animate-fade-in">
-                            <div className="flex flex-col items-center text-center p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-800">
-                                <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 p-[2px] mb-4 shadow-lg">
-                                    <div className="w-full h-full rounded-full bg-white dark:bg-slate-900 flex items-center justify-center">
-                                        <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">SA</span>
+                            {/* Privacy Policy Detailed */}
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2 px-1">
+                                    <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                                        <i className="fas fa-user-shield"></i>
                                     </div>
+                                    <h4 className="text-sm font-black uppercase tracking-widest text-slate-700 dark:text-slate-200">Privacy Policy</h4>
                                 </div>
-                                <h3 className="text-xl font-bold text-slate-800 dark:text-white">Shaheer Ahmed</h3>
-                                <p className="text-sm font-medium text-indigo-500 dark:text-indigo-400 mb-1">Sole Developer & Designer</p>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">BSCS • University of Lahore</p>
+                                <div className="p-4 rounded-3xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50 space-y-4">
+                                    <LegalPoint
+                                        icon="fa-server"
+                                        title="Zero Backend Interaction"
+                                        desc="Lucid Aura is a strictly frontend application. We do not maintain any servers, databases, or cloud processing units that could store your personal data."
+                                    />
+                                    <LegalPoint
+                                        icon="fa-database"
+                                        title="Local Storage Architecture"
+                                        desc="Your preferences (program, semester, section) are stored exclusively on your device's LocalStorage. This data never leaves your browser."
+                                    />
+                                    <LegalPoint
+                                        icon="fa-eye-slash"
+                                        title="No Tracking or Cookies"
+                                        desc="We do not use tracking pixels, fingerprinting, or invasive cookies. Your academic searches and interactions remain private to you."
+                                    />
+                                    <LegalPoint
+                                        icon="fa-network-wired"
+                                        title="Client-Side Processing"
+                                        desc="All timetable filtering and parsing are performed locally in your browser. The app only fetches public data sheets from official sources."
+                                    />
+                                </div>
                             </div>
 
-                            <div className="text-center">
-                                <p className="text-xs text-slate-400 italic">
-                                    "Crafting digital experiences that feel magical."
+                            {/* Terms of Service Detailed */}
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2 px-1">
+                                    <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                                        <i className="fas fa-file-contract"></i>
+                                    </div>
+                                    <h4 className="text-sm font-black uppercase tracking-widest text-slate-700 dark:text-slate-200">Terms of Service</h4>
+                                </div>
+                                <div className="p-4 rounded-3xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-700/50 space-y-4">
+                                    <LegalPoint
+                                        icon="fa-vial"
+                                        title="Algorithm Accuracy"
+                                        desc="Data is derived from official spreadsheets. While our smart-filtering algorithm is high-precision, no automated filter is guaranteed 100% accurate."
+                                    />
+                                    <LegalPoint
+                                        icon="fa-shield-alt"
+                                        title="Verification Responsibility"
+                                        desc="Users are advised to verify critical exam venues and lecture timings with official University of Lahore (UOL) portals in case of discrepancy."
+                                    />
+                                    <LegalPoint
+                                        icon="fa-landmark"
+                                        title="Affiliation Disclaimer"
+                                        desc="Lucid Aura is an independent academic utility developed for students. It is not an official branch of the University of Lahore administration."
+                                    />
+                                    <LegalPoint
+                                        icon="fa-plug"
+                                        title="Source Dependency"
+                                        desc="Application functionality depends on the availability and integrity of source public data sheets. We are not responsible for errors in the source data."
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="text-center pb-2">
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                                    Effective: September 2025
                                 </p>
                             </div>
                         </div>
@@ -290,6 +356,22 @@ function FeatureRow({ icon, color, bg, title, desc }: { icon: string, color: str
             <div>
                 <h4 className="font-bold text-slate-700 dark:text-slate-200 text-sm">{title}</h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400 leading-tight mt-1">{desc}</p>
+            </div>
+        </div>
+    );
+}
+
+function LegalPoint({ icon, title, desc }: { icon: string, title: string, desc: string }) {
+    return (
+        <div className="flex gap-3">
+            <div className="pt-0.5">
+                <div className="w-5 h-5 rounded bg-white dark:bg-slate-700 shadow-sm flex items-center justify-center text-slate-400 text-[10px]">
+                    <i className={`fas ${icon}`}></i>
+                </div>
+            </div>
+            <div className="space-y-0.5">
+                <h5 className="text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">{title}</h5>
+                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 leading-relaxed italic">{desc}</p>
             </div>
         </div>
     );
