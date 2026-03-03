@@ -12,7 +12,7 @@ export default function Footer() {
                     </a>
                     <span className="hidden md:block text-slate-300 dark:text-slate-700">|</span>
                     <p className="flex items-center gap-2">
-                        <i className="fas fa-code-branch text-purple-400"></i> v6.12.2
+                        <i className="fas fa-code-branch text-purple-400"></i> v6.12.5
 
                     </p>
                 </div>

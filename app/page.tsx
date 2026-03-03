@@ -474,6 +474,7 @@ export default function Home() {
 
         setToastMsg(isClassic ? 'Downloading...' : 'Initiating Chronicle Export...');
 
+
         try {
             const { toPng } = await import('html-to-image');
             const element = document.getElementById('timetable-print-view');
@@ -486,21 +487,20 @@ export default function Home() {
             // Small delay to ensure render
             await new Promise(r => setTimeout(r, 100));
 
-            // Determine if dark mode is active to set the correct background
-            const isDark = document.documentElement.classList.contains('dark');
-            const bgColor = isDark ? '#0f172a' : '#ffffff'; // slate-900 or white
 
             // Generate Image using html-to-image
+            // Light mode is forced at component level (isPrintView strips dark: classes)
+            // skipFonts: true prevents CORS errors from cross-origin FA stylesheets
             const dataUrl = await toPng(element, {
-                backgroundColor: bgColor,
+                backgroundColor: '#ffffff',
                 cacheBust: true,
                 pixelRatio: 2,
-                skipFonts: true, // Prevent CORS errors from external stylesheets
+                skipFonts: true,
                 filter: (node) => {
-                    // Exclude any elements that might cause issues if needed
                     return true;
                 }
             });
+
 
             // Create download link
             const dateStr = new Date().toLocaleDateString('en-GB').replace(/\//g, '-'); // DD-MM-YYYY

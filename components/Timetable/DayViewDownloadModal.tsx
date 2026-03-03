@@ -16,7 +16,7 @@ interface DayViewDownloadModalProps {
 // Inline Print View — Sleek, High-End Card-Based Layout for Single Day
 function InlineDayPrintView({ day, slots, mode, filters, generatedAt }: { day: string; slots: ProcessedSlot[], mode: string, filters: any, generatedAt: string }) {
     // Flatten all entries for the single day
-    const rows: { time: string; course: string; instructor: string; room: string; classInfo: string; isLab: boolean }[] = [];
+    const rows: { time: string; course: string; instructor: string; room: string; classInfo: string; isLab: boolean; isClash: boolean }[] = [];
     slots.forEach(slot => {
         if (!slot.entries || slot.entries.length === 0) return;
         slot.entries.forEach(entry => {
@@ -27,6 +27,7 @@ function InlineDayPrintView({ day, slots, mode, filters, generatedAt }: { day: s
                 room: entry.room || '-',
                 classInfo: entry.class || '-',
                 isLab: entry.isLab,
+                isClash: slot.entries.length > 1,
             });
         });
     });
@@ -101,7 +102,7 @@ function InlineDayPrintView({ day, slots, mode, filters, generatedAt }: { day: s
             <div style={s.headerBlock}>
                 <div style={s.titleBox}>
                     <h1 style={s.title}>Lucid <span style={s.titleHighlight}>Chronicle</span></h1>
-                    <div style={s.subtitle}>Generated via Lucid Aura∞ v6.12.2</div>
+                    <div style={s.subtitle}>Generated via Lucid Aura∞ v6.12.5</div>
                 </div>
                 <div style={s.infoBox}>
                     <div style={s.selectionBig}>{selectionInfo || 'FULL SCHEDULE'}</div>
@@ -165,6 +166,10 @@ function InlineDayPrintView({ day, slots, mode, filters, generatedAt }: { day: s
                                     <div style={s.roomLabel}>Room</div>
                                     <div style={s.roomValue}>{row.room}</div>
                                 </div>
+
+                                {row.isClash && (
+                                    <div style={{ position: 'absolute', top: '8px', right: '12px', background: 'linear-gradient(135deg, #ef4444, #dc2626)', color: 'white', fontSize: '9px', fontWeight: 800, padding: '3px 10px', borderRadius: '9999px', letterSpacing: '0.1em', textTransform: 'uppercase' as const, boxShadow: '0 2px 8px rgba(220, 38, 38, 0.3)' }}>CLASH</div>
+                                )}
                             </div>
                         ))}
                         {rows.length === 0 && (

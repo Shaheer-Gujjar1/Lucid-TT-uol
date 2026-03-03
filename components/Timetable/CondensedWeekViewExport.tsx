@@ -13,7 +13,7 @@ interface CondensedWeekViewExportProps {
 
 export default function CondensedWeekViewExport({ data, mode, filters, generatedAt }: CondensedWeekViewExportProps) {
     // Flatten all entries across all days into a single table
-    const rows: { day: string; time: string; course: string; instructor: string; room: string; classInfo: string; isLab: boolean }[] = [];
+    const rows: { day: string; time: string; course: string; instructor: string; room: string; classInfo: string; isLab: boolean; isClash: boolean }[] = [];
 
     data.forEach(dayData => {
         if (!dayData.slots) return;
@@ -28,6 +28,7 @@ export default function CondensedWeekViewExport({ data, mode, filters, generated
                     room: entry.room || '-',
                     classInfo: entry.class || '-',
                     isLab: entry.isLab,
+                    isClash: slot.entries.length > 1,
                 });
             });
         });
@@ -206,7 +207,7 @@ export default function CondensedWeekViewExport({ data, mode, filters, generated
                     <h1 style={s.title}>
                         Lucid <span style={{ color: '#7c3aed' }}>Chronicle</span>
                     </h1>
-                    <p style={s.subtitle}>Generated via Lucid Aura∞ v6.12.2</p>
+                    <p style={s.subtitle}>Generated via Lucid Aura∞ v6.12.5</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '16px', fontWeight: 800, color: '#1e293b' }}>
@@ -247,6 +248,7 @@ export default function CondensedWeekViewExport({ data, mode, filters, generated
                         <th style={{ ...s.th, width: '8%' }}>Room</th>
                         <th style={{ ...s.th, width: '10%' }}>Class</th>
                         <th style={{ ...s.th, width: '8%', textAlign: 'right' }}>Type</th>
+                        <th style={{ ...s.th, width: '6%', textAlign: 'center' }}>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -284,12 +286,17 @@ export default function CondensedWeekViewExport({ data, mode, filters, generated
                                         {row.isLab ? 'Lab' : 'Lec'}
                                     </span>
                                 </td>
+                                <td style={{ ...s.td, textAlign: 'center' }}>
+                                    {row.isClash && (
+                                        <span style={{ background: '#fef2f2', color: '#dc2626', fontWeight: 800, fontSize: '9px', padding: '3px 8px', borderRadius: '9999px', border: '1px solid #fecaca', display: 'inline-block', letterSpacing: '0.04em', textTransform: 'uppercase' as const }}>CLASH</span>
+                                    )}
+                                </td>
                             </tr>
                         );
                     })}
                     {rows.length === 0 && (
                         <tr>
-                            <td colSpan={7} style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>
+                            <td colSpan={8} style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>
                                 No classes found for the current selection.
                             </td>
                         </tr>
