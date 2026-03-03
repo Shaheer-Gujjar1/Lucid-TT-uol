@@ -773,6 +773,7 @@ export default function Home() {
     return (
         <div className="min-h-screen pb-10">
             <div className="print:hidden">
+                <h1 className="sr-only">Lucid Aura - University of Lahore (UOL) Academic Timetable & Exam Utility</h1>
                 <Navbar />
 
                 <div className="container mx-auto px-4 pt-28 max-w-5xl">

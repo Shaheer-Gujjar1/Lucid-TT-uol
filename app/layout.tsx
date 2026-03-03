@@ -16,9 +16,9 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-    title: "Lucid Aura∞ | UOL Timetable, exams & Academic Suite",
-    description: "Lucid Aura is the premier academic utility for UOL. Access dynamic timetables, intelligent exam planning, and performance analytics in one high-performance interface. No data collection, 100% frontend privacy.",
-    keywords: ["Lucid Aura", "UOL Timetable", "University of Lahore", "UOL Exam Seating Plan", "GPA Calculator", "Academic Suite", "Student Timetable"],
+    title: "Lucid Aura | UOL Timetable, Exams & Academic Suite",
+    description: "Lucid Aura is the premier academic utility for UOL students. Access dynamic timetables, intelligent exam planning, and performance analytics with 100% frontend privacy.",
+    keywords: ["Lucid Aura", "Lucid Aura UOL", "UOL Timetable", "University of Lahore", "UOL Exam Seating Plan", "GPA Calculator", "Academic Suite", "Student Timetable"],
     authors: [{ name: "Shaheer Ahmed" }],
     creator: "Shaheer Ahmed",
     publisher: "Lucid Dynamics",
@@ -32,8 +32,8 @@ export const metadata: Metadata = {
         canonical: "/",
     },
     openGraph: {
-        title: "Lucid Aura∞ - UOL Timetable & Academic Suite",
-        description: "The ultimate student companion for UOL. Timetables, exams, and GPA tracking with a magical interface.",
+        title: "Lucid Aura - UOL Timetable & Academic Suite",
+        description: "The ultimate student companion for UOL. Timetables, exams, and GPA tracking with a magical, privacy-focused interface.",
         url: "https://luciduol.netlify.app",
         siteName: "Lucid Aura",
         images: [
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: "summary_large_image",
-        title: "Lucid Aura∞ - UOL Academic Utility",
+        title: "Lucid Aura - UOL Academic Utility",
         description: "Intelligent timetable & academic tools for University of Lahore students.",
         images: ["/logo-primary.png"],
     },
@@ -97,6 +97,28 @@ export default function RootLayout({
 
                         gtag('config', 'G-376YYK5WW5');
                     `}
+                </Script>
+                {/* JSON-LD Structured Data */}
+                <Script id="json-ld" type="application/ld+json" strategy="afterInteractive">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "WebApplication",
+                        "name": "Lucid Aura",
+                        "alternateName": "Lucid Aura UOL",
+                        "description": "The premier academic utility for University of Lahore students, providing dynamic timetables and exam schedules.",
+                        "url": "https://luciduol.netlify.app",
+                        "applicationCategory": "EducationalApplication",
+                        "operatingSystem": "Web",
+                        "author": {
+                            "@type": "Person",
+                            "name": "Shaheer Ahmed"
+                        },
+                        "offers": {
+                            "@type": "Offer",
+                            "price": "0",
+                            "priceCurrency": "PKR"
+                        }
+                    })}
                 </Script>
                 {/* GLOBAL CHATBOT */}
                 <LucidChat />
