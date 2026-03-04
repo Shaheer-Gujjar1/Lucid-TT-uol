@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useSettings, resetSettings, AUSTERE_CONFIG, HARMONIZED_CONFIG, OPULENT_CONFIG, AppSettings } from '@/lib/settings';
 
 interface SettingsModalProps {
@@ -10,8 +11,13 @@ interface SettingsModalProps {
 export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     const { settings, saveSettings, mounted } = useSettings();
     const isClassic = settings?.wordingPreference === 'classic';
+    const [secretTapCount, setSecretTapCount] = useState(0);
 
     if (!isOpen || !mounted) return null;
+
+    const handleSecretTap = () => {
+        setSecretTapCount((prev: number) => prev + 1);
+    };
 
     const toggleSetting = (key: keyof AppSettings) => {
         const current = settings[key];
@@ -61,7 +67,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                         <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-sm border border-indigo-100/50 dark:border-indigo-500/20">
                             <i className="fas fa-sliders-h text-xl"></i>
                         </div>
-                        <div>
+                        <div onClick={handleSecretTap} className="cursor-pointer select-none">
                             <h3 className="text-xl font-black text-slate-800 dark:text-white tracking-tight italic">{isClassic ? 'Settings' : 'Preferences'}</h3>
                             <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">{isClassic ? 'Configure your application' : 'Personalize your experience'}</p>
                         </div>
@@ -147,15 +153,17 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                                 onToggle={() => toggleSetting('enableCrucible')}
                                 activeColor="bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.4)]"
                             />
-                            <SettingToggle
-                                icon="fa-calendar-week"
-                                color="text-blue-400"
-                                title={isClassic ? 'Week View' : 'Week View Chronicle'}
-                                desc={isClassic ? 'Toggle weekly schedule.' : 'Toggle weekly outlook.'}
-                                checked={settings.enableWeekView}
-                                onToggle={() => toggleSetting('enableWeekView')}
-                                activeColor="bg-blue-400 shadow-[0_0_15px_rgba(96,165,250,0.4)]"
-                            />
+                            {(secretTapCount >= 5 || settings.enableWeekView) && (
+                                <SettingToggle
+                                    icon="fa-calendar-week"
+                                    color="text-blue-400"
+                                    title={isClassic ? 'Week View' : 'Week View Chronicle'}
+                                    desc={isClassic ? 'Toggle weekly schedule.' : 'Toggle weekly outlook.'}
+                                    checked={settings.enableWeekView}
+                                    onToggle={() => toggleSetting('enableWeekView')}
+                                    activeColor="bg-blue-400 shadow-[0_0_15px_rgba(96,165,250,0.4)]"
+                                />
+                            )}
                         </div>
                     </SettingCard>
 
