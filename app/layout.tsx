@@ -16,9 +16,25 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-    title: "Lucid Aura | UOL Timetable, Exams & Academic Suite",
-    description: "Lucid Aura is the premier academic utility for UOL students. Access dynamic timetables, intelligent exam planning, and performance analytics with 100% frontend privacy.",
-    keywords: ["Lucid Aura", "Lucid Aura UOL", "UOL Timetable", "University of Lahore", "UOL Exam Seating Plan", "GPA Calculator", "Academic Suite", "Student Timetable"],
+    title: {
+        default: "UOL Timetable | Lucid Aura - University of Lahore Hub",
+        template: "%s | Lucid Aura"
+    },
+    description: "The ultimate UOL Timetable utility for University of Lahore students. Access dynamic timetables, intelligent exam planning, seating plans, and academic analytics with a privacy-focused interface.",
+    keywords: [
+        "UOL Timetable",
+        "University of Lahore Timetable",
+        "UOL Student Portal",
+        "Lucid Aura",
+        "Lucid Aura UOL",
+        "UOL Exam Seating Plan",
+        "UOL GPA Calculator",
+        "University of Lahore App",
+        "UOL Academic Suite",
+        "Student Timetable App",
+        "UOL Events",
+        "Timetable UOL"
+    ],
     authors: [{ name: "Shaheer Ahmed" }],
     creator: "Shaheer Ahmed",
     publisher: "Lucid Dynamics",
@@ -32,7 +48,7 @@ export const metadata: Metadata = {
         canonical: "/",
     },
     openGraph: {
-        title: "Lucid Aura - UOL Timetable & Academic Suite",
+        title: "UOL Timetable & Academic Suite | Lucid Aura",
         description: "The ultimate student companion for UOL. Timetables, exams, and GPA tracking with a magical, privacy-focused interface.",
         url: "https://luciduol.netlify.app",
         siteName: "Lucid Aura",
@@ -41,7 +57,7 @@ export const metadata: Metadata = {
                 url: "/logo-primary.png",
                 width: 800,
                 height: 600,
-                alt: "Lucid Aura Logo",
+                alt: "Lucid Aura Logo - UOL Timetable App",
             },
         ],
         locale: "en_US",
@@ -49,13 +65,19 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: "summary_large_image",
-        title: "Lucid Aura - UOL Academic Utility",
-        description: "Intelligent timetable & academic tools for University of Lahore students.",
+        title: "Lucid Aura | UOL Timetable & Academic Utility",
+        description: "Intelligent university timetable & academic tools for University of Lahore students.",
         images: ["/logo-primary.png"],
     },
     icons: {
         icon: "/favicon.ico",
         apple: "/logo-primary.png",
+    },
+    verification: {
+        google: "googleb52533f87b53fe9c", // Already has html file, but good to have here
+        other: {
+            "msvalidate.01": ["BING_VERIFICATION_CODE_HERE"], // User should replace this
+        },
     },
 };
 

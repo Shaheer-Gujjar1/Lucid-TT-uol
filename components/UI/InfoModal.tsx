@@ -85,16 +85,17 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                         <div className="space-y-6 animate-fade-in">
                             <div className="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/30 text-center">
                                 <p className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    <span className="font-bold text-indigo-600 dark:text-indigo-400">Lucid Aura∞ v6.12.6</span> is the premier academic utility for UOL. It integrates dynamic timetables, intelligent planning, and performance analytics into one high-performance interface.
+                                    <span className="font-bold text-indigo-600 dark:text-indigo-400">Lucid Aura∞ v6.12.7</span> is the premier academic utility for UOL. It integrates dynamic timetables, intelligent planning, and performance analytics into one high-performance interface.
                                 </p>
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
-                                <StatCard label="Version" value="6.12.6" icon="fa-code-branch" />
+                                <StatCard label="Version" value="6.12.7" icon="fa-code-branch" />
                                 <StatCard label="Release" value="SEPT 2025" icon="fa-calendar-check" />
                             </div>
 
                             <div className="text-center pt-2">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 italic">Developer Bio:</p>
                                 <div className="flex justify-center">
                                     <a
                                         href="https://quantam-bio.netlify.app"
@@ -108,7 +109,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                                 </div>
                             </div>
 
-                            <div className="pt-4 border-t border-slate-100 dark:border-slate-800/50">
+                            <div className="pt-4 border-t border-slate-100 dark:border-slate-800/50 space-y-4">
                                 <div className="flex flex-col items-center text-center p-6 rounded-3xl bg-slate-50/50 dark:bg-slate-800/20 border border-slate-100 dark:border-slate-800/50">
                                     <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 p-[2px] mb-3 shadow-lg">
                                         <div className="w-full h-full rounded-full bg-white dark:bg-slate-900 flex items-center justify-center">
@@ -116,7 +117,18 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                                         </div>
                                     </div>
                                     <h3 className="text-lg font-bold text-slate-800 dark:text-white">Shaheer Ahmed</h3>
-                                    <p className="text-xs font-medium text-indigo-500 dark:text-indigo-400">Sole Developer & Designer</p>
+                                    <p className="text-xs font-medium text-indigo-500 dark:text-indigo-400">Lead Developer & Designer</p>
+                                    <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-bold">BSCS • University of Lahore</p>
+                                </div>
+
+                                <div className="flex flex-col items-center text-center p-6 rounded-3xl bg-slate-50/50 dark:bg-slate-800/20 border border-slate-100 dark:border-slate-800/50">
+                                    <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-fuchsia-500 to-pink-500 p-[2px] mb-3 shadow-lg">
+                                        <div className="w-full h-full rounded-full bg-white dark:bg-slate-900 flex items-center justify-center">
+                                            <span className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-600 to-pink-600">MU</span>
+                                        </div>
+                                    </div>
+                                    <h3 className="text-lg font-bold text-slate-800 dark:text-white">M. Umair</h3>
+                                    <p className="text-xs font-medium text-fuchsia-500 dark:text-fuchsia-400">QA & Beta Testing Lead</p>
                                     <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-bold">BSCS • University of Lahore</p>
                                 </div>
                             </div>

@@ -12,13 +12,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
             url: 'https://luciduol.netlify.app/events',
             lastModified: new Date(),
             changeFrequency: 'weekly',
-            priority: 0.8,
+            priority: 0.9,
         },
         {
             url: 'https://luciduol.netlify.app/gpa',
             lastModified: new Date(),
             changeFrequency: 'monthly',
-            priority: 0.5,
+            priority: 0.8,
         },
     ]
 }
