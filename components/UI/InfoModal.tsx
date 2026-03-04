@@ -85,12 +85,12 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                         <div className="space-y-6 animate-fade-in">
                             <div className="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/30 text-center">
                                 <p className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    <span className="font-bold text-indigo-600 dark:text-indigo-400">Lucid Aura∞ v6.12.7</span> is the premier academic utility for UOL. It integrates dynamic timetables, intelligent planning, and performance analytics into one high-performance interface.
+                                    <span className="font-bold text-indigo-600 dark:text-indigo-400">Lucid Aura∞ v6.13.3</span> is the premier academic utility for UOL. It integrates dynamic timetables, intelligent planning, and performance analytics into one high-performance interface.
                                 </p>
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
-                                <StatCard label="Version" value="6.12.7" icon="fa-code-branch" />
+                                <StatCard label="Version" value="6.13.3" icon="fa-code-branch" />
                                 <StatCard label="Release" value="SEPT 2025" icon="fa-calendar-check" />
                             </div>
 
@@ -130,6 +130,13 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                                     <h3 className="text-lg font-bold text-slate-800 dark:text-white">M. Umair</h3>
                                     <p className="text-xs font-medium text-fuchsia-500 dark:text-fuchsia-400">QA & Beta Testing Lead</p>
                                     <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-bold">BSCS • University of Lahore</p>
+                                    <a
+                                        href="mailto:umairsikandar43@gmail.com"
+                                        className="text-[10px] text-indigo-600 dark:text-indigo-400 mt-2 font-bold hover:underline flex items-center gap-1"
+                                    >
+                                        <i className="fas fa-envelope text-[8px]"></i>
+                                        umairsikandar43@gmail.com
+                                    </a>
                                 </div>
                             </div>
                         </div>

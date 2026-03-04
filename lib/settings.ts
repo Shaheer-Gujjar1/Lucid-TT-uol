@@ -16,24 +16,28 @@ export interface AppSettings {
     enableWeekView: boolean;
     wordingPreference: 'premium' | 'classic';
     exportDayStyle: 'fancy' | 'normal';
+    filterStyle: 'dropdown' | 'buttons';
 }
 
 export const AUSTERE_CONFIG: AppSettings = {
     enableGPA: false, enableEvents: false, enableOnlineIndicator: false, enableAuraAI: false, enableAppInfo: false,
     defaultMode: 'student', enableCourseSearch: false, notificationStrategy: 'none', enableRoomMode: false,
     enableCrucible: false, enableWeekView: false, wordingPreference: 'classic', exportDayStyle: 'fancy',
+    filterStyle: 'dropdown',
 };
 
 export const HARMONIZED_CONFIG: AppSettings = {
     enableGPA: false, enableEvents: false, enableOnlineIndicator: true, enableAuraAI: false, enableAppInfo: true,
     defaultMode: 'student', enableCourseSearch: false, notificationStrategy: 'after_free', enableRoomMode: true,
     enableCrucible: false, enableWeekView: true, wordingPreference: 'premium', exportDayStyle: 'fancy',
+    filterStyle: 'dropdown',
 };
 
 export const OPULENT_CONFIG: AppSettings = {
     enableGPA: true, enableEvents: true, enableOnlineIndicator: true, enableAuraAI: true, enableAppInfo: true,
     defaultMode: 'student', enableCourseSearch: true, notificationStrategy: 'after_free_and_events', enableRoomMode: true,
     enableCrucible: true, enableWeekView: true, wordingPreference: 'premium', exportDayStyle: 'fancy',
+    filterStyle: 'dropdown',
 };
 
 const defaultSettings: AppSettings = HARMONIZED_CONFIG;

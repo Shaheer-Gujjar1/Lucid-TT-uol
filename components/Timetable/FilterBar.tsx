@@ -81,12 +81,48 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                     <div key={mode} className="animate-fade-in-up"> {/* Added Animation Wrapper */}
                         {mode === 'student' && (
                             <div className="flex flex-col gap-4 mb-6 relative z-[105]">
-                                {/* Row 1: Dropdowns */}
-                                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
-                                    <Dropdown label={isClassic ? "Program" : "Faculty Discipline"} value={filters.program} options={PROGRAMS} onChange={(v) => setFilter('program', v)} icon="fa-graduation-cap" isOpen={activeDropdown === 'program'} onToggle={(v) => setActiveDropdown(v ? 'program' : null)} />
-                                    <Dropdown label={isClassic ? "Semester" : "Academic Term"} value={filters.semester} options={SEMESTERS} onChange={(v) => setFilter('semester', v)} icon="fa-layer-group" isOpen={activeDropdown === 'semester'} onToggle={(v) => setActiveDropdown(v ? 'semester' : null)} />
-                                    <Dropdown label={isClassic ? "Section" : "Cohort"} value={filters.section} options={SECTIONS} onChange={(v) => setFilter('section', v)} icon="fa-users" isOpen={activeDropdown === 'section'} onToggle={(v) => setActiveDropdown(v ? 'section' : null)} />
-                                    <Dropdown label={isClassic ? "Day" : "Temporal Frame"} value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
+                                {/* Row 1: Dropdowns / Buttons */}
+                                <div className={settings.filterStyle === 'buttons' ? "space-y-6" : "grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6"}>
+                                    <FilterWrapper
+                                        label={isClassic ? "Program" : "Faculty Discipline"}
+                                        value={filters.program}
+                                        options={PROGRAMS}
+                                        onChange={(v) => setFilter('program', v)}
+                                        icon="fa-graduation-cap"
+                                        isOpen={activeDropdown === 'program'}
+                                        onToggle={(v) => setActiveDropdown(v ? 'program' : null)}
+                                        style={settings.filterStyle}
+                                    />
+                                    <FilterWrapper
+                                        label={isClassic ? "Semester" : "Academic Term"}
+                                        value={filters.semester}
+                                        options={SEMESTERS}
+                                        onChange={(v) => setFilter('semester', v)}
+                                        icon="fa-layer-group"
+                                        isOpen={activeDropdown === 'semester'}
+                                        onToggle={(v) => setActiveDropdown(v ? 'semester' : null)}
+                                        style={settings.filterStyle}
+                                    />
+                                    <FilterWrapper
+                                        label={isClassic ? "Section" : "Cohort"}
+                                        value={filters.section}
+                                        options={SECTIONS}
+                                        onChange={(v) => setFilter('section', v)}
+                                        icon="fa-users"
+                                        isOpen={activeDropdown === 'section'}
+                                        onToggle={(v) => setActiveDropdown(v ? 'section' : null)}
+                                        style={settings.filterStyle}
+                                    />
+                                    <FilterWrapper
+                                        label={isClassic ? "Day" : "Temporal Frame"}
+                                        value={filters.day}
+                                        options={DAYS_OPTIONS}
+                                        onChange={(v) => setFilter('day', v)}
+                                        icon="fa-calendar-day"
+                                        isOpen={activeDropdown === 'day'}
+                                        onToggle={(v) => setActiveDropdown(v ? 'day' : null)}
+                                        style={settings.filterStyle}
+                                    />
                                 </div>
                                 {/* Row 2: Subject Search (Optional) */}
                                 {settings.enableCourseSearch && (
@@ -138,7 +174,16 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                                         </div>
                                     )}
                                 </div>
-                                <Dropdown label={isClassic ? "Day" : "Temporal Frame"} value={filters.day} options={DAYS_OPTIONS} onChange={(v) => setFilter('day', v)} icon="fa-calendar-day" isOpen={activeDropdown === 'day'} onToggle={(v) => setActiveDropdown(v ? 'day' : null)} />
+                                <FilterWrapper
+                                    label={isClassic ? "Day" : "Temporal Frame"}
+                                    value={filters.day}
+                                    options={DAYS_OPTIONS}
+                                    onChange={(v) => setFilter('day', v)}
+                                    icon="fa-calendar-day"
+                                    isOpen={activeDropdown === 'day'}
+                                    onToggle={(v) => setActiveDropdown(v ? 'day' : null)}
+                                    style={settings.filterStyle}
+                                />
                             </div>
                         )}
                         {/* Room Mode */}
@@ -157,7 +202,7 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                                         />
                                     </div>
                                 </div>
-                                <Dropdown
+                                <FilterWrapper
                                     label={isClassic ? "Day" : "Temporal Frame"}
                                     value={filters.day}
                                     options={DAYS_OPTIONS}
@@ -165,6 +210,7 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                                     icon="fa-calendar-day"
                                     isOpen={activeDropdown === 'day'}
                                     onToggle={(v) => setActiveDropdown(v ? 'day' : null)}
+                                    style={settings.filterStyle}
                                 />
                             </div>
                         )}
@@ -297,6 +343,81 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    );
+}
+
+// Sub-components
+function FilterWrapper({ label, value, options, onChange, icon, isOpen, onToggle, style }: {
+    label: string,
+    value: string,
+    options: { label: string, value: string }[],
+    onChange: (v: string) => void,
+    icon: string,
+    isOpen: boolean,
+    onToggle: (v: boolean) => void,
+    style?: string
+}) {
+    if (style === 'buttons') {
+        return (
+            <ButtonGroup
+                label={label}
+                value={value}
+                options={options}
+                onChange={onChange}
+                icon={icon}
+            />
+        );
+    }
+    return (
+        <Dropdown
+            label={label}
+            value={value}
+            options={options}
+            onChange={onChange}
+            icon={icon}
+            isOpen={isOpen}
+            onToggle={onToggle}
+        />
+    );
+}
+
+function ButtonGroup({ label, value, options, onChange, icon }: {
+    label: string,
+    value: string,
+    options: { label: string, value: string }[],
+    onChange: (v: string) => void,
+    icon: string
+}) {
+    return (
+        <div className="flex flex-col gap-3 group animate-scale-in">
+            <div className="flex items-center gap-2 px-1">
+                <i className={`fas ${icon} text-indigo-500 text-[10px]`}></i>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">
+                    {label}
+                </label>
+                {value && (
+                    <div className="h-1 w-1 rounded-full bg-indigo-500 animate-pulse"></div>
+                )}
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+                {options.map((option) => {
+                    const isActive = value === option.value;
+                    return (
+                        <button
+                            key={option.value}
+                            onClick={() => onChange(isActive ? '' : option.value)}
+                            className={`px-4 py-2.5 rounded-2xl text-[11px] font-black transition-all duration-300 transform active:scale-95 border-2 ${isActive
+                                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/30 scale-[1.05]'
+                                : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-indigo-500/30 hover:bg-indigo-50/30 dark:hover:bg-indigo-500/5'
+                                }`}
+                        >
+                            {option.label}
+                        </button>
+                    );
+                })}
             </div>
         </div>
     );

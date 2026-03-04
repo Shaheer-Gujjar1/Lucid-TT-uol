@@ -74,274 +74,287 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     </button>
                 </div>
 
-                <div className="p-6 pb-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/30 dark:bg-slate-800/20">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 px-1">{isClassic ? 'Quick Presets' : 'Quick Config Protocols'}</p>
-                    <div className="grid grid-cols-3 gap-3">
-                        <button
-                            onClick={() => saveSettings({ ...settings, ...AUSTERE_CONFIG })}
-                            className={`flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 transition-all duration-300 group ${isConfigMatch(AUSTERE_CONFIG) ? 'border-indigo-500 shadow-[0_8px_30px_rgba(79,70,229,0.15)] ring-4 ring-indigo-500/10' : 'border-slate-100 dark:border-slate-700 hover:border-indigo-500/50'}`}
-                        >
-                            <i className={`fas fa-leaf ${isConfigMatch(AUSTERE_CONFIG) ? 'text-indigo-500' : 'text-slate-400 group-hover:text-indigo-500'}`}></i>
-                            <span className={`text-[9px] font-black uppercase tracking-tighter ${isConfigMatch(AUSTERE_CONFIG) ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500'}`}>Austere</span>
-                        </button>
-                        <button
-                            onClick={() => saveSettings({ ...settings, ...HARMONIZED_CONFIG })}
-                            className={`flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 transition-all duration-300 group ${isConfigMatch(HARMONIZED_CONFIG) ? 'border-indigo-500 shadow-[0_8px_30px_rgba(79,70,229,0.15)] ring-4 ring-indigo-500/10' : 'border-slate-100 dark:border-slate-700 hover:border-indigo-500/50'}`}
-                        >
-                            <i className={`fas fa-balance-scale ${isConfigMatch(HARMONIZED_CONFIG) ? 'text-indigo-500' : 'text-slate-400 group-hover:text-indigo-500'}`}></i>
-                            <span className={`text-[9px] font-black uppercase tracking-tighter ${isConfigMatch(HARMONIZED_CONFIG) ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500'}`}>Harmonized</span>
-                        </button>
-                        <button
-                            onClick={() => saveSettings({ ...settings, ...OPULENT_CONFIG })}
-                            className={`flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 transition-all duration-300 group ${isConfigMatch(OPULENT_CONFIG) ? 'border-amber-500 shadow-[0_8px_30px_rgba(245,158,11,0.15)] ring-4 ring-amber-500/10' : 'border-slate-100 dark:border-slate-700 hover:border-amber-500/50'}`}
-                        >
-                            <i className={`fas fa-gem ${isConfigMatch(OPULENT_CONFIG) ? 'text-amber-500' : 'text-slate-400 group-hover:text-amber-500'}`}></i>
-                            <span className={`text-[9px] font-black uppercase tracking-tighter ${isConfigMatch(OPULENT_CONFIG) ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500'}`}>Opulent</span>
-                        </button>
-                    </div>
-                </div>
+                {/* Scrollable Content */}
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-6 bg-slate-50/30 dark:bg-slate-900/30">
 
-                {/* Toggles */}
-                <div className="p-6 overflow-y-auto custom-scrollbar flex flex-col gap-6">
-
-                    <div
-                        onClick={() => toggleSetting('enableGPA')}
-                        className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                    >
-                        <div>
-                            <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
-                                <i className="fas fa-calculator text-indigo-500 w-5"></i> {isClassic ? 'GPA Calculator' : 'Academic GPA'}
-                            </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Enable the grade tracking module.' : 'Integrate the GPA analytic utility into your dashboard.'}</p>
+                    {/* Quick Presets Section */}
+                    <section className="space-y-3">
+                        <div className="flex items-center gap-2 px-1">
+                            <i className="fas fa-bolt text-amber-500 text-[10px]"></i>
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{isClassic ? 'Quick Presets' : 'Quick Config Protocols'}</p>
                         </div>
-                        <button
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableGPA ? 'bg-indigo-600 shadow-[0_0_15px_rgba(79,70,229,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
-                        >
-                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-500 ${settings.enableGPA ? 'translate-x-6' : 'translate-x-1'}`} />
-                        </button>
-                    </div>
-
-                    <div
-                        onClick={() => toggleSetting('enableEvents')}
-                        className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                    >
-                        <div>
-                            <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
-                                <i className="fas fa-calendar-alt text-amber-500 w-5"></i> {isClassic ? 'Events' : 'Event Chronicle'}
-                            </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Enable the event and task manager.' : 'Toggle access to the sophisticated event management suite.'}</p>
+                        <div className="grid grid-cols-3 gap-3">
+                            <button
+                                onClick={() => saveSettings({ ...settings, ...AUSTERE_CONFIG })}
+                                className={`flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 transition-all duration-300 group ${isConfigMatch(AUSTERE_CONFIG) ? 'border-indigo-500 shadow-[0_8px_30px_rgba(79,70,229,0.15)] ring-4 ring-indigo-500/10' : 'border-slate-100 dark:border-slate-800 hover:border-indigo-500/50'}`}
+                            >
+                                <i className={`fas fa-leaf ${isConfigMatch(AUSTERE_CONFIG) ? 'text-indigo-500' : 'text-slate-400 group-hover:text-indigo-500'}`}></i>
+                                <span className={`text-[9px] font-black uppercase tracking-tighter ${isConfigMatch(AUSTERE_CONFIG) ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500'}`}>Austere</span>
+                            </button>
+                            <button
+                                onClick={() => saveSettings({ ...settings, ...HARMONIZED_CONFIG })}
+                                className={`flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 transition-all duration-300 group ${isConfigMatch(HARMONIZED_CONFIG) ? 'border-indigo-500 shadow-[0_8px_30px_rgba(79,70,229,0.15)] ring-4 ring-indigo-500/10' : 'border-slate-100 dark:border-slate-800 hover:border-indigo-500/50'}`}
+                            >
+                                <i className={`fas fa-balance-scale ${isConfigMatch(HARMONIZED_CONFIG) ? 'text-indigo-500' : 'text-slate-400 group-hover:text-indigo-500'}`}></i>
+                                <span className={`text-[9px] font-black uppercase tracking-tighter ${isConfigMatch(HARMONIZED_CONFIG) ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500'}`}>Harmonized</span>
+                            </button>
+                            <button
+                                onClick={() => saveSettings({ ...settings, ...OPULENT_CONFIG })}
+                                className={`flex flex-col items-center gap-2 p-3 rounded-2xl bg-white dark:bg-slate-800 border-2 transition-all duration-300 group ${isConfigMatch(OPULENT_CONFIG) ? 'border-amber-500 shadow-[0_8px_30px_rgba(245,158,11,0.15)] ring-4 ring-amber-500/10' : 'border-slate-100 dark:border-slate-800 hover:border-amber-500/50'}`}
+                            >
+                                <i className={`fas fa-gem ${isConfigMatch(OPULENT_CONFIG) ? 'text-amber-500' : 'text-slate-400 group-hover:text-amber-500'}`}></i>
+                                <span className={`text-[9px] font-black uppercase tracking-tighter ${isConfigMatch(OPULENT_CONFIG) ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500'}`}>Opulent</span>
+                            </button>
                         </div>
-                        <button
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableEvents ? 'bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
-                        >
-                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-500 ${settings.enableEvents ? 'translate-x-6' : 'translate-x-1'}`} />
-                        </button>
-                    </div>
+                    </section>
 
-                    <div
-                        onClick={() => toggleSetting('enableOnlineIndicator')}
-                        className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                    >
-                        <div>
-                            <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
-                                <i className="fas fa-wifi text-emerald-500 w-5"></i> {isClassic ? 'Network Status' : 'Presence Indicator'}
-                            </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Show online status in the menu.' : 'Display active synchronization status in the floating interface.'}</p>
+                    {/* Engine Modules Card */}
+                    <SettingCard icon="fa-microchip" color="text-indigo-500" label={isClassic ? 'Core Modules' : 'Engine Protocols'}>
+                        <div className="space-y-1">
+                            <SettingToggle
+                                icon="fa-calculator"
+                                color="text-indigo-500"
+                                title={isClassic ? 'GPA Calculator' : 'Academic GPA'}
+                                desc={isClassic ? 'Enable grade tracking.' : 'Integrate GPA analytics.'}
+                                checked={settings.enableGPA}
+                                onToggle={() => toggleSetting('enableGPA')}
+                                activeColor="bg-indigo-600 shadow-[0_0_15px_rgba(79,70,229,0.4)]"
+                            />
+                            <SettingToggle
+                                icon="fa-calendar-alt"
+                                color="text-amber-500"
+                                title={isClassic ? 'Events' : 'Event Chronicle'}
+                                desc={isClassic ? 'Enable event manager.' : 'Toggle management suite.'}
+                                checked={settings.enableEvents}
+                                onToggle={() => toggleSetting('enableEvents')}
+                                activeColor="bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.4)]"
+                            />
+                            <SettingToggle
+                                icon="fa-door-open"
+                                color="text-orange-500"
+                                title={isClassic ? 'Room Mode' : 'Spatial Mode'}
+                                desc={isClassic ? 'Enable occupancy search.' : 'Enable Room Timetable.'}
+                                checked={settings.enableRoomMode}
+                                onToggle={() => toggleSetting('enableRoomMode')}
+                                activeColor="bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.4)]"
+                            />
+                            <SettingToggle
+                                icon="fa-chair"
+                                color="text-purple-500"
+                                title={isClassic ? 'Exams & Seating' : 'Crucible Protocol'}
+                                desc={isClassic ? 'Toggle exam plans.' : 'Toggle exam allocations.'}
+                                checked={settings.enableCrucible}
+                                onToggle={() => toggleSetting('enableCrucible')}
+                                activeColor="bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.4)]"
+                            />
+                            <SettingToggle
+                                icon="fa-calendar-week"
+                                color="text-blue-400"
+                                title={isClassic ? 'Week View' : 'Week View Chronicle'}
+                                desc={isClassic ? 'Toggle weekly schedule.' : 'Toggle weekly outlook.'}
+                                checked={settings.enableWeekView}
+                                onToggle={() => toggleSetting('enableWeekView')}
+                                activeColor="bg-blue-400 shadow-[0_0_15px_rgba(96,165,250,0.4)]"
+                            />
                         </div>
-                        <button
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableOnlineIndicator ? 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
-                        >
-                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-500 ${settings.enableOnlineIndicator ? 'translate-x-6' : 'translate-x-1'}`} />
-                        </button>
-                    </div>
+                    </SettingCard>
 
-                    <div
-                        onClick={() => toggleSetting('enableAuraAI')}
-                        className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                    >
-                        <div>
-                            <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
-                                <i className="fas fa-robot text-fuchsia-500 w-5"></i> {isClassic ? 'AI Scheduler' : 'Aura Intelligence'}
-                            </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Enable AI assistance for scheduling.' : 'Enable high-performance AI-driven scheduling assistance.'}</p>
-                        </div>
-                        <button
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableAuraAI ? 'bg-fuchsia-500 shadow-[0_0_15px_rgba(217,70,239,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
-                        >
-                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-500 ${settings.enableAuraAI ? 'translate-x-6' : 'translate-x-1'}`} />
-                        </button>
-                    </div>
+                    {/* Aura Intelligence Card */}
+                    <SettingCard icon="fa-brain-circuit" color="text-fuchsia-500" label={isClassic ? 'Intelligence' : 'Aura Intelligence'}>
+                        <div className="space-y-4 pt-1">
+                            <SettingToggle
+                                icon="fa-robot"
+                                color="text-fuchsia-500"
+                                title={isClassic ? 'AI Scheduler' : 'Aura AI Assist'}
+                                desc={isClassic ? 'Enable AI assistance.' : 'Enable high-performance help.'}
+                                checked={settings.enableAuraAI}
+                                onToggle={() => toggleSetting('enableAuraAI')}
+                                activeColor="bg-fuchsia-500 shadow-[0_0_15px_rgba(217,70,239,0.4)]"
+                            />
 
-                    <div
-                        onClick={() => toggleSetting('enableAppInfo')}
-                        className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                    >
-                        <div>
-                            <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
-                                <i className="fas fa-info-circle text-blue-500 w-5"></i> {isClassic ? 'About App' : 'Knowledge Hub'}
-                            </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'View application information and help.' : 'Access detailed application insights and documentation.'}</p>
-                        </div>
-                        <button
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableAppInfo ? 'bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
-                        >
-                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-500 ${settings.enableAppInfo ? 'translate-x-6' : 'translate-x-1'}`} />
-                        </button>
-                    </div>
-
-                    <div className="flex items-center justify-between border-t border-slate-100 dark:border-white/5 pt-6 px-2">
-                        <div>
-                            <h4 className="font-black text-slate-800 dark:text-slate-200 tracking-tight italic">{isClassic ? 'Default Mode' : 'Global Persona'}</h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Set your primary application view.' : 'Switch your primary academic lens.'}</p>
-                        </div>
-                        <select
-                            value={settings.defaultMode}
-                            onChange={(e) => saveSettings({ ...settings, defaultMode: e.target.value as any })}
-                            className="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-black rounded-xl px-4 py-2 border border-slate-200 dark:border-white/5 shadow-sm outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer"
-                        >
-                            <option value="student">STUDENT</option>
-                            <option value="teacher">LECTURER</option>
-                        </select>
-                    </div>
-
-                    <div className="flex items-center justify-between border-t border-slate-100 dark:border-white/5 pt-6 px-2">
-                        <div>
-                            <h4 className="font-black text-slate-800 dark:text-slate-200 tracking-tight italic">{isClassic ? 'Vocabulary Tone' : 'Linguistic Tone'}</h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Change wording across the site.' : 'Toggle between Premium and Classic wording.'}</p>
-                        </div>
-                        <select
-                            value={settings.wordingPreference}
-                            onChange={(e) => saveSettings({ ...settings, wordingPreference: e.target.value as any })}
-                            className="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-black rounded-xl px-4 py-2 border border-slate-200 dark:border-white/5 shadow-sm outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer"
-                        >
-                            <option value="premium">PREMIUM (Aura)</option>
-                            <option value="classic">CLASSIC (Standard)</option>
-                        </select>
-                    </div>
-
-                    <div className="flex items-center justify-between border-t border-slate-100 dark:border-white/5 pt-6 px-2">
-                        <div>
-                            <h4 className="font-black text-slate-800 dark:text-slate-200 tracking-tight italic">{isClassic ? 'Day View Export' : 'Chronicle Export Style'}</h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Choose the visual style for downloaded images.' : 'Toggle between UI Replica and Document Layout.'}</p>
-                        </div>
-                        <select
-                            value={settings.exportDayStyle || 'fancy'}
-                            onChange={(e) => saveSettings({ ...settings, exportDayStyle: e.target.value as any })}
-                            className="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-black rounded-xl px-4 py-2 border border-slate-200 dark:border-white/5 shadow-sm outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer"
-                        >
-                            <option value="fancy">FANCY (App Replica)</option>
-                            <option value="normal">NORMAL (Document)</option>
-                        </select>
-                    </div>
-
-                    <div
-                        onClick={() => toggleSetting('enableCourseSearch')}
-                        className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                    >
-                        <div>
-                            <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
-                                <i className="fas fa-search text-slate-400 w-5"></i> {isClassic ? 'Course Search' : 'Course Discovery'}
-                            </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Enable subject searching in the dashboard.' : 'Activate advanced subject lookup within the dashboard.'}</p>
-                        </div>
-                        <button
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableCourseSearch ? 'bg-indigo-600 shadow-[0_0_15px_rgba(79,70,229,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
-                        >
-                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-500 ${settings.enableCourseSearch ? 'translate-x-6' : 'translate-x-1'}`} />
-                        </button>
-                    </div>
-
-                    <div
-                        onClick={() => toggleSetting('enableRoomMode')}
-                        className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                    >
-                        <div>
-                            <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
-                                <i className="fas fa-door-open text-orange-500 w-5"></i> {isClassic ? 'Room Mode' : 'Spatial Mode'}
-                            </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Enable room occupancy search.' : 'Enable Room Timetable search mode.'}</p>
-                        </div>
-                        <button
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableRoomMode ? 'bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
-                        >
-                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-500 ${settings.enableRoomMode ? 'translate-x-6' : 'translate-x-1'}`} />
-                        </button>
-                    </div>
-
-                    <div
-                        onClick={() => toggleSetting('enableCrucible')}
-                        className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                    >
-                        <div>
-                            <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
-                                <i className="fas fa-chair text-purple-500 w-5"></i> {isClassic ? 'Exams & Seating' : 'Crucible Protocol'}
-                            </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Toggle examination and seating plans.' : 'Toggle all examination and seating allocations.'}</p>
-                        </div>
-                        <button
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableCrucible ? 'bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
-                        >
-                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-500 ${settings.enableCrucible ? 'translate-x-6' : 'translate-x-1'}`} />
-                        </button>
-                    </div>
-
-                    <div
-                        onClick={() => toggleSetting('enableWeekView')}
-                        className="flex items-center justify-between group p-2 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                    >
-                        <div>
-                            <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight">
-                                <i className="fas fa-calendar-week text-indigo-400 w-5"></i> {isClassic ? 'Week View' : 'Week View Chronicle'}
-                            </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Toggle the weekly schedule view.' : 'Toggle the high-density weekly schedule outlook.'}</p>
-                        </div>
-                        <button
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-500 focus:outline-none ${settings.enableWeekView ? 'bg-indigo-400 shadow-[0_0_15px_rgba(129,140,248,0.4)]' : 'bg-slate-200 dark:bg-slate-700'}`}
-                        >
-                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-500 ${settings.enableWeekView ? 'translate-x-6' : 'translate-x-1'}`} />
-                        </button>
-                    </div>
-
-                    <div className="flex flex-col gap-3 border-t border-slate-100 dark:border-white/5 pt-6 px-2">
-                        <div>
-                            <h4 className="font-black text-slate-800 dark:text-slate-200 tracking-tight italic">{isClassic ? 'Notifications' : 'Intelligence Alerts'}</h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">{isClassic ? 'Configure your notification preferences.' : 'Configure high-priority notification protocols.'}</p>
-                        </div>
-                        <select
-                            value={settings.notificationStrategy}
-                            onChange={(e) => saveSettings({ ...settings, notificationStrategy: e.target.value as any })}
-                            className="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-[11px] font-black rounded-xl px-4 py-3 border border-slate-200 dark:border-white/5 shadow-sm outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer w-full"
-                        >
-                            {settings.enableEvents && (
-                                <>
-                                    <option value="after_free_and_events">{isClassic ? 'CLASSES & EVENTS' : 'POST-RESUME INTELLIGENCE & EVENT CHRONICLE'}</option>
-                                    <option value="all_classes_and_events">{isClassic ? 'EVERYTHING' : 'COMPREHENSIVE CLASS ALERTS & EVENT CHRONICLE'}</option>
-                                    <option value="events_only">{isClassic ? 'EVENTS ONLY' : 'CHRONICLE EVENTS EXCLUSIVE'}</option>
-                                </>
-                            )}
-                            <option value="after_free">{isClassic ? 'CLASSES ONLY' : 'POST-RESUME INTELLIGENCE'}</option>
-                            <option value="all_classes">{isClassic ? 'ALL CLASSES' : 'COMPREHENSIVE CLASS ALERTS'}</option>
-                            <option value="none">{isClassic ? 'OFF' : 'SILENT MODE'}</option>
-                        </select>
-                        {settings.notificationStrategy !== 'none' && (
-                            <div className="bg-indigo-50/50 dark:bg-indigo-500/5 border border-indigo-100/50 dark:border-indigo-500/10 rounded-2xl p-4 flex items-start gap-3 mt-1">
-                                <i className="fas fa-shield-alt text-indigo-500 mt-1 text-sm"></i>
-                                <p className="text-[10px] text-indigo-700/80 dark:text-indigo-400/80 leading-relaxed font-bold tracking-tight block">
-                                    <span className="uppercase text-[9px] block mb-1">Architecture Protocol</span>
-                                    Intelligence alerts remain active offline. For optimal synchronization, ensure frequent application heartbeat by maintaining an active session.
-                                </p>
+                            <div className="px-2 space-y-2 pb-1">
+                                <div className="flex items-center gap-2">
+                                    <h4 className="font-black text-slate-800 dark:text-slate-200 tracking-tight italic text-xs uppercase">{isClassic ? 'Notifications' : 'Alerting Protocols'}</h4>
+                                    <div className="h-px flex-1 bg-slate-100 dark:bg-white/5"></div>
+                                </div>
+                                <select
+                                    value={settings.notificationStrategy}
+                                    onChange={(e) => saveSettings({ ...settings, notificationStrategy: e.target.value as any })}
+                                    className="bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-200 text-[10px] font-black rounded-xl px-4 py-3 border border-slate-200 dark:border-white/5 shadow-sm outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer w-full"
+                                >
+                                    {settings.enableEvents && (
+                                        <>
+                                            <option value="after_free_and_events">{isClassic ? 'CLASSES & EVENTS' : 'POST-RESUME & EVENTS'}</option>
+                                            <option value="all_classes_and_events">{isClassic ? 'EVERYTHING' : 'COMPREHENSIVE & EVENTS'}</option>
+                                            <option value="events_only">{isClassic ? 'EVENTS ONLY' : 'CHRONICLE EXCLUSIVE'}</option>
+                                        </>
+                                    )}
+                                    <option value="after_free">{isClassic ? 'CLASSES ONLY' : 'POST-RESUME INTELLIGENCE'}</option>
+                                    <option value="all_classes">{isClassic ? 'ALL CLASSES' : 'COMPREHENSIVE ALERTS'}</option>
+                                    <option value="none">{isClassic ? 'OFF' : 'SILENT MODE'}</option>
+                                </select>
                             </div>
-                        )}
+                        </div>
+                    </SettingCard>
+
+                    {/* Interface Controls Card */}
+                    <SettingCard icon="fa-wand-magic-sparkles" color="text-sky-500" label={isClassic ? 'Interface' : 'Experience Controls'}>
+                        <div className="space-y-5 py-2">
+                            <SettingSelect
+                                label={isClassic ? 'Default Mode' : 'Global Persona'}
+                                desc={isClassic ? 'Set primary view.' : 'Switch primary lens.'}
+                                value={settings.defaultMode}
+                                options={[
+                                    { label: 'STUDENT', value: 'student' },
+                                    { label: 'LECTURER', value: 'teacher' }
+                                ]}
+                                onChange={(v) => saveSettings({ ...settings, defaultMode: v as any })}
+                            />
+
+                            <SettingSelect
+                                label={isClassic ? 'Filter Style' : 'Selector Protocol'}
+                                desc={isClassic ? 'Choose filter appearance.' : 'dropdown vs button style.'}
+                                value={settings.filterStyle || 'dropdown'}
+                                options={[
+                                    { label: 'DROPDOWNS', value: 'dropdown' },
+                                    { label: 'BUTTONS', value: 'buttons' }
+                                ]}
+                                onChange={(v) => saveSettings({ ...settings, filterStyle: v as any })}
+                            />
+
+                            <SettingSelect
+                                label={isClassic ? 'Vocabulary Tone' : 'Linguistic Tone'}
+                                desc={isClassic ? 'Wording across site.' : 'Aura vs Standard tone.'}
+                                value={settings.wordingPreference}
+                                options={[
+                                    { label: 'PREMIUM (Aura)', value: 'premium' },
+                                    { label: 'CLASSIC (Standard)', value: 'classic' }
+                                ]}
+                                onChange={(v) => saveSettings({ ...settings, wordingPreference: v as any })}
+                            />
+
+                            <SettingToggle
+                                icon="fa-search"
+                                color="text-slate-400"
+                                title={isClassic ? 'Course Search' : 'Course Discovery'}
+                                desc={isClassic ? 'Enable subject searching.' : 'Enable advanced lookup.'}
+                                checked={settings.enableCourseSearch}
+                                onToggle={() => toggleSetting('enableCourseSearch')}
+                                activeColor="bg-indigo-600 shadow-[0_0_15px_rgba(79,70,229,0.4)]"
+                            />
+                        </div>
+                    </SettingCard>
+
+                    {/* VisualsCard */}
+                    <SettingCard icon="fa-database" color="text-emerald-500" label={isClassic ? 'Visuals & Meta' : 'Aesthetics & Data'}>
+                        <div className="space-y-5 py-2">
+                            <SettingSelect
+                                label={isClassic ? 'Day View Export' : 'Chronicle Style'}
+                                desc={isClassic ? 'Export image style.' : 'App Replica vs Document.'}
+                                value={settings.exportDayStyle || 'fancy'}
+                                options={[
+                                    { label: 'FANCY (Replica)', value: 'fancy' },
+                                    { label: 'NORMAL (Doc)', value: 'normal' }
+                                ]}
+                                onChange={(v) => saveSettings({ ...settings, exportDayStyle: v as any })}
+                            />
+
+                            <SettingToggle
+                                icon="fa-wifi"
+                                color="text-emerald-500"
+                                title={isClassic ? 'Network Status' : 'Presence Indicator'}
+                                desc={isClassic ? 'Show online status.' : 'Show active connectivity.'}
+                                checked={settings.enableOnlineIndicator}
+                                onToggle={() => toggleSetting('enableOnlineIndicator')}
+                                activeColor="bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]"
+                            />
+
+                            <SettingToggle
+                                icon="fa-info-circle"
+                                color="text-blue-500"
+                                title={isClassic ? 'About App' : 'Knowledge Hub'}
+                                desc={isClassic ? 'View help & info.' : 'Access app documentation.'}
+                                checked={settings.enableAppInfo}
+                                onToggle={() => toggleSetting('enableAppInfo')}
+                                activeColor="bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.4)]"
+                            />
+                        </div>
+                    </SettingCard>
+
+                    <div className="pt-2">
+                        <button
+                            onClick={handleReset}
+                            className="w-full py-4 rounded-2xl bg-red-50 dark:bg-red-900/10 border-2 border-red-500/20 text-red-500 font-black text-[10px] uppercase tracking-widest hover:bg-red-500 hover:text-white hover:border-red-500 transition-all active:scale-95 shadow-sm"
+                        >
+                            <i className="fas fa-undo-alt mr-2"></i> Factory Reset Protocol
+                        </button>
                     </div>
+
                 </div>
 
-                <div className="p-5 flex justify-center border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/20">
+                <div className="p-5 flex justify-center border-t border-slate-100 dark:border-white/5 bg-white dark:bg-slate-900">
                     <p className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-400 text-center leading-relaxed">
                         {isClassic ? 'Settings are saved on this device.' : 'Configurations are persisted locally.'}<br />
                         {isClassic ? 'Presets will overwrite current settings.' : 'Presets override current selections.'}
                     </p>
                 </div>
             </div>
+        </div>
+    );
+}
+
+// Sub-components
+function SettingCard({ icon, color, label, children }: { icon: string, color: string, label: string, children: React.ReactNode }) {
+    return (
+        <div className="bg-white dark:bg-slate-800/40 rounded-3xl border border-slate-100 dark:border-white/5 shadow-sm overflow-hidden animate-scale-in">
+            <div className="px-5 py-3 border-b border-slate-50 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 flex items-center gap-3">
+                <i className={`fas ${icon} ${color} text-[10px]`}></i>
+                <h3 className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">{label}</h3>
+            </div>
+            <div className="p-3">
+                {children}
+            </div>
+        </div>
+    );
+}
+
+function SettingToggle({ icon, color, title, desc, checked, onToggle, activeColor }: { icon: string, color: string, title: string, desc: string, checked: boolean, onToggle: () => void, activeColor: string }) {
+    return (
+        <div
+            onClick={onToggle}
+            className="flex items-center justify-between group p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+        >
+            <div className="flex-1 pr-2">
+                <h4 className="font-black text-slate-800 dark:text-slate-200 flex items-center gap-2 tracking-tight text-xs">
+                    <i className={`fas ${icon} ${color} w-4 text-[12px]`}></i> {title}
+                </h4>
+                <p className="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium leading-tight">{desc}</p>
+            </div>
+            <button
+                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-all duration-500 focus:outline-none shrink-0 ${checked ? activeColor : 'bg-slate-200 dark:bg-slate-700'}`}
+            >
+                <span className={`inline-block h-3 w-3 transform rounded-full bg-white shadow-sm transition-transform duration-500 ${checked ? 'translate-x-[1.35rem]' : 'translate-x-1'}`} />
+            </button>
+        </div>
+    );
+}
+
+function SettingSelect({ label, desc, value, options, onChange }: { label: string, desc: string, value: string, options: { label: string, value: string }[], onChange: (v: string) => void }) {
+    return (
+        <div className="flex items-center justify-between px-3">
+            <div className="flex-1 pr-2">
+                <h4 className="font-black text-slate-800 dark:text-slate-200 tracking-tight italic text-xs uppercase">{label}</h4>
+                <p className="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium leading-tight">{desc}</p>
+            </div>
+            <select
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className="bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 text-[9px] font-black rounded-xl px-3 py-2 border border-slate-200 dark:border-white/5 shadow-sm outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer min-w-[100px]"
+            >
+                {options.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+            </select>
         </div>
     );
 }
