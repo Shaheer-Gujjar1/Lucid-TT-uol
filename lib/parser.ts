@@ -446,7 +446,7 @@ function parseAllClasses(cell: string): ClassMatch[] {
     // Pattern 1: BSMDS / Data Science long form
     // Pattern 2: BS Math / Maths / Mathematics / MTS / BSMTS / BSMATS
     // Pattern 3: Standard codes (BSCS etc)
-    const regex = /(?:(BSMDS|BS\s*Mathematics\s*for\s*Data\s*Science)|(BS(?:\s*|-)MTS|MTS|BSMATS|BS\s*Math(?:s|ematics)?|Math(?:s|ematics)?)|(BSCS|BSSE|BSAI|BBA(?:\s*\(?\s*2Y\s*\)?)?|BSAF(?:\s*\(?\s*2Y\s*\)?)?|BSDM|BS\w+|BS\s\w+|BS\s\d+|BBA\s\w+|BSAF\s\w+|BSDM\s\w+|\bPharmD\b|\bDPT\b|\bMLT\b|\bHND\b|(?:^|[\s/])RIT\b|\bNursing\b|BS\sUrdu|BS\sBiotech|BS\sZoology|BS\sChemistry|BS\sPhysics|BS\sEnglish|BS\sPsychology|BS\sCriminology|BS\sIR|BS\sNursing|Post\s*RN\s*Nursing|BS\sSISS|BS\sEducation|BS\sIslamic\sStudies|BS\sNutrition|BS\sMedical\sPhysics))[-\s]*(?:Sem(?:ester)?\.?\s*)?(\d+(?:rd|th|st|nd)?(?:\+\d+)?|[IVX]+)(?:[-\s]*([ABC]))?/gi;
+    const regex = /(?:(BSMDS|BS\s*Mathematics\s*for\s*Data\s*Science)|(BS(?:\s*|-)MTS|MTS|BSMATS|BS\s*Math(?:s|ematics)?|Math(?:s|ematics)?)|(BSCS|BSSE|BSAI|BBA(?:[-\s]*\(?\s*2Y\s*\)?)?|BSAF(?:[-\s]*\(?\s*2Y\s*\)?)?|BSDM|BS\w+|BS\s\w+|BS\s\d+|BBA\s\w+|BSAF\s\w+|BSDM\s\w+|\bPharmD\b|\bDPT\b|\bMLT\b|\bHND\b|(?:^|[\s/])RIT\b|\bNursing\b|BS\sUrdu|BS\sBiotech|BS\sZoology|BS\sChemistry|BS\sPhysics|BS\sEnglish|BS\sPsychology|BS\sCriminology|BS\sIR|BS\sNursing|Post\s*RN\s*Nursing|BS\sSISS|BS\sEducation|BS\sIslamic\sStudies|BS\sNutrition|BS\sMedical\sPhysics))[-\s]*(?:Sem(?:ester)?\.?\s*)?(\d+(?:rd|th|st|nd)?(?:\+\d+)?|[IVX]+)(?:[-\s]*([ABC]))?/gi;
 
     let m;
     while ((m = regex.exec(cell)) !== null) {
@@ -475,9 +475,9 @@ function parseAllClasses(cell: string): ClassMatch[] {
         }
 
         // Existing BBA/BSAF 2Y normalization
-        if (/BBA\(2Y\)/i.test(program) || /BBA2Y/i.test(program) || /BBA\s*2Y/i.test(program)) {
+        if (/BBA[-\s]*\(?2Y\)?/i.test(program) || /BBA[-\s]*2Y/i.test(program)) {
             program = "BBA(2Y)";
-        } else if (/BSAF\(2Y\)/i.test(program) || /BSAF2Y/i.test(program) || /BSAF\s*2Y/i.test(program)) {
+        } else if (/BSAF[-\s]*\(?2Y\)?/i.test(program) || /BSAF[-\s]*2Y/i.test(program)) {
             program = "BSAF(2Y)";
         }
 
@@ -677,7 +677,7 @@ export function processDayData(dayData: string[][], mode: 'student' | 'teacher' 
                     classStr = `${match.program}-${match.semester}${match.section || ''}`;
                 } else {
                     // Fallback for teacher/room/subject mode if no strict parse
-                    const classMatch = cell.match(/(BSMDS|BS\s*Maths?|Maths?|BSMATS|BSMTS|MTS|BSCS|BSSE|BSAI|BS\w+|BBA\w*|BSAF\w*|BSDM\w*|BS\w*|PharmD|DPT|MLT|HND|RIT|Nursing|BS\s\w+|BS\s\d+|BBA\s\w+|BSAF\s\w+|BSDM\s\w+)[-\s]*(\d+|[IVX]+)([ABC])?/gi);
+                    const classMatch = cell.match(/(BSMDS|BS\s*Maths?|Maths?|BSMATS|BSMTS|MTS|BSCS|BSSE|BSAI|BS\w+|BBA(?:[-\s]*\(?\s*2Y\s*\)?)?|BSAF(?:[-\s]*\(?\s*2Y\s*\)?)?|BSDM\w*|BS\w*|PharmD|DPT|MLT|HND|RIT|Nursing|BS\s\w+|BS\s\d+|BBA\s\w+|BSAF\s\w+|BSDM\s\w+)[-\s]*(\d+|[IVX]+)([ABC])?/gi);
                     if (classMatch) classStr = classMatch[0];
                 }
 
