@@ -117,7 +117,7 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
                                         </div>
                                     </div>
                                     <h3 className="text-lg font-bold text-slate-800 dark:text-white">Shaheer Ahmed</h3>
-                                    <p className="text-xs font-medium text-indigo-500 dark:text-indigo-400">Lead Developer & Designer</p>
+                                    <p className="text-xs font-medium text-indigo-500 dark:text-indigo-400">Sole Developer & Designer</p>
                                     <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-bold">BSCS • University of Lahore</p>
                                 </div>
 
