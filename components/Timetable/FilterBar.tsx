@@ -271,7 +271,7 @@ export default function FilterBar({ mode, examView, filters, setFilter, onSave, 
                                                     type="text"
                                                     value={filters.roomNumber || ''}
                                                     onChange={(e) => setFilter('roomNumber', e.target.value)}
-                                                    placeholder="Discovery Spatial..."
+                                                    placeholder="Discovery Spatial-Room Number e.g. 103)"
                                                     className="w-full bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 pl-12 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-slate-700 dark:text-slate-200 font-black text-sm transition-all shadow-inner"
                                                 />
                                             </div>
