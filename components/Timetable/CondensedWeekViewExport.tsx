@@ -207,7 +207,7 @@ export default function CondensedWeekViewExport({ data, mode, filters, generated
                     <h1 style={s.title}>
                         Lucid <span style={{ color: '#7c3aed' }}>Chronicle</span>
                     </h1>
-                    <p style={s.subtitle}>Generated via Lucid Aura∞ v6.13.3</p>
+                    <p style={s.subtitle}>Generated via Lucid Aura∞ v6.13.6</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '16px', fontWeight: 800, color: '#1e293b' }}>
@@ -304,10 +304,14 @@ export default function CondensedWeekViewExport({ data, mode, filters, generated
                 </tbody>
             </table>
 
-            {/* Footer */}
-            <div style={s.footer}>
-                <div>https://luciduol.netlify.app</div>
-                <div>{generatedAt}</div>
+            <div style={{ ...s.footer, flexDirection: 'column', gap: '12px' }}>
+                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', color: '#475569', fontSize: '11px', lineHeight: '1.5', textAlign: 'center' }}>
+                    <span style={{ fontWeight: 800, color: '#6366f1' }}>🌟 Stay Synced!</span> Schedules evolve dynamically to enhance your experience. I highly encourage checking the live app regularly for real-time updates so you never miss a beat! Downloaded chronicles capture a single moment in time, so relying on the live platform ensures you always have the most accurate information (developer is not liable for misguided assumptions from outdated copies).
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                    <div>https://luciduol.netlify.app</div>
+                    <div>{generatedAt}</div>
+                </div>
             </div>
         </div>
     );

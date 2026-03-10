@@ -102,7 +102,7 @@ function InlineDayPrintView({ day, slots, mode, filters, generatedAt }: { day: s
             <div style={s.headerBlock}>
                 <div style={s.titleBox}>
                     <h1 style={s.title}>Lucid <span style={s.titleHighlight}>Chronicle</span></h1>
-                    <div style={s.subtitle}>Generated via Lucid Aura∞ v6.13.3</div>
+                    <div style={s.subtitle}>Generated via Lucid Aura∞ v6.13.6</div>
                 </div>
                 <div style={s.infoBox}>
                     <div style={s.selectionBig}>{selectionInfo || 'FULL SCHEDULE'}</div>
@@ -181,10 +181,15 @@ function InlineDayPrintView({ day, slots, mode, filters, generatedAt }: { day: s
                 </div>
             </div>
 
-            <div style={s.footer}>
-                <div style={s.footerText}>https://luciduol.netlify.app</div>
-                <div style={s.footerBrand}>BY: SHAHEER AHMED</div>
-                <div style={s.footerText}>{generatedAt}</div>
+            <div style={{ ...s.footer, flexDirection: 'column', gap: '12px' }}>
+                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', color: '#475569', fontSize: '11px', lineHeight: '1.5', textAlign: 'center' }}>
+                    <span style={{ fontWeight: 800, color: '#6366f1' }}>🌟 Stay Synced!</span> Schedules evolve dynamically to enhance your experience. I highly encourage checking the live app regularly for real-time updates so you never miss a beat! Downloaded chronicles capture a single moment in time, so relying on the live platform ensures you always have the most accurate information (developer is not liable for misguided assumptions from outdated copies).
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                    <div style={s.footerText}>https://luciduol.netlify.app</div>
+                    <div style={s.footerBrand}>BY: SHAHEER AHMED</div>
+                    <div style={s.footerText}>{generatedAt}</div>
+                </div>
             </div>
         </div>
     );

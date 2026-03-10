@@ -81,6 +81,8 @@ export default function Home() {
         }
     }, [mounted, settings.defaultMode, isInitialLoad]);
 
+    const [modalInitialTab, setModalInitialTab] = useState<'about' | 'features' | 'aura' | 'legal'>('about');
+
     useEffect(() => {
         setGeneratedAt(new Date().toLocaleString());
 
@@ -89,6 +91,7 @@ export default function Home() {
         if (!hasSeenIntro) {
             // Small delay to let the UI load and settle
             const timer = setTimeout(() => {
+                setModalInitialTab('legal');
                 setShowInfoModal(true);
                 localStorage.setItem('lucid_intro_seen', 'true');
             }, 1200);
@@ -990,8 +993,12 @@ export default function Home() {
                     </button>
                 </div>
 
-                <InfoModal isOpen={showInfoModal} onClose={() => setShowInfoModal(false)} />
-                <SettingsModal isOpen={showSettingsModal} onClose={() => setShowSettingsModal(false)} />
+                <InfoModal
+                isOpen={showInfoModal}
+                onClose={() => setShowInfoModal(false)}
+                initialTab={modalInitialTab}
+            />
+    <SettingsModal isOpen={showSettingsModal} onClose={() => setShowSettingsModal(false)} />
 
                 <DatesheetDownloadModal
                     isOpen={showDatesheetDownloadModal}

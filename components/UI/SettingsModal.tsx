@@ -24,7 +24,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
         if (typeof current !== 'boolean') return;
 
         const newValue = !current;
-        let newSettings = { ...settings, [key]: newValue };
+        let newSettings: AppSettings = { ...settings, [key]: newValue, preset: 'custom' };
 
         // Notification strategy sync logic if events toggle is swapped
         if (key === 'enableEvents') {
@@ -43,8 +43,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     };
 
     const isConfigMatch = (preset: AppSettings) => {
-        const keys: (keyof AppSettings)[] = ['enableGPA', 'enableEvents', 'enableOnlineIndicator', 'enableAuraAI', 'enableAppInfo', 'enableCourseSearch', 'enableRoomMode', 'enableCrucible', 'enableWeekView', 'notificationStrategy', 'wordingPreference'];
-        return keys.every(key => settings[key] === preset[key]);
+        return settings.preset === preset.preset;
     };
 
     const handleReset = () => {
@@ -153,7 +152,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                                 onToggle={() => toggleSetting('enableCrucible')}
                                 activeColor="bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.4)]"
                             />
-                            {(secretTapCount >= 5 || settings.enableWeekView) && (
+                            {(secretTapCount >= 5 || (settings.enableWeekView && settings.preset !== 'opulent')) && (
                                 <SettingToggle
                                     icon="fa-calendar-week"
                                     color="text-blue-400"
@@ -187,7 +186,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                                 </div>
                                 <select
                                     value={settings.notificationStrategy}
-                                    onChange={(e) => saveSettings({ ...settings, notificationStrategy: e.target.value as any })}
+                                    onChange={(e) => saveSettings({ ...settings, notificationStrategy: e.target.value as any, preset: 'custom' })}
                                     className="bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-200 text-[10px] font-black rounded-xl px-4 py-3 border border-slate-200 dark:border-white/5 shadow-sm outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all cursor-pointer w-full"
                                 >
                                     {settings.enableEvents && (
@@ -216,7 +215,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                                     { label: 'STUDENT', value: 'student' },
                                     { label: 'LECTURER', value: 'teacher' }
                                 ]}
-                                onChange={(v) => saveSettings({ ...settings, defaultMode: v as any })}
+                                onChange={(v) => saveSettings({ ...settings, defaultMode: v as any, preset: 'custom' })}
                             />
 
                             <SettingSelect
@@ -227,7 +226,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                                     { label: 'DROPDOWNS', value: 'dropdown' },
                                     { label: 'BUTTONS', value: 'buttons' }
                                 ]}
-                                onChange={(v) => saveSettings({ ...settings, filterStyle: v as any })}
+                                onChange={(v) => saveSettings({ ...settings, filterStyle: v as any, preset: 'custom' })}
                             />
 
                             <SettingSelect
@@ -238,7 +237,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                                     { label: 'PREMIUM (Aura)', value: 'premium' },
                                     { label: 'CLASSIC (Standard)', value: 'classic' }
                                 ]}
-                                onChange={(v) => saveSettings({ ...settings, wordingPreference: v as any })}
+                                onChange={(v) => saveSettings({ ...settings, wordingPreference: v as any, preset: 'custom' })}
                             />
 
                             <SettingToggle
@@ -264,7 +263,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                                     { label: 'FANCY (Replica)', value: 'fancy' },
                                     { label: 'NORMAL (Doc)', value: 'normal' }
                                 ]}
-                                onChange={(v) => saveSettings({ ...settings, exportDayStyle: v as any })}
+                                onChange={(v) => saveSettings({ ...settings, exportDayStyle: v as any, preset: 'custom' })}
                             />
 
                             <SettingToggle

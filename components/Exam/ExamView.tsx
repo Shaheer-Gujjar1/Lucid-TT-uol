@@ -390,7 +390,7 @@ export default function ExamView({ view, onViewChange, filters, onDatesAvailable
                                 className={`py-3 px-6 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest transition-colors duration-300 flex items-center justify-center gap-2 transform active:scale-95 ${view === 'datesheet' ? 'text-white' : 'text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400'}`}
                             >
                                 <i className="fas fa-calendar-alt text-sm"></i>
-                                <span>{isClassic ? 'Schedule' : 'Timeline'}</span>
+                                <span>{isClassic ? 'Datesheet' : 'Timeline'}</span>
                             </button>
                             <button
                                 onClick={() => onViewChange('seating')}

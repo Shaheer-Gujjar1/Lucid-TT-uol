@@ -17,27 +17,28 @@ export interface AppSettings {
     wordingPreference: 'premium' | 'classic';
     exportDayStyle: 'fancy' | 'normal';
     filterStyle: 'dropdown' | 'buttons';
+    preset?: 'austere' | 'harmonized' | 'opulent' | 'custom';
 }
 
 export const AUSTERE_CONFIG: AppSettings = {
     enableGPA: false, enableEvents: false, enableOnlineIndicator: false, enableAuraAI: false, enableAppInfo: false,
     defaultMode: 'student', enableCourseSearch: false, notificationStrategy: 'none', enableRoomMode: false,
     enableCrucible: false, enableWeekView: false, wordingPreference: 'classic', exportDayStyle: 'fancy',
-    filterStyle: 'dropdown',
+    filterStyle: 'dropdown', preset: 'austere',
 };
 
 export const HARMONIZED_CONFIG: AppSettings = {
-    enableGPA: false, enableEvents: false, enableOnlineIndicator: true, enableAuraAI: false, enableAppInfo: true,
+    enableGPA: true, enableEvents: false, enableOnlineIndicator: true, enableAuraAI: false, enableAppInfo: true,
     defaultMode: 'student', enableCourseSearch: false, notificationStrategy: 'after_free', enableRoomMode: true,
     enableCrucible: false, enableWeekView: false, wordingPreference: 'premium', exportDayStyle: 'fancy',
-    filterStyle: 'dropdown',
+    filterStyle: 'dropdown', preset: 'harmonized',
 };
 
 export const OPULENT_CONFIG: AppSettings = {
     enableGPA: true, enableEvents: true, enableOnlineIndicator: true, enableAuraAI: true, enableAppInfo: true,
     defaultMode: 'student', enableCourseSearch: true, notificationStrategy: 'after_free_and_events', enableRoomMode: true,
-    enableCrucible: true, enableWeekView: false, wordingPreference: 'premium', exportDayStyle: 'fancy',
-    filterStyle: 'dropdown',
+    enableCrucible: true, enableWeekView: true, wordingPreference: 'premium', exportDayStyle: 'fancy',
+    filterStyle: 'dropdown', preset: 'opulent',
 };
 
 const defaultSettings: AppSettings = HARMONIZED_CONFIG;
