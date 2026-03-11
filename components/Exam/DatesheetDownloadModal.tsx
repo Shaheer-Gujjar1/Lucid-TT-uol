@@ -135,7 +135,7 @@ function InlineDatesheetPrintView({ data, filters, generatedAt }: { data: Datesh
                     <h1 style={styles.title}>
                         Lucid <span style={{ color: '#7c3aed' }}>Datesheet</span>
                     </h1>
-                    <p style={styles.subtitle}>Generated via Lucid Aura∞ v6.13.6</p>
+                    <p style={styles.subtitle}>Generated via Lucid Aura∞ v6.13.8</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                     <div style={styles.dateText}>{generatedAt.split(',')[0]}</div>

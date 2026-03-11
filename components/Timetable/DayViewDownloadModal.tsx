@@ -102,7 +102,7 @@ function InlineDayPrintView({ day, slots, mode, filters, generatedAt }: { day: s
             <div style={s.headerBlock}>
                 <div style={s.titleBox}>
                     <h1 style={s.title}>Lucid <span style={s.titleHighlight}>Chronicle</span></h1>
-                    <div style={s.subtitle}>Generated via Lucid Aura∞ v6.13.6</div>
+                    <div style={s.subtitle}>Generated via Lucid Aura∞ v6.13.8</div>
                 </div>
                 <div style={s.infoBox}>
                     <div style={s.selectionBig}>{selectionInfo || 'FULL SCHEDULE'}</div>

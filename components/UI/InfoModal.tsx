@@ -93,12 +93,12 @@ export default function InfoModal({ isOpen, onClose, initialTab }: InfoModalProp
                         <div className="space-y-6 animate-fade-in">
                             <div className="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/30 text-center">
                                 <p className="text-sm font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    <span className="font-bold text-indigo-600 dark:text-indigo-400">Lucid Aura∞ v6.13.6</span> is the premier academic utility for UOL. It integrates dynamic timetables, intelligent planning, and performance analytics into one high-performance interface.
+                                    <span className="font-bold text-indigo-600 dark:text-indigo-400">Lucid Aura∞ v6.13.8</span> is the premier academic utility for UOL. It integrates dynamic timetables, intelligent planning, and performance analytics into one high-performance interface.
                                 </p>
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
-                                <StatCard label="Version" value="6.13.6" icon="fa-code-branch" />
+                                <StatCard label="Version" value="6.13.8" icon="fa-code-branch" />
                                 <StatCard label="Release" value="SEPT 2025" icon="fa-calendar-check" />
                             </div>
 
