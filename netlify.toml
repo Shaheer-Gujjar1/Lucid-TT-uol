@@ -5,3 +5,6 @@
 [build.environment]
   # Whitelist the Sheet ID as it's not a true secret in this context (it's a public resource ID)
   SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_GOOGLE_SHEETS_ID"
+
+[functions]
+  included_files = ["public/datesheet.xlsx"]
